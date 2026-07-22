@@ -1565,6 +1565,11 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <p>سيتم تحميل خطتك الدراسية الكاملة تلقائياً</p>
   </div>
   <input class="srch" type="text" id="spec-srch" placeholder="🔍 ابحث عن تخصص..." oninput="renderSpecs()" style="max-width:420px;margin:0 auto 18px;display:block">
+  <div style="max-width:640px;margin:0 auto 16px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;">
+    <select id="specexp-college" style="padding:10px 12px;border-radius:11px;border:1px solid var(--bor,#28303a);background:var(--s2,#1a1f25);color:var(--t,#eef2f5);font-family:inherit;min-width:180px;"></select>
+    <button onclick="exportSpecsPlans()" style="padding:10px 16px;border-radius:11px;border:none;background:var(--grad,linear-gradient(135deg,#5b8cff,#8a63ff));color:#05060d;font-weight:800;cursor:pointer;">🖼️ صوّر خطط التخصصات</button>
+    <button onclick="exportSpecsPoster()" style="padding:10px 16px;border-radius:11px;border:1px solid var(--bor,#28303a);background:var(--s2,#1a1f25);color:var(--t,#eef2f5);font-weight:800;cursor:pointer;">🎨 بوستر كل التخصصات</button>
+  </div>
   <div id="spec-content"></div>
 </div>
 
@@ -2202,6 +2207,7 @@ default:`<circle cx='16' cy='16' r='11'/><path d='M16 11v10M11 16h10'/>`,
 const SPEC_ICON_MAP={'engl':'lang','chem':'chem','phys':'energy','biol':'bio','math':'math','sp12':'atom','sp13':'geo','cs':'cs','ai':'ai','is':'db','coe':'chip','cyb':'shield','ds':'chart','sp1':'factory','sp2':'building','sp3':'bolt','tu4':'gear','comm':'signal','civil':'crane','sp4':'heart','sp5':'pill','sp6':'limb','sp7':'puzzle','sp8':'body','tu14':'lungs','tu16':'ear','sp9':'micro','sp10':'scan','sp11':'nutrition','tu1':'dress','tu2':'sofa','tu3':'needle','tu22':'pen','tu23':'palette','tu5':'book','tu6':'media','tu7':'amphora','tu9':'mappin','tu10':'books','tu12':'geography','tu17':'news','tu18':'mosque','tu24':'quran','tu25':'compass','tu26':'book','tu8':'briefcase','tu11':'megaphone','tu15':'finance','tu20':'people','mis_md':'grid','acct':'calc','tu13':'teddy','tu21':'run','tu19':'scale','med1':'med'};
 function specIcon(id){var k=(SPEC_ICON_MAP[id]||'default');var pp=SPEC_ICONS[k]||SPEC_ICONS['default'];return '<svg viewBox=\'0 0 32 32\' aria-hidden=\'true\'>'+pp+'</svg>';}
 function renderSpecs(){
+  try{specExpFill();}catch(e){}
   const q=(document.getElementById('spec-srch')?.value||'').trim().toLowerCase();
   let h='';
   SPECS.forEach(col=>{
@@ -2539,6 +2545,50 @@ function savePlanImage(){
     try{document.body.removeChild(shot);}catch(e){}
   }).catch(function(e){try{document.body.removeChild(shot);}catch(_){}toast('تعذّر إنشاء الصورة، حاول مرة ثانية');});
 }
+var SPECEXP_HUE=['#5b8cff','#8a63ff','#39d0ff','#2ed47a','#f5c030','#ff7a9c','#f5894a','#4ad0c0','#b06bff','#5bd0ff'];
+function specExpHx(h){h=h.replace('#','');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+function specExpRgba(h,al){var c=specExpHx(h);return 'rgba('+c[0]+','+c[1]+','+c[2]+','+al+')';}
+function specExpFill(){var sel=document.getElementById('specexp-college');if(!sel||sel.options.length)return;var h='<option value="__all__">🌍 كل الكليات</option>';SPECS.forEach(function(c,i){h+='<option value="'+i+'">'+c.college+'</option>';});sel.innerHTML=h;}
+function specExpBlock(spec,collegeName){
+  var cols=spec.levels.map(function(lv){
+    var hue=SPECEXP_HUE[(lv.level-1)%SPECEXP_HUE.length];var lvH=0;
+    var chips=lv.courses.map(function(c){lvH+=(+c.hrs||0);return '<div style="background:'+specExpRgba(hue,0.13)+';border:1px solid #28303a;border-inline-start:3px solid '+hue+';border-radius:10px;padding:8px 10px;margin-bottom:7px;"><div style="font-size:11.5px;font-weight:500;color:#eef2f5;line-height:1.35;margin-bottom:5px;">'+esc(c.name)+'</div><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><span style="font-size:9px;color:#5f6b76;">'+esc(c.code)+'</span><span style="font-size:9px;color:#5f6b76">'+(+c.hrs||0)+' س</span></div></div>';}).join('');
+    return '<div style="flex:0 0 186px;width:186px;background:#1a1f25;border:1px solid #28303a;border-radius:16px;overflow:hidden;"><div style="display:flex;align-items:center;gap:8px;padding:11px 12px;border-bottom:1px solid #28303a;background:linear-gradient(135deg,'+specExpRgba(hue,0.30)+','+specExpRgba(hue,0.07)+');"><span style="width:30px;height:30px;flex-shrink:0;background:'+hue+';border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">'+lv.level+'</span><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:#eef2f5;">المستوى '+lv.level+'</div><div style="font-size:9px;color:#5f6b76;margin-top:1px;">'+lv.courses.length+' مواد · '+lvH+' ساعة</div></div></div><div style="padding:11px 12px 13px;">'+chips+'</div></div>';
+  }).join('');
+  var tot=0,cn=0;spec.levels.forEach(function(l){l.courses.forEach(function(c){tot+=(+c.hrs||0);cn++;});});
+  var head='<div style="display:flex;align-items:center;gap:12px;margin:0 0 12px;"><span style="font-size:30px;line-height:1;">'+(spec.icon||'📘')+'</span><div><div style="font-weight:900;font-size:20px;color:#eef2f5;">'+esc(spec.name)+'</div><div style="font-size:12px;color:#9aa6b0;margin-top:2px;">'+esc(collegeName)+' · '+spec.levels.length+' مستوى · '+cn+' مادة · '+tot+' ساعة</div></div></div>';
+  return '<div style="margin-bottom:30px;">'+head+'<div style="display:flex;flex-direction:row;gap:12px;align-items:flex-start;flex-wrap:nowrap;">'+cols+'</div></div>';
+}
+function specExpShow(canvas,fname){var url=canvas.toDataURL('image/png');var img=document.getElementById('pim-img');if(img)img.src=url;var dl=document.getElementById('pim-dl');if(dl){dl.href=url;dl.download=fname;}var m=document.getElementById('plan-img-modal');if(m)m.classList.add('on');}
+function exportSpecsPlans(){
+  if(typeof html2canvas==='undefined'){toast('جاري تحميل الأداة... حاول بعد لحظة');return;}
+  var sel=document.getElementById('specexp-college');var val=sel?sel.value:'__all__';
+  var list=[];SPECS.forEach(function(c,i){if(val==='__all__'||(''+i)===(''+val)){c.entries.forEach(function(sp){list.push({college:c.college,spec:sp});});}});
+  if(!list.length){toast('لا يوجد تخصصات');return;}
+  toast('جاري تجهيز الصورة... قد تأخذ لحظات');
+  var title=val==='__all__'?'كل التخصصات':(SPECS[+val]?SPECS[+val].college:'');
+  var head='<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:20px;"><div style="font-weight:900;font-size:26px;color:#eef2f5;">🗺️ خطط '+esc(title)+'</div><div style="font-size:14px;color:#9aa6b0;">'+list.length+' تخصص</div></div>';
+  var footer='<div style="margin-top:8px;padding-top:14px;border-top:1px solid #28303a;text-align:center;"><div style="font-size:12px;color:#eef2f5;font-weight:800;">طيبة أكاديمي · TU Academic</div><div style="font-size:11px;color:#5f6b76;margin-top:3px;">taibahu-academic.com — جميع الحقوق محفوظة</div></div>';
+  var body=list.map(function(x){return specExpBlock(x.spec,x.college);}).join('');
+  var shot=document.createElement('div');
+  shot.style.cssText='position:fixed;left:-100000px;top:0;padding:28px;background:#0e1114;font-family:Tajawal,system-ui,sans-serif;direction:rtl;display:inline-block;box-sizing:border-box;';
+  shot.innerHTML=head+body+footer;document.body.appendChild(shot);
+  var sc=list.length>30?1:(list.length>8?1.4:2);
+  html2canvas(shot,{scale:sc,backgroundColor:'#0e1114',useCORS:true,logging:false}).then(function(canvas){specExpShow(canvas,'TU-Academic-Plans-'+(val==='__all__'?'all':'college')+'.png');try{document.body.removeChild(shot);}catch(e){}}).catch(function(e){try{document.body.removeChild(shot);}catch(_){}toast('تعذّر إنشاء الصورة، جرّب كلية واحدة');});
+}
+function exportSpecsPoster(){
+  if(typeof html2canvas==='undefined'){toast('جاري تحميل الأداة... حاول بعد لحظة');return;}
+  var cards='';var n=0;
+  SPECS.forEach(function(c){c.entries.forEach(function(sp){var hue=SPECEXP_HUE[n%SPECEXP_HUE.length];n++;var tot=0,cn=0;sp.levels.forEach(function(l){l.courses.forEach(function(cc){tot+=(+cc.hrs||0);cn++;});});cards+='<div style="width:200px;background:#1a1f25;border:1px solid #28303a;border-inline-start:4px solid '+hue+';border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;"><div style="display:flex;align-items:center;gap:10px;"><span style="width:44px;height:44px;flex-shrink:0;background:'+specExpRgba(hue,0.18)+';border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;">'+(sp.icon||'📘')+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:#eef2f5;line-height:1.3;">'+esc(sp.name)+'</div></div></div><div style="font-size:11px;color:#9aa6b0;">'+esc(c.college)+'</div><div style="font-size:11px;color:#5f6b76;">'+sp.levels.length+' مستوى · '+cn+' مادة · '+tot+' ساعة</div></div>';});});
+  toast('جاري تجهيز البوستر...');
+  var head='<div style="text-align:center;margin-bottom:22px;"><div style="font-weight:900;font-size:30px;color:#eef2f5;">🎓 تخصصات جامعة طيبة</div><div style="font-size:14px;color:#9aa6b0;margin-top:6px;">'+n+' تخصص · '+SPECS.length+' كلية</div></div>';
+  var footer='<div style="margin-top:22px;padding-top:14px;border-top:1px solid #28303a;text-align:center;"><div style="font-size:13px;color:#eef2f5;font-weight:800;">طيبة أكاديمي · TU Academic</div><div style="font-size:11px;color:#5f6b76;margin-top:3px;">taibahu-academic.com — جميع الحقوق محفوظة</div></div>';
+  var shot=document.createElement('div');
+  shot.style.cssText='position:fixed;left:-100000px;top:0;width:1180px;padding:34px;background:#0e1114;font-family:Tajawal,system-ui,sans-serif;direction:rtl;box-sizing:border-box;';
+  shot.innerHTML=head+'<div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">'+cards+'</div>'+footer;document.body.appendChild(shot);
+  html2canvas(shot,{scale:2,backgroundColor:'#0e1114',useCORS:true,logging:false}).then(function(canvas){specExpShow(canvas,'TU-Academic-Specialties.png');try{document.body.removeChild(shot);}catch(e){}}).catch(function(e){try{document.body.removeChild(shot);}catch(_){}toast('تعذّر إنشاء الصورة');});
+}
+
 function closePlanImg(e){ if(e&&e.target&&e.target.id!=='plan-img-modal')return; var m=document.getElementById('plan-img-modal');if(m)m.classList.remove('on'); }
 function savePlan(){if(planData&&planData.specId){planStore[planData.specId]=planData;try{localStorage.setItem('tu_pro_plans',JSON.stringify(planStore));}catch(e){}}localStorage.setItem('tu_pro_plan',JSON.stringify(planData));}
 function pickAvatar(){var i=document.getElementById('avatar-file');if(i){i.value='';i.click();}}
