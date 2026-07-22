@@ -1915,35 +1915,66 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <!-- DEVELOPER / ADMIN -->
     <div class="tab-pane" id="p-admin">
       <div class="card" id="dev-panel-card">
-        <div class="card-h">🛠️ لوحة المطور — تخصيص الموقع</div>
-        <div style="display:flex;flex-direction:column;gap:16px;padding:4px 2px">
+        <div class="card-h">🛠️ لوحة المطوّر — تحكّم كامل بالموقع</div>
+        <div style="font-size:.82rem;color:var(--t3);margin-bottom:14px;line-height:1.7">التغييرات تظهر لك فورًا كمعاينة. اضغط <b>🌍 نشر للجميع</b> لتطبّقها على كل الزوار.</div>
+        <div style="display:flex;flex-direction:column;gap:20px">
           <div>
-            <div style="font-weight:700;margin-bottom:8px">🎨 اللون الأساسي</div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"><button onclick="devSetAccent('#f5c030')" title="أصفر" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f5c030;cursor:pointer"></button><button onclick="devSetAccent('#f5823a')" title="برتقالي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f5823a;cursor:pointer"></button><button onclick="devSetAccent('#f5504a')" title="أحمر" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f5504a;cursor:pointer"></button><button onclick="devSetAccent('#f55bb5')" title="وردي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f55bb5;cursor:pointer"></button><button onclick="devSetAccent('#a78bfa')" title="بنفسجي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#a78bfa;cursor:pointer"></button><button onclick="devSetAccent('#5b8cff')" title="أزرق" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#5b8cff;cursor:pointer"></button><button onclick="devSetAccent('#22d3ee')" title="سماوي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#22d3ee;cursor:pointer"></button><button onclick="devSetAccent('#34d399')" title="أخضر" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#34d399;cursor:pointer"></button><button onclick="devSetAccent('#eef2f5')" title="أبيض" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#eef2f5;cursor:pointer"></button></div>
-            <label style="font-size:.85rem;color:var(--t2)">لون مخصّص: </label>
-            <input type="color" id="dev-accent" onchange="devSetAccent(this.value)" style="width:52px;height:34px;border:none;background:none;cursor:pointer;vertical-align:middle">
+            <div style="font-weight:800;margin-bottom:10px">✍️ الهوية</div>
+            <label style="font-size:.8rem;color:var(--t2)">اسم الموقع</label>
+            <input type="text" id="scfg-brand" oninput="scfgSet('brand',this.value)" placeholder="طيبة أكاديمي" style="width:100%;margin:6px 0 0;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t)">
           </div>
           <div>
-            <div style="font-weight:700;margin-bottom:8px">🌑 لون الخلفية</div>
-            <input type="color" id="dev-bg" onchange="devSetBg(this.value)" style="width:52px;height:34px;border:none;background:none;cursor:pointer">
+            <div style="font-weight:800;margin-bottom:10px">🎨 الألوان</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"><button onclick="scfgSet('accent','#eef2f5')" title="أبيض" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#eef2f5;cursor:pointer"></button><button onclick="scfgSet('accent','#f5c030')" title="أصفر" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f5c030;cursor:pointer"></button><button onclick="scfgSet('accent','#f5823a')" title="برتقالي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f5823a;cursor:pointer"></button><button onclick="scfgSet('accent','#f5504a')" title="أحمر" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f5504a;cursor:pointer"></button><button onclick="scfgSet('accent','#f55bb5')" title="وردي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#f55bb5;cursor:pointer"></button><button onclick="scfgSet('accent','#a78bfa')" title="بنفسجي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#a78bfa;cursor:pointer"></button><button onclick="scfgSet('accent','#5b8cff')" title="أزرق" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#5b8cff;cursor:pointer"></button><button onclick="scfgSet('accent','#22d3ee')" title="سماوي" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#22d3ee;cursor:pointer"></button><button onclick="scfgSet('accent','#34d399')" title="أخضر" style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:#34d399;cursor:pointer"></button></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <label style="font-size:.8rem;color:var(--t2)">الأساسي<br><input type="color" id="scfg-accent" onchange="scfgSet('accent',this.value)" style="width:100%;height:34px;border:none;background:none"></label>
+              <label style="font-size:.8rem;color:var(--t2)">الثانوي<br><input type="color" id="scfg-accent2" onchange="scfgSet('accent2',this.value)" style="width:100%;height:34px;border:none;background:none"></label>
+              <label style="font-size:.8rem;color:var(--t2)">الخلفية<br><input type="color" id="scfg-bg" onchange="scfgSet('bg',this.value)" style="width:100%;height:34px;border:none;background:none"></label>
+              <label style="font-size:.8rem;color:var(--t2)">النص<br><input type="color" id="scfg-text" onchange="scfgSet('text',this.value)" style="width:100%;height:34px;border:none;background:none"></label>
+            </div>
           </div>
           <div>
-            <div style="font-weight:700;margin-bottom:8px">✍️ اسم الموقع</div>
-            <input type="text" id="dev-title" oninput="devSetTitle(this.value)" placeholder="طيبة أكاديمي" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t)">
+            <div style="font-weight:800;margin-bottom:10px">🔠 الخط والشكل</div>
+            <label style="font-size:.8rem;color:var(--t2)">حجم الخط (<span id="scfg-fs-val">100</span>%)</label>
+            <input type="range" id="scfg-fs" min="80" max="130" value="100" oninput="scfgSet('fontScale',this.value)" style="width:100%;margin:6px 0 14px">
+            <label style="font-size:.8rem;color:var(--t2)">نوع الخط</label>
+            <select id="scfg-ff" onchange="scfgSet('fontFamily',this.value)" style="width:100%;margin:6px 0 14px;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t)">
+              <option value="Tajawal">Tajawal (افتراضي)</option>
+              <option value="system">النظام</option>
+              <option value="serif">Serif</option>
+              <option value="mono">Monospace</option>
+            </select>
+            <label style="font-size:.8rem;color:var(--t2)">استدارة الحواف (<span id="scfg-radius-val">18</span>px)</label>
+            <input type="range" id="scfg-radius" min="0" max="30" value="18" oninput="scfgSet('radius',this.value)" style="width:100%;margin:6px 0">
           </div>
           <div>
-            <div style="font-weight:700;margin-bottom:8px">🔠 حجم الخط (<span id="dev-fs-val">100</span>%)</div>
-            <input type="range" id="dev-fs" min="85" max="125" value="100" oninput="devSetFont(this.value)" style="width:100%">
+            <div style="font-weight:800;margin-bottom:10px">📢 شريط إعلان</div>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox" id="scfg-ann-on" onchange="scfgSetIn('announce','on',this.checked)"> تفعيل الشريط</label>
+            <input type="text" id="scfg-ann-text" oninput="scfgSetIn('announce','text',this.value)" placeholder="نص الإعلان..." style="width:100%;margin-bottom:8px;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t)">
+            <label style="font-size:.8rem;color:var(--t2)">لون الشريط <input type="color" id="scfg-ann-color" onchange="scfgSetIn('announce','color',this.value)" style="height:32px;border:none;background:none;vertical-align:middle"></label>
           </div>
           <div>
-            <div style="font-weight:700;margin-bottom:8px">💻 CSS مخصّص (للمتقدّمين)</div>
-            <textarea id="dev-css" oninput="devSetCss(this.value)" rows="4" placeholder=".nav-logo{color:gold}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);font-family:monospace;font-size:.85rem"></textarea>
+            <div style="font-weight:800;margin-bottom:10px">🚧 وضع الصيانة</div>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox" id="scfg-maint-on" onchange="scfgSetIn('maintenance','on',this.checked)"> إغلاق الموقع للزوار (يبقى مفتوحًا لك)</label>
+            <input type="text" id="scfg-maint-text" oninput="scfgSetIn('maintenance','text',this.value)" placeholder="رسالة الصيانة..." style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t)">
+          </div>
+          <div>
+            <div style="font-weight:800;margin-bottom:10px">🗂️ إظهار/إخفاء التبويبات</div>
+            <div id="scfg-tabs" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+          </div>
+          <div>
+            <div style="font-weight:800;margin-bottom:10px">🔗 روابط التواصل</div>
+            <input type="text" id="scfg-tg" oninput="scfgSet('telegram',this.value)" placeholder="رابط تيليجرام" style="width:100%;margin-bottom:8px;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t)">
+            <input type="text" id="scfg-tw" oninput="scfgSet('twitter',this.value)" placeholder="رابط X / تويتر" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t)">
+          </div>
+          <div>
+            <div style="font-weight:800;margin-bottom:10px">💻 CSS مخصّص (عام)</div>
+            <textarea id="scfg-css" oninput="scfgSet('css',this.value)" rows="5" placeholder=".nav-logo{color:gold}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);font-family:monospace;font-size:.85rem"></textarea>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button onclick="devSave()" style="flex:1;min-width:130px;padding:12px;border-radius:10px;border:none;background:var(--grad);color:#05060d;font-weight:700;cursor:pointer">💾 حفظ الإعدادات</button>
-            <button onclick="devReset()" style="flex:1;min-width:130px;padding:12px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);font-weight:700;cursor:pointer">↩️ استعادة الافتراضي</button>
+            <button onclick="scfgPublish()" style="flex:1;min-width:150px;padding:13px;border-radius:10px;border:none;background:var(--grad);color:#05060d;font-weight:800;cursor:pointer">🌍 نشر للجميع</button>
+            <button onclick="scfgResetAll()" style="flex:1;min-width:150px;padding:13px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);font-weight:800;cursor:pointer">↩️ استعادة الافتراضي</button>
           </div>
-          <div style="font-size:.8rem;color:var(--t3)">🛠️ التغييرات تُطبّق فورًا وتُحفظ في متصفّحك على هذا الجهاز.</div>
         </div>
       </div>
 
@@ -3305,6 +3336,7 @@ function authBootEntry(){
   goAuthScreen('loading');
   if(typeof supabase==='undefined' || !supabase || !supabase.createClient){ routeLocal(); return; }
   try{ sbClient=supabase.createClient(SB_URL, SB_KEY); }catch(e){ routeLocal(); return; }
+  try{ scfgLoad(); }catch(e){}
   try{ sbClient.auth.onAuthStateChange(function(ev,sess){ if(ev==='PASSWORD_RECOVERY'){ promptNewPassword(); } }); }catch(e){}
   authBoot();
 }
@@ -3406,7 +3438,7 @@ if(document.readyState!=='loading')lpInit();else document.addEventListener('DOMC
     setTimeout(function(){els.forEach(function(el){el.classList.add('in');});},2200);
   }
   function lpProg(){try{var st=window.pageYOffset||document.documentElement.scrollTop||0;var h=(document.documentElement.scrollHeight-document.documentElement.clientHeight)||0;var p=h>0?(st/h*100):0;var el=document.getElementById('lp-progress'); if(el)el.style.width=p+'%';}catch(e){}}
-  function boot(){demoInit();reveal();lpProg();try{devApply(devCfg());}catch(_){}}
+  function boot(){demoInit();reveal();lpProg();}
   if(document.readyState!=='loading')boot();else document.addEventListener('DOMContentLoaded',boot);
   window.addEventListener('scroll',lpProg,{passive:true});
   window.addEventListener('resize',lpProg,{passive:true});
@@ -3697,7 +3729,7 @@ async function checkAdminStatus(){
     IS_ADMIN=!!(r&&r.data&&r.data.is_admin);
   }catch(e){ IS_ADMIN=false; }
   var btn=document.getElementById('admin-tab-btn'); if(btn) btn.style.display=IS_ADMIN?'':'none';
-  if(IS_ADMIN) subscribeReviewAlerts();
+  if(IS_ADMIN) subscribeReviewAlerts(); try{scfgApply(SITE_CFG);}catch(e){}
 }
 function onReviewsTab(){ loadMyReviews(); }
 function openMaterialsModal(lv,id){
@@ -3818,33 +3850,45 @@ async function loadMyReviews(){
   }catch(e){ wrap.innerHTML='<div class="peers-loading">⚠️ تعذّر الاتصال</div>'; }
 }
 
-var DEV_KEY='tu_dev_cfg';
-function devCfg(){try{return JSON.parse(localStorage.getItem(DEV_KEY)||'{}');}catch(_){return{};}}
-function devApply(c){c=c||{};var r=document.documentElement;
- if(c.accent){['--a1','--a2','--a3','--grad','--g'].forEach(function(v){r.style.setProperty(v,c.accent,'important');});}
+var SITE_CFG={};
+var SCFG_TABS=[['plan','الخطة'],['roadmap','الخريطة'],['gen','المولّد'],['chart','الإحصائيات'],['pomo','بومودورو'],['target','التخرج'],['goals','الأهداف'],['schedule','الجدول'],['peers','الزملاء'],['compare','المقارنة'],['countdown','العدّاد'],['settings','الإعدادات']];
+var SCFG_FF={Tajawal:"'Tajawal',sans-serif",system:"system-ui,-apple-system,'Segoe UI',sans-serif",serif:"'Georgia','Times New Roman',serif",mono:"'Courier New',monospace"};
+function scfgApply(c){
+ c=c||{}; var r=document.documentElement;
+ if(c.accent){['--a1','--a2','--grad','--g'].forEach(function(v){r.style.setProperty(v,c.accent,'important');});}
+ if(c.accent2){r.style.setProperty('--a3',c.accent2,'important');}
  if(c.bg){r.style.setProperty('--bg',c.bg,'important');if(document.body){document.body.style.background=c.bg;}}
- if(c.fs){r.style.fontSize=c.fs+'%';var fv=document.getElementById('dev-fs-val');if(fv){fv.textContent=c.fs;}}
- if(c.title){var t=(''+c.title).trim();if(t){var ls=document.querySelectorAll('.nav-logo');for(var i=0;i<ls.length;i++){if(ls[i].children.length===0){ls[i].textContent=t;}}document.title=t;}}
- if('css' in c){var st=document.getElementById('dev-custom-css');if(!st){st=document.createElement('style');st.id='dev-custom-css';document.head.appendChild(st);}st.textContent=c.css||'';}
+ if(c.text){r.style.setProperty('--t',c.text,'important');}
+ if(c.fontScale){r.style.fontSize=c.fontScale+'%';}
+ if(c.fontFamily&&SCFG_FF[c.fontFamily]&&document.body){document.body.style.fontFamily=SCFG_FF[c.fontFamily];}
+ if(c.radius!=null&&c.radius!==''){r.style.setProperty('--ra',c.radius+'px');}
+ if(c.brand){var t=(''+c.brand).trim();if(t){var ls=document.querySelectorAll('.nav-logo');for(var i=0;i<ls.length;i++){if(ls[i].children.length===0){ls[i].textContent=t;}}document.title=t;}}
+ var st=document.getElementById('site-custom-css');if(!st){st=document.createElement('style');st.id='site-custom-css';document.head.appendChild(st);}st.textContent=c.css||'';
+ if(c.telegram){var tg=document.querySelectorAll('a[href*="t.me"]');for(var i=0;i<tg.length;i++){tg[i].href=c.telegram;}}
+ if(c.twitter){var tw=document.querySelectorAll('a[href*="x.com"],a[href*="twitter.com"]');for(var i=0;i<tw.length;i++){tw[i].href=c.twitter;}}
+ var hid=c.hiddenTabs||[];var btns=document.querySelectorAll('.tab-item');for(var i=0;i<btns.length;i++){var oc=btns[i].getAttribute('onclick')||'';var mm=oc.match(/goTab\('([^']+)'/);if(mm){var id=mm[1];if(id==='admin'||id==='home')continue;btns[i].style.display=(hid.indexOf(id)>=0)?'none':'';}}
+ var ab=document.getElementById('site-announce');var an=c.announce||{};
+ if(an.on&&an.text){if(!ab){ab=document.createElement('div');ab.id='site-announce';ab.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9000;padding:9px 14px;text-align:center;font-weight:800;font-size:.85rem;color:#05060d;box-shadow:0 2px 10px rgba(0,0,0,.4)';document.body.appendChild(ab);}ab.style.background=an.color||'#f5c030';ab.textContent=an.text;ab.style.display='block';}else if(ab){ab.style.display='none';}
+ var isAdm=(typeof IS_ADMIN!=='undefined'&&IS_ADMIN);var mo=c.maintenance||{};var mel=document.getElementById('site-maint');
+ if(mo.on&&!isAdm){if(!mel){mel=document.createElement('div');mel.id='site-maint';mel.style.cssText='position:fixed;inset:0;z-index:99999;background:#05060d;color:#eef2f5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:Tajawal,sans-serif';document.body.appendChild(mel);}var mtxt=(mo.text||'الموقع تحت الصيانة، نعود قريبًا').replace(/</g,'&lt;');mel.innerHTML='<div style="font-size:3.2rem;margin-bottom:14px">🛠️</div><div style="font-size:1.35rem;font-weight:800;line-height:1.7;max-width:520px">'+mtxt+'</div>';mel.style.display='flex';}else if(mel){mel.style.display='none';}
 }
-function devSet(k,v){var c=devCfg();c[k]=v;localStorage.setItem(DEV_KEY,JSON.stringify(c));devApply(c);}
-function devSetAccent(v){devSet('accent',v);var a=document.getElementById('dev-accent');if(a){a.value=v;}}
-function devSetBg(v){devSet('bg',v);}
-function devSetTitle(v){devSet('title',v);}
-function devSetFont(v){devSet('fs',v);var fv=document.getElementById('dev-fs-val');if(fv){fv.textContent=v;}}
-function devSetCss(v){devSet('css',v);}
-function devSave(){try{toast('✅ تم حفظ إعدادات المطور');}catch(_){alert('✅ تم الحفظ');}}
-function devReset(){if(confirm('استعادة الإعدادات الافتراضية؟')){localStorage.removeItem(DEV_KEY);location.reload();}}
-function devInit(){var c=devCfg();devApply(c);
- var a=document.getElementById('dev-accent');if(a&&c.accent){a.value=c.accent;}
- var b=document.getElementById('dev-bg');if(b&&c.bg){b.value=c.bg;}
- var t=document.getElementById('dev-title');if(t){t.value=c.title||'';}
- var f=document.getElementById('dev-fs');if(f){f.value=c.fs||100;}
- var fv=document.getElementById('dev-fs-val');if(fv){fv.textContent=c.fs||100;}
- var cs=document.getElementById('dev-css');if(cs){cs.value=c.css||'';}
+function scfgSet(k,v){SITE_CFG[k]=v;scfgApply(SITE_CFG);}
+function scfgSetIn(g,k,v){SITE_CFG[g]=SITE_CFG[g]||{};SITE_CFG[g][k]=v;scfgApply(SITE_CFG);}
+function scfgToggleTab(id,on){SITE_CFG.hiddenTabs=SITE_CFG.hiddenTabs||[];var a=SITE_CFG.hiddenTabs;var idx=a.indexOf(id);if(on){if(idx>=0)a.splice(idx,1);}else{if(idx<0)a.push(id);}scfgApply(SITE_CFG);}
+async function scfgLoad(){try{if(sbClient){var r=await sbClient.from('site_config').select('config').eq('id',1).maybeSingle();if(r&&!r.error&&r.data&&r.data.config){SITE_CFG=r.data.config||{};}}}catch(e){}try{if(!SITE_CFG||!Object.keys(SITE_CFG).length){var ls=localStorage.getItem('tu_site_cfg');if(ls)SITE_CFG=JSON.parse(ls)||{};}}catch(e){}scfgApply(SITE_CFG);}
+async function scfgPublish(){try{localStorage.setItem('tu_site_cfg',JSON.stringify(SITE_CFG));}catch(e){}if(!sbClient){alert('لا يوجد اتصال بقاعدة البيانات');return;}if(typeof IS_ADMIN==='undefined'||!IS_ADMIN){alert('هذه الميزة للمطوّر فقط');return;}try{var r=await sbClient.from('site_config').upsert({id:1,config:SITE_CFG,updated_at:new Date().toISOString()},{onConflict:'id'});if(r&&r.error){alert('تعذّر النشر: '+r.error.message);return;}try{toast('🌍 تم النشر لجميع الزوار');}catch(_){alert('🌍 تم النشر لجميع الزوار');}}catch(e){alert('تعذّر النشر');}}
+async function scfgResetAll(){if(!confirm('استعادة كل الإعدادات الافتراضية للجميع؟'))return;SITE_CFG={};scfgApply(SITE_CFG);await scfgPublish();location.reload();}
+function scfgInitPanel(){var c=SITE_CFG||{};
+ function setv(id,v){var e=document.getElementById(id);if(e&&v!=null)e.value=v;}
+ setv('scfg-brand',c.brand||'');setv('scfg-accent',c.accent||'#eef2f5');setv('scfg-accent2',c.accent2||'#ffffff');setv('scfg-bg',c.bg||'#05060d');setv('scfg-text',c.text||'#eef2f5');
+ setv('scfg-fs',c.fontScale||100);var fv=document.getElementById('scfg-fs-val');if(fv)fv.textContent=(c.fontScale||100);
+ setv('scfg-ff',c.fontFamily||'Tajawal');setv('scfg-radius',c.radius!=null?c.radius:18);var rv=document.getElementById('scfg-radius-val');if(rv)rv.textContent=(c.radius!=null?c.radius:18);
+ setv('scfg-css',c.css||'');setv('scfg-tg',c.telegram||'');setv('scfg-tw',c.twitter||'');
+ var an=c.announce||{};var ao=document.getElementById('scfg-ann-on');if(ao)ao.checked=!!an.on;setv('scfg-ann-text',an.text||'');setv('scfg-ann-color',an.color||'#f5c030');
+ var mo=c.maintenance||{};var mm=document.getElementById('scfg-maint-on');if(mm)mm.checked=!!mo.on;setv('scfg-maint-text',mo.text||'');
+ var wrap=document.getElementById('scfg-tabs');if(wrap){wrap.innerHTML='';var hid=c.hiddenTabs||[];for(var i=0;i<SCFG_TABS.length;i++){(function(id,nm){var lab=document.createElement('label');lab.style.cssText='display:flex;align-items:center;gap:6px;font-size:.85rem;background:var(--s2);border:1px solid var(--bor);border-radius:8px;padding:6px 10px;cursor:pointer';var cb=document.createElement('input');cb.type='checkbox';cb.checked=hid.indexOf(id)<0;cb.addEventListener('change',function(){scfgToggleTab(id,cb.checked);});lab.appendChild(cb);lab.appendChild(document.createTextNode(nm));wrap.appendChild(lab);})(SCFG_TABS[i][0],SCFG_TABS[i][1]);}}
 }
-
-function onAdminTab(){ loadAdminReviews(); loadAdminMaterials(); loadAdminUsers(); try{devInit();}catch(_){} }
+function onAdminTab(){ loadAdminReviews(); loadAdminMaterials(); loadAdminUsers(); try{scfgInitPanel();}catch(_){} }
 async function setAdminReviewFilter(f){
   adminReviewFilter=f;
   document.querySelectorAll('#rev-tabs .adm-rv-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-f')===f); });
