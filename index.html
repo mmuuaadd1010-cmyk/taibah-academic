@@ -1669,6 +1669,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 
     <!-- PLAN -->
     <div class="tab-pane" id="p-plan">
+      <button onclick="saveGrades()" style="position:sticky;top:8px;z-index:8;width:100%;padding:13px;border-radius:12px;border:none;background:var(--grad);color:#fff;font-weight:800;cursor:pointer;font-size:.95rem;margin-bottom:12px;box-shadow:0 6px 20px rgba(0,0,0,.35)">💾 حفظ الدرجات</button>
       <input class="srch" type="text" id="srch-box" placeholder="🔍 ابحث عن مادة أو رمز..." oninput="renderPlan()">
       <div class="filter-row">
         <button class="fbtn on" onclick="setF('all',this)">الكل</button>
@@ -1677,7 +1678,6 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <button class="fbtn" onclick="setF('del',this)">🗑 محذوفة</button>
       </div>
       <div id="plan-cnt"></div>
-      <button class="fab" onclick="saveGrades()">💾 حفظ الدرجات</button>
     </div>
 
     <!-- ROADMAP / رؤية خطتي -->
