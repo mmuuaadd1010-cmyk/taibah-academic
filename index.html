@@ -1883,7 +1883,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     </div>
 
     <!-- SETTINGS -->
-    <div class="tab-pane" id="p-settings">
+    <div class="tab-pane" id="p-settings"><div class="set-card" id="set-support-card" style="display:none;text-align:center"></div>
       <div class="set-card">
         <h3>👤 معلومات الطالب</h3>
         <div class="set-avatar-row">
@@ -4421,6 +4421,8 @@ function scfgApply(c){
  var sd=c.support||{};var __surl=(sd.url!=null&&sd.url!=='')?sd.url:('https://'+'creators.sa/81chamber');var __son=(sd.on!==false);var __stt=sd.title||'ادعم المطور';var __smsg=(sd.msg!=null&&sd.msg!=='')?sd.msg:'إذا الموقع فادك وحاب تدعمني عشان أكمّل تطويره وأضيف تخصصات وميزات أكثر، دعمك — ولو بسيط — يفرق ويحفّزني كثير 💛 شكرًا إنك جزء من طيبة أكاديمي.';
  var sb=document.getElementById('site-support');
  if(__son&&__surl){if(!sb){sb=document.createElement('a');sb.id='site-support';sb.target='_blank';sb.rel='noopener';sb.style.cssText='position:fixed;bottom:22px;left:22px;z-index:8500;display:inline-flex;align-items:center;gap:6px;padding:11px 17px;border-radius:30px;background:linear-gradient(135deg,#ff9ec2,#ff3d7f);color:#fff;font-weight:800;font-size:.86rem;text-decoration:none;box-shadow:0 6px 20px rgba(255,61,127,.45);transition:transform .15s';sb.onmouseover=function(){this.style.transform='scale(1.06)'};sb.onmouseout=function(){this.style.transform='scale(1)'};document.body.appendChild(sb);}sb.href=__surl;sb.title=__smsg;sb.innerHTML='💛 '+__stt;sb.style.display='inline-flex';}else if(sb){sb.style.display='none';}
+ var scs=document.getElementById('set-support-card');
+ if(scs){if(__son&&__surl){scs.innerHTML='<h3>💛 '+__stt+'</h3><div style="font-size:.85rem;color:var(--t2);line-height:1.9;margin:8px 0 14px">'+(''+__smsg).replace(/</g,'&lt;')+'</div><a href="'+__surl+'" target="_blank" rel="noopener" style="display:inline-block;padding:11px 26px;border-radius:24px;background:linear-gradient(135deg,#ff9ec2,#ff3d7f);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(255,61,127,.4)">💛 '+__stt+'</a>';scs.style.display='block';}else{scs.style.display='none';}}
  var sc=document.getElementById('site-support-card');var __ft=document.querySelector('.lp-footer');
  if(__son&&__surl&&__ft){if(!sc){sc=document.createElement('div');sc.id='site-support-card';sc.style.cssText='max-width:520px;margin:18px auto 0;padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,rgba(255,158,194,.14),rgba(255,61,127,.10));border:1px solid rgba(255,61,127,.3);text-align:center';__ft.insertBefore(sc,__ft.firstChild);}sc.innerHTML='<div style="font-size:1.7rem;margin-bottom:6px">💛</div><div style="font-weight:800;font-size:1rem;color:var(--t);margin-bottom:6px">'+__stt+'</div><div style="font-size:.85rem;color:var(--t2);line-height:1.9;margin-bottom:13px">'+(''+__smsg).replace(/</g,'&lt;')+'</div><a href="'+__surl+'" target="_blank" rel="noopener" style="display:inline-block;padding:10px 24px;border-radius:24px;background:linear-gradient(135deg,#ff9ec2,#ff3d7f);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(255,61,127,.4)">💛 '+__stt+'</a>';sc.style.display='block';}else if(sc){sc.style.display='none';}
  // maintenance
