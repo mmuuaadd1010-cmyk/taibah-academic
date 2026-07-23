@@ -2771,13 +2771,37 @@ function scfgEdSave(){
 }
 
 function scfgEdAboutStatus(m,c){var e=document.getElementById('scfg-ed-about-status');if(e){e.innerHTML=m;e.style.color=c||'var(--t3)';}}
+function scfgEdSetAbout(f,v){if(!SCFG_ED||!SCFG_ED.spec)return;var a=SCFG_ED.spec.about;if(!a||typeof a!=='object')a=(typeof a==='string'&&a)?{intro:a}:{};a[f]=v;SCFG_ED.spec.about=a;}
+function scfgAboutField(a,f){if(!a)return '';if(typeof a==='string')return f==='intro'?a:'';if(typeof a==='object')return a[f]||'';return '';}
 function scfgEdAboutBox(){
  if(!SCFG_ED||!SCFG_ED.spec)return '';
- var sp=SCFG_ED.spec;
+ var sp=SCFG_ED.spec; var a=sp.about;
+ function fld(f){return scfgEdAttr(scfgAboutField(a,f));}
+ var inpCss='padding:8px;border-radius:8px;border:1px solid var(--bor);background:var(--s1,#0e1114);color:var(--t);width:100%;font-family:inherit;box-sizing:border-box';
+ var lblCss='font-size:.72rem;color:var(--t2);display:block;margin:8px 0 4px';
  var h='<div style="border:1px solid var(--bor);border-radius:10px;padding:10px 12px;margin-bottom:12px;background:var(--s2)">';
- h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px"><label style="font-size:.72rem;color:var(--t2)">\ud83d\udccb \u0646\u0628\u0630\u0629/\u0628\u0637\u0627\u0642\u0629 \u0627\u0644\u062a\u062e\u0635\u0635</label><button onclick="scfgEdGenAbout()" style="padding:5px 11px;border-radius:8px;border:1px solid var(--a1);background:transparent;color:var(--a1);font-size:.72rem;cursor:pointer;white-space:nowrap">\ud83e\udd16 \u062a\u0648\u0644\u064a\u062f \u0628\u0627\u0644\u0630\u0643\u0627\u0621</button></div>';
- h+='<textarea id="scfg-ed-about" oninput="scfgEdSetIntro(this.value)" rows="3" placeholder="\u0646\u0628\u0630\u0629 \u0642\u0635\u064a\u0631\u0629 \u0639\u0646 \u0627\u0644\u062a\u062e\u0635\u0635\u060c \u0645\u062c\u0627\u0644\u0627\u062a \u0627\u0644\u0639\u0645\u0644\u060c \u0623\u0628\u0631\u0632 \u0627\u0644\u0645\u0648\u0627\u062f..." style="padding:8px;border-radius:8px;border:1px solid var(--bor);background:var(--s1,#0e1114);color:var(--t);width:100%;font-family:inherit;resize:vertical">'+scfgEdAttr(scfgAboutIntro(sp.about))+'</textarea>';
- h+='<div id="scfg-ed-about-status" style="font-size:.72rem;margin-top:6px;color:var(--t3);line-height:1.6"></div></div>';
+ h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px"><label style="font-size:.72rem;color:var(--t2)">📋 البطاقة التعريفية للتخصص</label><button onclick="scfgEdGenAbout()" style="padding:5px 11px;border-radius:8px;border:1px solid var(--a1);background:transparent;color:var(--a1);font-size:.72rem;cursor:pointer;white-space:nowrap">🤖 توليد بالذكاء</button></div>';
+ h+='<div style="font-size:.68rem;color:var(--t3);margin-bottom:6px;line-height:1.6">عدّل أي حقل يدويًا لتصحيح أخطاء الذكاء، ثم اضغط 💾🌍 حفظ ونشر.</div>';
+ h+='<label style="'+lblCss+'">📝 نبذة مختصرة</label>';
+ h+='<textarea id="scfg-ed-about" oninput="scfgEdSetIntro(this.value)" rows="3" placeholder="نبذة قصيرة عن التخصص..." style="'+inpCss+';resize:vertical">'+fld('intro')+'</textarea>';
+ h+='<label style="'+lblCss+'">📘 طبيعة التخصص</label>';
+ h+='<textarea id="scfg-ed-ab-nature" oninput="scfgEdSetAbout(\'nature\',this.value)" rows="2" placeholder="ماذا يدرس الطالب في هذا التخصص" style="'+inpCss+';resize:vertical">'+fld('nature')+'</textarea>';
+ h+='<label style="'+lblCss+'">💼 بعد التخرج / مجالات العمل</label>';
+ h+='<textarea id="scfg-ed-ab-careers" oninput="scfgEdSetAbout(\'careers\',this.value)" rows="2" placeholder="أبرز الوظائف والمسميات" style="'+inpCss+';resize:vertical">'+fld('careers')+'</textarea>';
+ h+='<label style="'+lblCss+'">💰 الرواتب المتوقعة</label>';
+ h+='<input id="scfg-ed-ab-salary" oninput="scfgEdSetAbout(\'salary\',this.value)" placeholder="مثال: المبتدئ 8–12 ألف، الخبير 20–30 ألف ريال" style="'+inpCss+'" value="'+fld('salary')+'">';
+ h+='<label style="'+lblCss+'">🚀 مستقبل التخصص 2026</label>';
+ h+='<textarea id="scfg-ed-ab-future" oninput="scfgEdSetAbout(\'future\',this.value)" rows="2" placeholder="نظرة على مستقبل التخصص" style="'+inpCss+';resize:vertical">'+fld('future')+'</textarea>';
+ var dm=scfgAboutField(a,'demand');
+ var demVals=['مرتفع جدًا','مرتفع','متوسط','منخفض'];
+ var demOpts='<option value="">—</option>';
+ if(dm&&demVals.indexOf(dm)<0)demOpts+='<option value="'+scfgEdAttr(dm)+'" selected>'+dm+'</option>';
+ demVals.forEach(function(v){demOpts+='<option value="'+v+'"'+(dm===v?' selected':'')+'>'+v+'</option>';});
+ h+='<label style="'+lblCss+'">📈 قوة الطلب حاليًا</label>';
+ h+='<select id="scfg-ed-ab-demand" onchange="scfgEdSetAbout(\'demand\',this.value)" style="'+inpCss+'">'+demOpts+'</select>';
+ h+='<label style="'+lblCss+'">📝 ملاحظة عن الطلب</label>';
+ h+='<input id="scfg-ed-ab-demandnote" oninput="scfgEdSetAbout(\'demandNote\',this.value)" placeholder="سبب مختصر لمستوى الطلب" style="'+inpCss+'" value="'+fld('demandNote')+'">';
+ h+='<div id="scfg-ed-about-status" style="font-size:.72rem;margin-top:8px;color:var(--t3);line-height:1.6"></div></div>';
  return h;
 }
 function specAboutHtml(sp){
@@ -2818,6 +2842,9 @@ async function scfgEdGenAbout(){
   if(!obj){scfgEdAboutStatus('⚠️ ما رجع محتوى','#f0736b');return;}
   SCFG_ED.spec.about=obj;
   var ta=document.getElementById('scfg-ed-about');if(ta)ta.value=(obj&&obj.intro)||'';
+  function _sv(id,val){var el=document.getElementById(id);if(el)el.value=(val==null?'':val);}
+  _sv('scfg-ed-ab-nature',obj.nature);_sv('scfg-ed-ab-careers',obj.careers);_sv('scfg-ed-ab-salary',obj.salary);_sv('scfg-ed-ab-future',obj.future);_sv('scfg-ed-ab-demandnote',obj.demandNote);
+  var _ds=document.getElementById('scfg-ed-ab-demand');if(_ds){var _dv=obj.demand||'';var _ok=false;for(var _i=0;_i<_ds.options.length;_i++){if(_ds.options[_i].value===_dv)_ok=true;}if(!_ok&&_dv){var _o=document.createElement('option');_o.value=_dv;_o.text=_dv;_ds.appendChild(_o);}_ds.value=_dv;}
   try{scfgEdSave();}catch(e){}
   scfgEdAboutStatus('✅ تم توليد البطاقة كاملة وحفظها — اضغط 🌍 نشر للجميع.','#5ccb8a');
  }catch(e){scfgEdAboutStatus('⚠️ تعذّر التوليد: '+((e&&e.message)||''),'#f0736b');}
