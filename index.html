@@ -1623,6 +1623,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
           </div>
         </div>
       </div>
+      <div id="home-spec-about"></div>
       <div class="reco-box">
         <div class="reco-title">⭐ مساعدك الذكي</div>
         <div class="reco-text" id="home-reco">—</div>
@@ -2253,6 +2254,7 @@ function renderHome(){
   let totH=0,doneH=0,doneC=0,dist={A:0,B:0,C:0,D:0,F:0};
   currentPlan.levels.forEach(lv=>lv.courses.forEach(c=>{if(!c.deleted){totH+=c.hrs;if(countsHours(c.grade)){doneH+=c.hrs;doneC++;}if(inGPA(c.grade)){const k=c.grade==='DN'?'F':c.grade[0];if(dist[k]!==undefined)dist[k]++;}}}));
   document.getElementById('home-crs-done').textContent=doneC;
+   try{var _sa=document.getElementById('home-spec-about');if(_sa)_sa.innerHTML=(typeof currentSpec!=='undefined'&&currentSpec)?specAboutHtml(currentSpec):'';}catch(e){}
   document.getElementById('s-hrs').textContent=doneH;
   document.getElementById('s-crs').textContent=doneC;
   document.getElementById('s-rem').textContent=totH-doneH;
@@ -2305,7 +2307,6 @@ function renderPlan(){
     if(!cs&&q)return;
     h+=`<div class="lv-block"><div class="lv-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'"><div class="lv-left"><div class="lv-num">${lv.level}</div><div><div class="lv-title">\u0627\u0644\u0645\u0633\u062a\u0648\u0649 ${lv.level}</div><div class="lv-meta">${lv.courses.length} \u0645\u0648\u0627\u062f</div></div></div><div class="lv-gpa-badge ${lvG>0?'has':''}">${lvG>0?lvG.toFixed(2):'\u2014'}</div></div><div>${cs}<div class="add-row"><input class="add-inp" placeholder="\u0631\u0645\u0632 \u0627\u0644\u0645\u0627\u062f\u0629" id="nc-code-${lv.level}"><input class="add-inp" placeholder="\u0627\u0633\u0645 \u0627\u0644\u0645\u0627\u062f\u0629" id="nc-name-${lv.level}"><input class="add-inp" type="number" placeholder="\u0633\u0627\u0639\u0627\u062a" id="nc-hrs-${lv.level}" min="1" max="6" style="width:62px"><button class="btn-add-c" onclick="addC(${lv.level})">+ \u0623\u0636\u0641</button></div></div></div>`;
   });
-  try{if(typeof currentSpec!=='undefined'&&currentSpec)h+=specAboutHtml(currentSpec);}catch(e){}
   document.getElementById('plan-cnt').innerHTML=h||'<div class="empty"><span class="ei">\ud83d\udcda</span>\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0648\u0627\u062f \u0628\u0647\u0630\u0627 \u0627\u0644\u0641\u0644\u062a\u0631</div>';
 }
 function updGrade(lv,id,v){const c=findC(lv,id);if(c){c.grade=v;savePlan();renderPlan();renderHome();}}
@@ -2477,15 +2478,65 @@ function exportSchPDF(){
 
 /* ===== ACHIEVEMENTS ===== */
 function renderAchievements(){}
-function specMeta(id){ var sp=findSpec(id); if(!sp)return null; var lv=(sp.levels||[]); var courses=0,hrs=0; lv.forEach(function(l){(l.courses||[]).forEach(function(c){courses++;hrs+=(c.hrs||0);});}); var col=''; SPECS.forEach(function(c){(c.entries||[]).forEach(function(e){if(e.id===id)col=c.college;});}); var info=(typeof SPEC_INFO!=='undefined'&&SPEC_INFO[id])||{}; return {id:id,name:sp.name,icon:sp.icon||'🎓',college:col,levels:lv.length,courses:courses,hrs:hrs,d:info.d||'—',n:info.n||'',j:info.j||'',e:info.e||''}; }
-function demScore(d){ return ({'مرتفع جدًا':5,'مرتفع':4,'متوسط–مرتفع':3.5,'متزايد':3,'متوسط':2})[d]||0; }
+function specMeta(id){ var sp=findSpec(id); if(!sp)return null; var lv=(sp.levels||[]); var courses=0,hrs=0; lv.forEach(function(l){(l.courses||[]).forEach(function(c){courses++;hrs+=(c.hrs||0);});}); var col=''; SPECS.forEach(function(c){(c.entries||[]).forEach(function(e){if(e.id===id)col=c.college;});}); var info=(typeof SPEC_INFO!=='undefined'&&SPEC_INFO[id])||{}; var ab=sp.about; if(typeof ab==='string')ab={intro:ab}; if(!ab||typeof ab!=='object')ab={}; return {id:id,name:sp.name,icon:sp.icon||'🎓',college:col,levels:lv.length,courses:courses,hrs:hrs,d:info.d||ab.demand||'—',n:info.n||ab.nature||'',j:info.j||ab.careers||'',e:info.e||ab.demandNote||'',sal:info.sal||ab.salary||'',fut:info.fut||ab.future||''}; }
+function demScore(d){ return ({'مرتفع جدًا':5,'مرتفع':4,'متوسط–مرتفع':3.5,'متزايد':3,'متوسط':2,'منخفض':1})[d]||0; }
+function cmpDemColor(dm){dm=(''+(dm||'')).trim();var dc='#2ed47a';if(dm.indexOf('متوسط')>=0)dc='#f5c030';else if(dm.indexOf('منخفض')>=0||dm.indexOf('ضعيف')>=0)dc='#f0736b';else if(dm.indexOf('مرتفع')>=0)dc='#2ed47a';return dc;}
+function saveCompareImage(){
+  if(typeof html2canvas==='undefined'){toast('جاري تحميل الأداة... حاول بعد لحظة');return;}
+  var ids=window.cmpSelected||[];
+  if(ids.length<2){toast('أضف تخصصين على الأقل للمقارنة');return;}
+  var M=ids.map(specMeta).filter(Boolean);
+  if(M.length<2){toast('تعذّر جلب بيانات التخصصات');return;}
+  toast('جاري تجهيز صورة المقارنة...');
+  function e2(v){try{return esc(v==null?'':(''+v));}catch(_){return (v==null?'':(''+v));}}
+  function rrow(icon,lbl,val,extra){if((val===undefined||val===null||val==='')&&!extra)val='—';return '<div style="padding:9px 0;border-top:1px solid #28303a;"><div style="font-size:10.5px;color:#9aa6b0;font-weight:700;margin-bottom:3px;">'+icon+' '+lbl+'</div><div style="font-size:12px;color:#eef2f5;line-height:1.6;font-weight:500;">'+(extra||e2(val))+'</div></div>';}
+  var dem=M.map(function(x){return demScore(x.d);});
+  var mx=Math.max.apply(null,dem);
+  var cols=M.map(function(x,idx){
+    var win=(dem[idx]===mx&&mx>0);
+    var pill='<span style="display:inline-block;background:'+cmpDemColor(x.d)+';color:#07130f;padding:2px 11px;border-radius:20px;font-size:11px;font-weight:800;">'+e2(x.d||'—')+'</span>';
+    var h='<div style="flex:0 0 236px;width:236px;background:#1a1f25;border:1px solid '+(win?'#2ed47a':'#28303a')+';border-radius:16px;overflow:hidden;">';
+    h+='<div style="padding:14px 14px 12px;background:linear-gradient(135deg,rgba(91,140,255,0.22),rgba(91,140,255,0.05));border-bottom:1px solid #28303a;text-align:center;">';
+    h+='<div style="font-size:30px;line-height:1;">'+(x.icon||'🎓')+'</div>';
+    h+='<div style="font-size:14px;font-weight:900;color:#eef2f5;margin-top:6px;">'+e2(x.name)+'</div>';
+    h+='<div style="font-size:10.5px;color:#9aa6b0;margin-top:2px;">'+e2(x.college||'')+'</div>';
+    if(win)h+='<div style="margin-top:7px;font-size:10px;color:#2ed47a;font-weight:800;">🏆 الأعلى طلبًا</div>';
+    h+='</div><div style="padding:4px 14px 14px;">';
+    h+=rrow('📈','الطلب في السوق','',pill);
+    h+=rrow('💰','الرواتب المتوقعة',x.sal);
+    h+=rrow('🚀','مستقبل التخصص 2026',x.fut);
+    h+=rrow('📘','طبيعة التخصص',x.n);
+    h+=rrow('💼','مجالات العمل',x.j);
+    h+=rrow('⏱️','الساعات · المستويات · المواد',x.hrs+' س · '+x.levels+' مستوى · '+x.courses+' مادة');
+    h+='</div></div>';
+    return h;
+  }).join('');
+  var winNames=[];M.forEach(function(x,i){if(dem[i]===mx&&mx>0)winNames.push(x.name);});
+  var verdict=winNames.length?('<div style="margin-top:16px;background:rgba(46,212,122,0.12);border:1px solid #2ed47a;border-radius:12px;padding:12px 16px;text-align:center;color:#eef2f5;font-size:14px;font-weight:800;min-width:600px;">🏆 الأعلى طلبًا في سوق العمل: '+e2(winNames.join('، '))+'</div>'):'';
+  var head='<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:16px;min-width:600px;"><div style="font-weight:900;font-size:24px;color:#eef2f5;">⚖️ مقارنة التخصصات</div><div style="font-size:14px;color:#9aa6b0;font-weight:700;">'+M.length+' تخصصات</div></div>';
+  var footer='<div style="margin-top:20px;padding-top:14px;border-top:1px solid #28303a;text-align:center;min-width:600px;"><div style="font-size:12px;color:#eef2f5;font-weight:800;">طيبة أكاديمي · TU Academic</div><div style="font-size:11px;color:#5f6b76;margin-top:3px;">taibahu-academic.com — مقارنة إرشادية</div></div>';
+  var shot=document.createElement('div');
+  shot.style.cssText='position:fixed;left:-10000px;top:0;padding:28px;background:#0e1114;font-family:Tajawal,system-ui,sans-serif;direction:rtl;display:inline-block;box-sizing:border-box;';
+  shot.innerHTML=head+'<div style="display:flex;flex-direction:row;gap:12px;align-items:flex-start;">'+cols+'</div>'+verdict+footer;
+  document.body.appendChild(shot);
+  html2canvas(shot,{scale:2,backgroundColor:'#0e1114',useCORS:true,logging:false}).then(function(canvas){
+    var url=canvas.toDataURL('image/png');
+    var img=document.getElementById('pim-img');if(img){img.src=url;img.style.display='';}
+    var mu=document.getElementById('pim-multi');if(mu){mu.innerHTML='';mu.style.display='none';}
+    var dl=document.getElementById('pim-dl');if(dl){dl.href=url;dl.setAttribute('download','TU-Academic-Compare.png');}
+    var hd=document.querySelector('#plan-img-modal .pim-head span');if(hd)hd.textContent='📷 صورة المقارنة';
+    var m=document.getElementById('plan-img-modal');if(m)m.classList.add('on');
+    try{document.body.removeChild(shot);}catch(e){}
+  }).catch(function(e){try{document.body.removeChild(shot);}catch(_){}toast('تعذّر إنشاء الصورة، حاول مرة ثانية');});
+}
+
 function buildCompare(){ var sel=document.getElementById('cmp-add'); if(!sel)return; if(!sel.dataset.filled){ var opts='<option value="">➕ أضف تخصصًا للمقارنة</option>'; SPECS.forEach(function(c){ opts+='<optgroup label="'+c.college+'">'; (c.entries||[]).forEach(function(e){ opts+='<option value="'+e.id+'">'+(e.icon||'')+' '+e.name+'</option>'; }); opts+='</optgroup>'; }); sel.innerHTML=opts; sel.dataset.filled='1'; } cmpRenderChips(); }
 function cmpAdd(sel){ var id=sel.value; sel.value=''; if(!id)return; window.cmpSelected=window.cmpSelected||[]; if(window.cmpSelected.indexOf(id)>-1){toast('التخصص مضاف مسبقًا');return;} if(window.cmpSelected.length>=6){toast('الحد الأقصى 6 تخصصات');return;} window.cmpSelected.push(id); cmpRenderChips(); }
 function cmpRemove(id){ window.cmpSelected=(window.cmpSelected||[]).filter(function(x){return x!==id;}); cmpRenderChips(); }
 function cmpRenderChips(){ var wrap=document.getElementById('cmp-chips'); if(!wrap)return; var arr=window.cmpSelected||[]; if(!arr.length){wrap.innerHTML='<div class="cmp-chips-empty">لم تُضِف أي تخصص بعد — اختر من القائمة أعلاه.</div>';return;} wrap.innerHTML=arr.map(function(id){var M=specMeta(id);var nm=M?(M.icon+' '+M.name):id;return '<span class="cmp-chip">'+nm+'<button class="cmp-chip-x" onclick="cmpRemove(\''+id+'\')" title="إزالة">✕</button></span>';}).join(''); }
 function cmpRow(lbl,va,vb,win){ var ca=(win==='a')?' cmp-win':'',cb=(win==='b')?' cmp-win':''; return '<div class="cmp-row"><div class="cr-v'+ca+'">'+va+'</div><div class="cr-lbl">'+lbl+'</div><div class="cr-v'+cb+'">'+vb+'</div></div>'; }
-function cmpDcard(M){ return '<div class="cmp-dcard"><h4>'+M.icon+' '+M.name+'</h4><div class="cd-row"><div class="cd-l">طبيعة التخصص</div><div class="cd-t">'+(M.n||'—')+'</div></div><div class="cd-row"><div class="cd-l">مجالات العمل</div><div class="cd-t">'+(M.j||'—')+'</div></div><div class="cd-row"><div class="cd-l">نظرة على الطلب</div><div class="cd-t">'+(M.e||'—')+'</div></div></div>'; }
-function runCompare(){ var out=document.getElementById('cmp-result'); var ids=window.cmpSelected||[]; if(ids.length<2){out.innerHTML='<div class="cmp-hint">أضف تخصصين على الأقل للمقارنة.</div>';return;} var M=ids.map(specMeta).filter(Boolean); if(M.length<2){out.innerHTML='<div class="cmp-hint">تعذّر جلب بيانات التخصصات.</div>';return;} var dem=M.map(function(x){return demScore(x.d);}); var hrs=M.map(function(x){return x.hrs;}); var lvs=M.map(function(x){return x.levels;}); var crs=M.map(function(x){return x.courses;}); function bestOf(vs){var mx=Math.max.apply(null,vs);var r=[];vs.forEach(function(v,i){if(v===mx)r.push(i);});return r;} function trow(lbl,vals,best){ return '<div class="cmp-trow"><div class="cmp-tlbl">'+lbl+'</div>'+vals.map(function(v,i){return '<div class="cmp-tv'+(best.indexOf(i)>-1?' cmp-win':'')+'">'+v+'</div>';}).join('')+'</div>'; } var head='<div class="cmp-thead"><div class="cmp-tlbl"></div>'+M.map(function(x){return '<div class="cmp-tcard"><div class="cc-ic">'+x.icon+'</div><div class="cc-nm">'+x.name+'</div><div class="cc-cl">'+x.college+'</div></div>';}).join('')+'</div>'; var table='<div class="cmp-table">'+head; table+=trow('الطلب في سوق العمل',M.map(function(x){return x.d;}),bestOf(dem)); table+=trow('عدد الساعات',hrs,bestOf(hrs)); table+=trow('عدد المستويات',lvs,bestOf(lvs)); table+=trow('عدد المواد',crs,bestOf(crs)); table+='</div>'; var win=bestOf(dem).map(function(i){return M[i].name;}); var verdict=(win.length===1)?('الأعلى طلبًا في سوق العمل: <b>'+win[0]+'</b>'):('الأعلى طلبًا (متقاربة): <b>'+win.join('، ')+'</b>'); var detail='<div class="cmp-detail">'+M.map(cmpDcard).join('')+'</div>'; var note='<div class="cmp-note">⚖️ المقارنة إرشادية تعتمد على مؤشرات عامة لسوق العمل؛ والتخصص الأفضل لك هو ما يناسب ميولك وقدراتك وشغفك.</div>'; out.innerHTML=table+'<div class="cmp-verdict">🏆 '+verdict+'</div>'+detail+note; }
+function cmpDcard(M){ return '<div class="cmp-dcard"><h4>'+M.icon+' '+M.name+'</h4><div class="cd-row"><div class="cd-l">طبيعة التخصص</div><div class="cd-t">'+(M.n||'—')+'</div></div><div class="cd-row"><div class="cd-l">مجالات العمل</div><div class="cd-t">'+(M.j||'—')+'</div></div><div class="cd-row"><div class="cd-l">💰 الرواتب المتوقعة</div><div class="cd-t">'+(M.sal||'—')+'</div></div><div class="cd-row"><div class="cd-l">🚀 مستقبل التخصص 2026</div><div class="cd-t">'+(M.fut||'—')+'</div></div><div class="cd-row"><div class="cd-l">نظرة على الطلب</div><div class="cd-t">'+(M.e||'—')+'</div></div></div>'; }
+function runCompare(){ var out=document.getElementById('cmp-result'); var ids=window.cmpSelected||[]; if(ids.length<2){out.innerHTML='<div class="cmp-hint">أضف تخصصين على الأقل للمقارنة.</div>';return;} var M=ids.map(specMeta).filter(Boolean); if(M.length<2){out.innerHTML='<div class="cmp-hint">تعذّر جلب بيانات التخصصات.</div>';return;} var dem=M.map(function(x){return demScore(x.d);}); var hrs=M.map(function(x){return x.hrs;}); var lvs=M.map(function(x){return x.levels;}); var crs=M.map(function(x){return x.courses;}); function bestOf(vs){var mx=Math.max.apply(null,vs);var r=[];vs.forEach(function(v,i){if(v===mx)r.push(i);});return r;} function trow(lbl,vals,best){ return '<div class="cmp-trow"><div class="cmp-tlbl">'+lbl+'</div>'+vals.map(function(v,i){return '<div class="cmp-tv'+(best.indexOf(i)>-1?' cmp-win':'')+'">'+v+'</div>';}).join('')+'</div>'; } var head='<div class="cmp-thead"><div class="cmp-tlbl"></div>'+M.map(function(x){return '<div class="cmp-tcard"><div class="cc-ic">'+x.icon+'</div><div class="cc-nm">'+x.name+'</div><div class="cc-cl">'+x.college+'</div></div>';}).join('')+'</div>'; var table='<div class="cmp-table">'+head; table+=trow('الطلب في سوق العمل',M.map(function(x){return x.d;}),bestOf(dem)); table+=trow('عدد الساعات',hrs,bestOf(hrs)); table+=trow('عدد المستويات',lvs,bestOf(lvs)); table+=trow('عدد المواد',crs,bestOf(crs)); table+='</div>'; var win=bestOf(dem).map(function(i){return M[i].name;}); var verdict=(win.length===1)?('الأعلى طلبًا في سوق العمل: <b>'+win[0]+'</b>'):('الأعلى طلبًا (متقاربة): <b>'+win.join('، ')+'</b>'); var detail='<div class="cmp-detail">'+M.map(cmpDcard).join('')+'</div>'; var note='<div class="cmp-note">⚖️ المقارنة إرشادية تعتمد على مؤشرات عامة لسوق العمل؛ والتخصص الأفضل لك هو ما يناسب ميولك وقدراتك وشغفك.</div>'; out.innerHTML=table+'<div class="cmp-verdict">🏆 '+verdict+'</div>'+detail+note+'<button class="cmp-btn" style="margin-top:14px" onclick="saveCompareImage()">📷 صوّر المقارنة</button>'; }
 
 /* ===== COUNTDOWN ===== */
 function updateCountdown(){
@@ -2745,55 +2796,58 @@ function scfgEdAboutBox(){
  var sp=SCFG_ED.spec;
  var h='<div style="border:1px solid var(--bor);border-radius:10px;padding:10px 12px;margin-bottom:12px;background:var(--s2)">';
  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px"><label style="font-size:.72rem;color:var(--t2)">\ud83d\udccb \u0646\u0628\u0630\u0629/\u0628\u0637\u0627\u0642\u0629 \u0627\u0644\u062a\u062e\u0635\u0635</label><button onclick="scfgEdGenAbout()" style="padding:5px 11px;border-radius:8px;border:1px solid var(--a1);background:transparent;color:var(--a1);font-size:.72rem;cursor:pointer;white-space:nowrap">\ud83e\udd16 \u062a\u0648\u0644\u064a\u062f \u0628\u0627\u0644\u0630\u0643\u0627\u0621</button></div>';
- h+='<textarea id="scfg-ed-about" oninput="SCFG_ED.spec.about=this.value" rows="3" placeholder="\u0646\u0628\u0630\u0629 \u0642\u0635\u064a\u0631\u0629 \u0639\u0646 \u0627\u0644\u062a\u062e\u0635\u0635\u060c \u0645\u062c\u0627\u0644\u0627\u062a \u0627\u0644\u0639\u0645\u0644\u060c \u0623\u0628\u0631\u0632 \u0627\u0644\u0645\u0648\u0627\u062f..." style="padding:8px;border-radius:8px;border:1px solid var(--bor);background:var(--s1,#0e1114);color:var(--t);width:100%;font-family:inherit;resize:vertical">'+scfgEdAttr(sp.about||'')+'</textarea>';
+ h+='<textarea id="scfg-ed-about" oninput="scfgEdSetIntro(this.value)" rows="3" placeholder="\u0646\u0628\u0630\u0629 \u0642\u0635\u064a\u0631\u0629 \u0639\u0646 \u0627\u0644\u062a\u062e\u0635\u0635\u060c \u0645\u062c\u0627\u0644\u0627\u062a \u0627\u0644\u0639\u0645\u0644\u060c \u0623\u0628\u0631\u0632 \u0627\u0644\u0645\u0648\u0627\u062f..." style="padding:8px;border-radius:8px;border:1px solid var(--bor);background:var(--s1,#0e1114);color:var(--t);width:100%;font-family:inherit;resize:vertical">'+scfgEdAttr(scfgAboutIntro(sp.about))+'</textarea>';
  h+='<div id="scfg-ed-about-status" style="font-size:.72rem;margin-top:6px;color:var(--t3);line-height:1.6"></div></div>';
  return h;
 }
 function specAboutHtml(sp){
- if(!sp||!sp.about||!(''+sp.about).trim())return '';
- var t=String(sp.about).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');
- return '<div style="border:1px solid var(--a1);border-radius:12px;padding:12px 15px;margin-bottom:14px;background:var(--s2);line-height:1.9;font-size:.85rem;color:var(--t2)"><b style="color:var(--a1);display:block;margin-bottom:6px">\ud83d\udccb \u0646\u0628\u0630\u0629 \u0639\u0646 \u0627\u0644\u062a\u062e\u0635\u0635</b>'+t+'</div>';
+ if(!sp||!sp.about)return '';
+ var a=sp.about;
+ if(typeof a==='string'){var s0=a.trim();if(!s0)return '';a={intro:s0};}
+ if(typeof a!=='object'||!a)return '';
+ function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');}
+ function row(icon,title,val){if(!val||!(''+val).trim())return '';return '<div style="padding:11px 0;border-top:1px solid var(--bor)"><div style="font-weight:800;color:var(--t);margin-bottom:5px;font-size:.88rem">'+icon+' '+title+'</div><div style="color:var(--t2);line-height:1.85;font-size:.85rem">'+esc(val)+'</div></div>';}
+ var rows='';
+ rows+=row('📘','طبيعة التخصص',a.nature);
+ rows+=row('💼','بعد التخرج تشتغل',a.careers);
+ rows+=row('💰','الرواتب المتوقعة',a.salary);
+ rows+=row('🚀','مستقبل التخصص 2026',a.future);
+ if(a.demand&&(''+a.demand).trim()){
+  var dm=(''+a.demand).trim();var dc='#2e7d5b';
+  if(dm.indexOf('متوسط')>=0)dc='#c98a2e';else if(dm.indexOf('منخفض')>=0||dm.indexOf('ضعيف')>=0)dc='#c0524b';
+  rows+='<div style="padding:11px 0;border-top:1px solid var(--bor)"><div style="font-weight:800;color:var(--t);margin-bottom:6px;font-size:.88rem">📈 قوة التخصص حاليًا</div><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="background:'+dc+';color:#fff;padding:3px 13px;border-radius:20px;font-size:.77rem;font-weight:800;white-space:nowrap">'+esc(dm)+'</span>'+(a.demandNote?'<span style="color:var(--t2);font-size:.83rem;line-height:1.7;flex:1;min-width:160px">'+esc(a.demandNote)+'</span>':'')+'</div></div>';
+ }
+ if(!rows&&!(a.intro&&(''+a.intro).trim()))return '';
+ var intro=(a.intro&&(''+a.intro).trim())?('<div style="color:var(--t2);font-size:.85rem;line-height:1.85;margin-top:2px">'+esc(a.intro)+'</div>'):'';
+ var nm=esc(sp.name||'');var ic=(sp.icon||'📘');
+ return '<div class="card" style="border:1px solid var(--bor);border-radius:16px;padding:16px 18px;margin-bottom:14px;background:var(--s2)"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px"><div><div style="font-weight:900;font-size:1.02rem;color:var(--t)">عن تخصص: '+nm+'</div><div style="color:var(--t3);font-size:.74rem;margin-top:2px">نبذة تعريفية عن مجالك</div></div><div style="font-size:1.7rem;line-height:1">'+ic+'</div></div>'+intro+rows+'<div style="margin-top:12px;color:var(--t3);font-size:.67rem;line-height:1.6;border-top:1px solid var(--bor);padding-top:9px">* معلومات تعريفية إرشادية لمساعدتك على تصوّر المجال، وليست إحصاءات رسمية.</div></div>';
 }
+function scfgAboutIntro(a){if(!a)return '';if(typeof a==='string')return a;if(typeof a==='object')return a.intro||'';return '';}
+function scfgEdSetIntro(v){if(!SCFG_ED||!SCFG_ED.spec)return;var a=SCFG_ED.spec.about;if(!a||typeof a!=='object')a={};a.intro=v;SCFG_ED.spec.about=a;}
 async function scfgEdGenAbout(){
- if(!SCFG_ED||!SCFG_ED.spec){toast('\u0627\u062e\u062a\u0631 \u062a\u062e\u0635\u0635\u064b\u0627 \u0623\u0648\u0644\u0627\u064b');return;}
+ if(!SCFG_ED||!SCFG_ED.spec){toast('اختر تخصصًا أولاً');return;}
  var pel=document.getElementById('scfg-ed-ai-provider');var provider=pel?pel.value:'openrouter';
  var kel=document.getElementById('scfg-ed-ai-key');var key=((kel&&kel.value)||'').trim();
  if(!key){key=((((window.SITE_CFG&&SITE_CFG.publicAiKey))||PUBLIC_AI_KEY)||'').trim();}
- if(!key){scfgEdAboutStatus('\u26a0\ufe0f \u0636\u0639 \u0645\u0641\u062a\u0627\u062d \u0627\u0644\u0630\u0643\u0627\u0621 \u0641\u064a \u0635\u0646\u062f\u0648\u0642 \u00ab\u062a\u062d\u062f\u064a\u062b \u0628\u0627\u0644\u0630\u0643\u0627\u0621\u00bb \u0628\u0627\u0644\u0623\u0639\u0644\u0649\u060c \u0623\u0648 \u0641\u064a \u00ab\u0645\u0641\u062a\u0627\u062d \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0639\u0627\u0645\u00bb.','#f5a05a');return;}
+ if(!key){scfgEdAboutStatus('⚠️ ضع مفتاح الذكاء في «مفتاح الذكاء العام».','#f5a05a');return;}
  var sp=SCFG_ED.spec;var names=[];sp.levels.forEach(function(lv){lv.courses.forEach(function(c){if(c&&c.name)names.push(c.name);});});
- var prompt='\u0627\u0643\u062a\u0628 \u0646\u0628\u0630\u0629 \u062a\u0639\u0631\u064a\u0641\u064a\u0629 \u0645\u062e\u062a\u0635\u0631\u0629 \u0648\u0627\u062d\u062a\u0631\u0627\u0641\u064a\u0629 \u0639\u0646 \u062a\u062e\u0635\u0635 \u062c\u0627\u0645\u0639\u064a \u0628\u0627\u0644\u0639\u0631\u0628\u064a\u0629\u060c \u0641\u064a 3 \u0625\u0644\u0649 5 \u062c\u0645\u0644\u060c \u062a\u0634\u0645\u0644: \u0645\u0627\u0630\u0627 \u064a\u062f\u0631\u0633 \u0627\u0644\u0637\u0627\u0644\u0628\u060c \u0623\u0628\u0631\u0632 \u0627\u0644\u0645\u062c\u0627\u0644\u0627\u062a\u060c \u0648\u0641\u0631\u0635 \u0627\u0644\u0639\u0645\u0644. \u0628\u062f\u0648\u0646 \u0639\u0646\u0627\u0648\u064a\u0646 \u0623\u0648 \u0631\u0645\u0648\u0632\u060c \u0641\u0642\u0637 \u0641\u0642\u0631\u0629 \u0646\u0635\u064a\u0629. \u0627\u0633\u0645 \u0627\u0644\u062a\u062e\u0635\u0635: '+sp.name+'. \u0645\u0646 \u0623\u0628\u0631\u0632 \u0645\u0648\u0627\u062f\u0647: '+names.slice(0,15).join('\u060c ')+'.';
- scfgEdAboutStatus('\u23f3 \u064a\u0648\u0644\u0651\u062f \u0627\u0644\u0646\u0628\u0630\u0629...','var(--a1)');
+ scfgEdAboutStatus('⏳ يولّد البطاقة (نبذة/رواتب/مستقبل/طلب)...','var(--a1)');
  try{localStorage.setItem('tu_aikey_'+provider,key);}catch(e){}
  try{
-  var txt='';
-  if(provider==='openrouter'){
-   var body={model:'openrouter/free',messages:[{role:'user',content:[{type:'text',text:prompt}]}]};
-   var orurl='https://'+'openrouter.ai'+'/api/v1/chat/completions';
-   var resp=await fetch(orurl,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
-   var data=await resp.json();
-   if(!resp.ok){scfgEdAboutStatus('\u26a0\ufe0f \u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u062a\u0648\u0644\u064a\u062f: '+((data&&data.error&&data.error.message)||resp.status),'#f0736b');return;}
-   var mc=data.choices[0].message.content;txt=(typeof mc==='string')?mc:mc.map(function(x){return x.text||'';}).join('');
-  }else{
-   var gbody={contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.4}};
-   var gurl='https://'+'generativelanguage.googleapis.com'+'/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(key);
-   var gresp=await fetch(gurl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(gbody)});
-   var gdata=await gresp.json();
-   if(!gresp.ok){scfgEdAboutStatus('\u26a0\ufe0f \u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u062a\u0648\u0644\u064a\u062f: '+((gdata&&gdata.error&&gdata.error.message)||gresp.status),'#f0736b');return;}
-   txt=gdata.candidates[0].content.parts.map(function(p){return p.text||'';}).join('');
-  }
-  txt=(''+txt).trim();
-  if(!txt){scfgEdAboutStatus('\u26a0\ufe0f \u0645\u0627 \u0631\u062c\u0639 \u0646\u0635','#f0736b');return;}
-  SCFG_ED.spec.about=txt;
-  var ta=document.getElementById('scfg-ed-about');if(ta)ta.value=txt;try{scfgEdSave();}catch(e){}
-  scfgEdAboutStatus('\u2705 \u062a\u0645 \u062a\u0648\u0644\u064a\u062f \u0627\u0644\u0646\u0628\u0630\u0629. \u0631\u0627\u062c\u0639\u0647\u0627 \u062b\u0645 \u0627\u062d\u0641\u0638 \u0627\u0644\u062a\u0639\u062f\u064a\u0644\u0627\u062a \u0648\u0627\u0646\u0634\u0631.','#5ccb8a');
- }catch(e){scfgEdAboutStatus('\u26a0\ufe0f \u062e\u0637\u0623: '+((e&&e.message)||''),'#f0736b');}
+  var obj=await aiAboutText(provider,key,sp.name,names);
+  if(!obj){scfgEdAboutStatus('⚠️ ما رجع محتوى','#f0736b');return;}
+  SCFG_ED.spec.about=obj;
+  var ta=document.getElementById('scfg-ed-about');if(ta)ta.value=(obj&&obj.intro)||'';
+  try{scfgEdSave();}catch(e){}
+  scfgEdAboutStatus('✅ تم توليد البطاقة كاملة وحفظها — اضغط 🌍 نشر للجميع.','#5ccb8a');
+ }catch(e){scfgEdAboutStatus('⚠️ تعذّر التوليد: '+((e&&e.message)||''),'#f0736b');}
 }
 async function scfgEdSavePublish(){try{scfgEdSave();}catch(e){}try{if(typeof scfgEdStatus==='function')scfgEdStatus('☁️ جارٍ النشر...','#5b8cff');}catch(e){}try{await scfgPublish();}catch(e){}try{if(typeof scfgEdStatus==='function')scfgEdStatus('✅ تم الحفظ والنشر للجميع','#5ccb8a');}catch(e){}}
 function scfgCardsStatus(m,c){var e=document.getElementById('scfg-cards-status');if(e){e.innerHTML=m;e.style.color=c||'var(--t3)';}}
 function scfgCardsKey(){var k=((document.getElementById('scfg-pub-ai-key')||{}).value||'').trim();if(!k)k=(((window.SITE_CFG&&SITE_CFG.publicAiKey)||PUBLIC_AI_KEY)||'').trim();return k;}
 function scfgCardsProvider(){var p=((document.getElementById('scfg-pub-ai-provider')||{}).value||'');if(!p)p=((window.SITE_CFG&&SITE_CFG.publicAiProvider)||PUBLIC_AI_PROVIDER||'openrouter');return p;}
 async function aiAboutText(provider,key,specName,names){
- var prompt='\u0627\u0643\u062a\u0628 \u0646\u0628\u0630\u0629 \u062a\u0639\u0631\u064a\u0641\u064a\u0629 \u0645\u062e\u062a\u0635\u0631\u0629 \u0648\u0627\u062d\u062a\u0631\u0627\u0641\u064a\u0629 \u0639\u0646 \u062a\u062e\u0635\u0635 \u062c\u0627\u0645\u0639\u064a \u0628\u0627\u0644\u0639\u0631\u0628\u064a\u0629\u060c \u0641\u064a 3 \u0625\u0644\u0649 5 \u062c\u0645\u0644\u060c \u062a\u0634\u0645\u0644: \u0645\u0627\u0630\u0627 \u064a\u062f\u0631\u0633 \u0627\u0644\u0637\u0627\u0644\u0628\u060c \u0623\u0628\u0631\u0632 \u0627\u0644\u0645\u062c\u0627\u0644\u0627\u062a\u060c \u0648\u0641\u0631\u0635 \u0627\u0644\u0639\u0645\u0644. \u0628\u062f\u0648\u0646 \u0639\u0646\u0627\u0648\u064a\u0646 \u0623\u0648 \u0631\u0645\u0648\u0632\u060c \u0641\u0642\u0637 \u0641\u0642\u0631\u0629 \u0646\u0635\u064a\u0629. \u0627\u0633\u0645 \u0627\u0644\u062a\u062e\u0635\u0635: '+specName+'. \u0645\u0646 \u0623\u0628\u0631\u0632 \u0645\u0648\u0627\u062f\u0647: '+names.slice(0,15).join('\u060c ')+'.';
+ var prompt='أنت مستشار مهني وأكاديمي. أعِد فقط كائن JSON صالحًا واحدًا دون أي شرح أو أسطر برمجية، يصف تخصصًا جامعيًا في السعودية بالعربية، بهذه الحقول بالضبط: '+'{"intro":"جملة أو جملتين مختصرة جدًا تعرّف بالتخصص","nature":"طبيعة التخصص وماذا يدرس الطالب باختصار","careers":"أبرز 4 إلى 5 وظائف بعد التخرج مفصولة بفواصل","salary":"الرواتب المتوقعة بالريال السعودي شهريًا مع نطاق للمبتدئ ونطاق لذوي الخبرة","future":"نظرة على مستقبل التخصص في 2026 وما بعده باختصار","demand":"مستوى الطلب حاليًا: اختر واحدة فقط من (مرتفع جدًا، مرتفع، متوسط، منخفض)","demandNote":"سبب مختصر جدًا في جملة واحدة"}'+'. اجعل المحتوى واقعيًا ومناسبًا للسوق السعودي. التخصص: '+specName+'. من أبرز مواده: '+names.slice(0,15).join('، ')+'. أعِد JSON فقط.';
  var txt='';
  if(provider==='openrouter'){
   var body={model:'openrouter/free',messages:[{role:'user',content:[{type:'text',text:prompt}]}]};
@@ -2810,7 +2864,11 @@ async function aiAboutText(provider,key,specName,names){
   if(!gresp.ok)throw new Error((gdata&&gdata.error&&gdata.error.message)||('HTTP '+gresp.status));
   txt=gdata.candidates[0].content.parts.map(function(p){return p.text||'';}).join('');
  }
- return (''+txt).trim();
+ var raw=(''+txt).trim();
+ raw=raw.replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+ var m=raw.match(/\{[\s\S]*\}/);
+ if(m){try{var o=JSON.parse(m[0]);if(o&&typeof o==='object')return o;}catch(e){}}
+ return {intro:raw};
 }
 function scfgCardPersist(colName,sp){
  window.SITE_CFG=SITE_CFG||{};SITE_CFG.extraSpecs=SITE_CFG.extraSpecs||[];
@@ -2900,7 +2958,7 @@ async function scfgEdAiUpdate(){
  }catch(e){scfgEdAiStatus('\u274c \u0641\u0634\u0644 \u0627\u0644\u062a\u062d\u0644\u064a\u0644: '+e.message+' \u2014 \u062a\u0623\u0643\u062f \u0645\u0646 \u0627\u0644\u0646\u0635/\u0627\u0644\u0635\u0648\u0631 \u0648\u0627\u0644\u0645\u0641\u062a\u0627\u062d','#f77');}
 }
 
-function closePlanImg(e){ if(e&&e.target&&e.target.id!=='plan-img-modal')return; var m=document.getElementById('plan-img-modal');if(m)m.classList.remove('on'); var mu=document.getElementById('pim-multi');if(mu){mu.innerHTML='';mu.style.display='none';} var im=document.getElementById('pim-img');if(im)im.style.display=''; var sdl=document.getElementById('pim-dl');if(sdl)sdl.style.display=''; }
+function closePlanImg(e){ if(e&&e.target&&e.target.id!=='plan-img-modal')return; var m=document.getElementById('plan-img-modal');if(m)m.classList.remove('on'); var mu=document.getElementById('pim-multi');if(mu){mu.innerHTML='';mu.style.display='none';} var im=document.getElementById('pim-img');if(im)im.style.display=''; var sdl=document.getElementById('pim-dl');if(sdl)sdl.style.display=''; if(sdl)sdl.setAttribute('download','TU-Academic-Plan.png'); var _hd=document.querySelector('#plan-img-modal .pim-head span');if(_hd)_hd.textContent='📷 صورة الخطة'; }
 function savePlan(){if(planData&&planData.specId){planStore[planData.specId]=planData;try{localStorage.setItem('tu_pro_plans',JSON.stringify(planStore));}catch(e){}}localStorage.setItem('tu_pro_plan',JSON.stringify(planData));}
 function pickAvatar(){var i=document.getElementById('avatar-file');if(i){i.value='';i.click();}}
 function removeAvatar(){student.avatar=null;saveSt();updateAvatarUI();toast('تمت إزالة الصورة');}
