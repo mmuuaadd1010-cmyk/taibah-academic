@@ -2485,46 +2485,26 @@ function saveCompareImage(){
   if(typeof html2canvas==='undefined'){toast('جاري تحميل الأداة... حاول بعد لحظة');return;}
   var ids=window.cmpSelected||[];
   if(ids.length<2){toast('أضف تخصصين على الأقل للمقارنة');return;}
-  var M=ids.map(specMeta).filter(Boolean);
-  if(M.length<2){toast('تعذّر جلب بيانات التخصصات');return;}
+  var res=document.getElementById('cmp-result');
+  if(!res||!res.querySelector('.cmp-table')){ try{runCompare();}catch(e){} res=document.getElementById('cmp-result'); }
+  if(!res||!res.querySelector('.cmp-table')){toast('اضغط «قارن الآن» أولاً');return;}
   toast('جاري تجهيز صورة المقارنة...');
-  function e2(v){try{return esc(v==null?'':(''+v));}catch(_){return (v==null?'':(''+v));}}
-  function rrow(icon,lbl,val,extra){if((val===undefined||val===null||val==='')&&!extra)val='—';return '<div style="padding:9px 0;border-top:1px solid #28303a;"><div style="font-size:10.5px;color:#9aa6b0;font-weight:700;margin-bottom:3px;">'+icon+' '+lbl+'</div><div style="font-size:12px;color:#eef2f5;line-height:1.6;font-weight:500;">'+(extra||e2(val))+'</div></div>';}
-  var dem=M.map(function(x){return demScore(x.d);});
-  var mx=Math.max.apply(null,dem);
-  var cols=M.map(function(x,idx){
-    var win=(dem[idx]===mx&&mx>0);
-    var pill='<span style="display:inline-block;background:'+cmpDemColor(x.d)+';color:#07130f;padding:2px 11px;border-radius:20px;font-size:11px;font-weight:800;">'+e2(x.d||'—')+'</span>';
-    var h='<div style="flex:0 0 236px;width:236px;background:#1a1f25;border:1px solid '+(win?'#2ed47a':'#28303a')+';border-radius:16px;overflow:hidden;">';
-    h+='<div style="padding:14px 14px 12px;background:linear-gradient(135deg,rgba(91,140,255,0.22),rgba(91,140,255,0.05));border-bottom:1px solid #28303a;text-align:center;">';
-    h+='<div style="font-size:30px;line-height:1;">'+(x.icon||'🎓')+'</div>';
-    h+='<div style="font-size:14px;font-weight:900;color:#eef2f5;margin-top:6px;">'+e2(x.name)+'</div>';
-    h+='<div style="font-size:10.5px;color:#9aa6b0;margin-top:2px;">'+e2(x.college||'')+'</div>';
-    if(win)h+='<div style="margin-top:7px;font-size:10px;color:#2ed47a;font-weight:800;">🏆 الأعلى طلبًا</div>';
-    h+='</div><div style="padding:4px 14px 14px;">';
-    h+=rrow('📈','الطلب في السوق','',pill);
-    h+=rrow('💰','الرواتب المتوقعة',x.sal);
-    h+=rrow('🚀','مستقبل التخصص 2026',x.fut);
-    h+=rrow('📘','طبيعة التخصص',x.n);
-    h+=rrow('💼','مجالات العمل',x.j);
-    h+=rrow('⏱️','الساعات · المستويات · المواد',x.hrs+' س · '+x.levels+' مستوى · '+x.courses+' مادة');
-    h+='</div></div>';
-    return h;
-  }).join('');
-  var winNames=[];M.forEach(function(x,i){if(dem[i]===mx&&mx>0)winNames.push(x.name);});
-  var verdict=winNames.length?('<div style="margin-top:16px;background:rgba(46,212,122,0.12);border:1px solid #2ed47a;border-radius:12px;padding:12px 16px;text-align:center;color:#eef2f5;font-size:14px;font-weight:800;min-width:600px;">🏆 الأعلى طلبًا في سوق العمل: '+e2(winNames.join('، '))+'</div>'):'';
-  var head='<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:16px;min-width:600px;"><div style="font-weight:900;font-size:24px;color:#eef2f5;">⚖️ مقارنة التخصصات</div><div style="font-size:14px;color:#9aa6b0;font-weight:700;">'+M.length+' تخصصات</div></div>';
-  var footer='<div style="margin-top:20px;padding-top:14px;border-top:1px solid #28303a;text-align:center;min-width:600px;"><div style="font-size:12px;color:#eef2f5;font-weight:800;">طيبة أكاديمي · TU Academic</div><div style="font-size:11px;color:#5f6b76;margin-top:3px;">taibahu-academic.com — مقارنة إرشادية</div></div>';
+  var clone=res.cloneNode(true);
+  try{var bs=clone.querySelectorAll('button');for(var i=0;i<bs.length;i++){if(bs[i].parentNode)bs[i].parentNode.removeChild(bs[i]);}}catch(e){}
+  var head='<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:16px;"><div style="font-weight:900;font-size:23px;color:#eef2f5;">⚖️ مقارنة التخصصات</div><div style="font-size:13px;color:#9aa6b0;font-weight:700;">'+ids.length+' تخصصات</div></div>';
+  var footer='<div style="margin-top:18px;padding-top:13px;border-top:1px solid #28303a;text-align:center;"><div style="font-size:12px;color:#eef2f5;font-weight:800;">طيبة أكاديمي · TU Academic</div><div style="font-size:11px;color:#5f6b76;margin-top:3px;">taibahu-academic.com — مقارنة إرشادية</div></div>';
   var shot=document.createElement('div');
-  shot.style.cssText='position:fixed;left:-10000px;top:0;padding:28px;background:#0e1114;font-family:Tajawal,system-ui,sans-serif;direction:rtl;display:inline-block;box-sizing:border-box;';
-  shot.innerHTML=head+'<div style="display:flex;flex-direction:row;gap:12px;align-items:flex-start;">'+cols+'</div>'+verdict+footer;
+  shot.style.cssText='position:fixed;left:-10000px;top:0;width:720px;padding:26px;background:#0e1114;font-family:Tajawal,system-ui,sans-serif;direction:rtl;box-sizing:border-box;';
+  var hd=document.createElement('div');hd.innerHTML=head;shot.appendChild(hd);
+  shot.appendChild(clone);
+  var ft=document.createElement('div');ft.innerHTML=footer;shot.appendChild(ft);
   document.body.appendChild(shot);
   html2canvas(shot,{scale:2,backgroundColor:'#0e1114',useCORS:true,logging:false}).then(function(canvas){
     var url=canvas.toDataURL('image/png');
     var img=document.getElementById('pim-img');if(img){img.src=url;img.style.display='';}
     var mu=document.getElementById('pim-multi');if(mu){mu.innerHTML='';mu.style.display='none';}
     var dl=document.getElementById('pim-dl');if(dl){dl.href=url;dl.setAttribute('download','TU-Academic-Compare.png');}
-    var hd=document.querySelector('#plan-img-modal .pim-head span');if(hd)hd.textContent='📷 صورة المقارنة';
+    var h2=document.querySelector('#plan-img-modal .pim-head span');if(h2)h2.textContent='📷 صورة المقارنة';
     var m=document.getElementById('plan-img-modal');if(m)m.classList.add('on');
     try{document.body.removeChild(shot);}catch(e){}
   }).catch(function(e){try{document.body.removeChild(shot);}catch(_){}toast('تعذّر إنشاء الصورة، حاول مرة ثانية');});
