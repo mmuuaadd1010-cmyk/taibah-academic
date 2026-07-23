@@ -4533,7 +4533,7 @@ async function scfgAiImport(){
  setv('scfg-ls',c.letterSpacing!=null?c.letterSpacing:'');setv('scfg-lh',c.lineHeight!=null?c.lineHeight:'');
  setv('scfg-radius',c.radius!=null?c.radius:18);var rv=document.getElementById('scfg-radius-val');if(rv)rv.textContent=(c.radius!=null?c.radius:18);
  setv('scfg-shadow',c.shadow||'md');setv('scfg-density',c.density||'normal');
- var an=c.announce||{};setck('scfg-ann-on',an.on);setv('scfg-ann-text',an.text||'');setv('scfg-ann-link',an.link||'');setv('scfg-ann-color',an.color||'#f5c030');var sup=c.support||{};setck('scfg-sup-on',sup.on!==false);setv('scfg-sup-url',sup.url||'');setv('scfg-sup-title',sup.title||'');setv('scfg-sup-msg',sup.msg||'');
+ var an=c.announce||{};setck('scfg-ann-on',an.on);setv('scfg-ann-text',an.text||'');setv('scfg-ann-link',an.link||'');setv('scfg-ann-color',an.color||'#f5c030');var sup=c.support||{};setck('scfg-sup-on',sup.on!==false);setv('scfg-sup-url',sup.url||('https://'+'creators.sa/81chamber'));setv('scfg-sup-title',sup.title||'ادعم المطور');setv('scfg-sup-msg',sup.msg||'إذا الموقع فادك وحاب تدعمني عشان أكمّل تطويره وأضيف تخصصات وميزات أكثر، دعمك — ولو بسيط — يفرق ويحفّزني كثير 💛 شكرًا إنك جزء من طيبة أكاديمي.');
  var pu=c.popup||{};setck('scfg-pu-on',pu.on);setv('scfg-pu-title',pu.title||'');setv('scfg-pu-body',pu.body||'');setv('scfg-pu-btn',pu.btn||'');
  var mo=c.maintenance||{};setck('scfg-maint-on',mo.on);setv('scfg-maint-text',mo.text||'');
  setck('scfg-nosignup',c.disableSignup);setck('scfg-forcelogin',c.forceLogin);setv('scfg-redirect',c.redirect||'');
