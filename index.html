@@ -1591,12 +1591,32 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
       <div class="nav-spec-pill" id="nav-spec-pill" onclick="changeSpec()">التخصص ‹</div>
     </div>
     <div class="nav-right">
+      <button class="tu-menu-btn" onclick="tuOpenDrawer()" title="القائمة" aria-label="القائمة">☰</button>
       <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">🌙</button>
       <div class="nav-gpa"><div class="nav-gpa-val" id="nav-gpa">–</div><div class="nav-gpa-lbl">معدلك</div></div>
     </div>
   </div>
 
-  <div class="tab-rail">
+  <style id="tu-nav-css">
+.tab-rail{display:none!important}
+#p-home>#home-quote{display:none!important}
+.tu-menu-btn{background:var(--s2);border:1px solid var(--bor);border-radius:10px;width:38px;height:38px;font-size:1.2rem;line-height:1;cursor:pointer;color:var(--t);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.tu-menu-btn:hover{border-color:var(--a1);color:var(--a1)}
+#tu-drawer-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:998}
+#tu-drawer-ov.open{opacity:1;pointer-events:auto}
+#tu-drawer{position:fixed;top:0;right:0;height:100%;width:min(82vw,320px);background:var(--s2);border-left:1px solid var(--bor);box-shadow:-8px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:999;display:flex;flex-direction:column}
+#tu-drawer.open{transform:translateX(0)}
+.tu-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 12px;border-bottom:1px solid var(--bor)}
+.tu-drawer-tt{font-size:1.05rem;font-weight:800;color:var(--t)}
+.tu-drawer-x{background:var(--bg,rgba(0,0,0,.15));border:1px solid var(--bor);border-radius:9px;width:32px;height:32px;cursor:pointer;color:var(--t2)}
+#tu-drawer-list{display:flex;flex-direction:column;gap:3px;padding:10px;overflow-y:auto}
+.tu-drawer-item{display:flex;align-items:center;text-align:right;background:none;border:none;border-radius:12px;padding:13px 15px;font-family:inherit;font-size:.95rem;color:var(--t2);cursor:pointer;transition:all .18s;width:100%}
+.tu-drawer-item:hover{background:var(--bg,rgba(0,0,0,.12));color:var(--t)}
+.tu-drawer-item.on{background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;font-weight:700}
+</style>
+<div id="tu-drawer-ov" onclick="tuCloseDrawer()"></div>
+<aside id="tu-drawer"><div class="tu-drawer-head"><span class="tu-drawer-tt">القائمة</span><button class="tu-drawer-x" onclick="tuCloseDrawer()" aria-label="إغلاق">✕</button></div><div id="tu-drawer-list"></div></aside>
+<div class="tab-rail">
     <button class="tab-item on" onclick="goTab('home',this)">🏠 الرئيسية</button>
     <button class="tab-item" onclick="goTab('plan',this)">📋 الخطة</button>
     <button class="tab-item" onclick="goTab('roadmap',this)">🗺️ رؤية خطتي</button>
@@ -2337,6 +2357,20 @@ function selectSpec(id){const spec=findSpec(id);if(!spec)return;student.spec=id;
 function loadApp(){currentSpec=findSpec(student.spec);if(!currentSpec){showScreen('s-spec');renderSpecs();return;}planData=reconcilePlan(currentSpec,planStore[student.spec]);savePlan();currentPlan=planData;showScreen('s-app');initApp();}
 function initApp(){document.getElementById('nav-spec-pill').innerText=currentSpec.name+' \u2039';if(student.name)document.getElementById('set-name').value=student.name;buildGradeScale();renderHome();renderPlan();renderGoals();renderSchedule();renderAchievements();renderGenCourses();buildOffdayPicker();}
 function changeSpec(){if(confirm('هل تريد تغيير التخصص؟ درجاتك تبقى محفوظة لكل تخصص وتقدر ترجع لها.')){showScreen('s-spec');renderSpecs();}}
+function tuBuildDrawer(){
+  var list=document.getElementById('tu-drawer-list'); if(!list)return;
+  var items=document.querySelectorAll('.tab-rail .tab-item'); list.innerHTML='';
+  items.forEach(function(it){
+    if(it.style.display==='none') return;
+    var b=document.createElement('button');
+    b.className='tu-drawer-item'+(it.classList.contains('on')?' on':'');
+    b.textContent=(it.textContent||'').trim();
+    b.onclick=function(){ try{it.click();}catch(e){} tuCloseDrawer(); };
+    list.appendChild(b);
+  });
+}
+function tuOpenDrawer(){ tuBuildDrawer(); var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.add('open'); if(o)o.classList.add('open'); }
+function tuCloseDrawer(){ var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.remove('open'); if(o)o.classList.remove('open'); }
 function goTab(id,btn){document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}}
 
 /* ===== GRADES / PLAN ===== */
