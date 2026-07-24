@@ -1646,6 +1646,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <button class="tab-item" onclick="goTab('peers',this)">👥 الزملاء<span class="peers-badge" id="peers-badge"></span></button>
     <button class="tab-item" onclick="goTab('compare',this)">⚖️ مقارنة تخصصين</button>
     <button class="tab-item" onclick="goTab('countdown',this)">⏳ التخرج</button>
+    <button class="tab-item" onclick="goTab('fans',this);renderFans()">🏆 نجوم المنصة</button>
     <button class="tab-item" onclick="goTab('settings',this)">⚙️ الإعدادات</button>
     <button class="tab-item" id="admin-tab-btn" style="display:none" onclick="goTab('admin',this)">🛠️ لوحة المطوّر<span class="peers-badge" id="adm-badge"></span></button>
   </div>
@@ -1899,6 +1900,55 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     </div>
 
     <!-- COUNTDOWN -->
+    <style id="fans-css">
+.fans-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:var(--s2);border:1px solid var(--bor);border-radius:16px;padding:16px;margin-bottom:14px}
+.fans-head-tt{display:flex;align-items:center;gap:12px}
+.fans-head-ic{font-size:1.7rem}
+.fans-head-title{font-weight:800;font-size:1.12rem;color:var(--t)}
+.fans-head-sub{font-size:.82rem;color:var(--t2);max-width:520px;line-height:1.55;margin-top:3px}
+.fans-stat{display:flex;gap:8px;flex-wrap:wrap}
+.fans-stat-chip{background:var(--s3);border:1px solid var(--bor);border-radius:20px;padding:5px 12px;font-size:.8rem;font-weight:700;color:var(--t2)}
+.fan-card{display:flex;align-items:center;gap:13px;background:var(--s2);border:1px solid var(--bor);border-radius:16px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden}
+.fan-card.rank1{border-color:#f5c542;box-shadow:0 6px 22px rgba(245,197,66,.18)}
+.fan-card.rank2{border-color:#c8d0dc}
+.fan-card.rank3{border-color:#e0975a}
+.fan-card::before{content:"";position:absolute;top:0;bottom:0;right:0;width:4px;background:var(--a1)}
+.fan-card.rank1::before{background:#f5c542}
+.fan-card.rank2::before{background:#c8d0dc}
+.fan-card.rank3::before{background:#e0975a}
+.fan-rank{font-size:1.55rem;flex-shrink:0;width:34px;text-align:center}
+.fan-av{width:52px;height:52px;border-radius:50%;flex-shrink:0;overflow:hidden;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.3rem}
+.fan-av img{width:100%;height:100%;object-fit:cover}
+.fan-info{flex:1;min-width:0}
+.fan-name{font-weight:800;color:var(--t);font-size:.98rem}
+.fan-uname{font-size:.78rem;color:var(--a1);font-weight:600;margin-top:1px}
+.fan-thanks{font-size:.8rem;color:var(--t2);margin-top:4px;line-height:1.45}
+.fan-count{flex-shrink:0;text-align:center;background:var(--s3);border-radius:12px;padding:8px 10px;min-width:62px}
+.fan-count b{display:block;font-size:1.2rem;color:var(--a1);font-weight:800}
+.fan-count span{font-size:.66rem;color:var(--t2)}
+.fans-empty{text-align:center;padding:40px 16px;color:var(--t2)}
+.fans-empty-ic{font-size:2.6rem}
+.fans-empty-tt{font-weight:800;color:var(--t);font-size:1.05rem;margin-top:8px}
+.fans-empty-sb{font-size:.85rem;margin-top:5px;line-height:1.5}
+.fans-cta{text-align:center;background:var(--grad);border-radius:18px;padding:22px 18px;margin-top:16px;color:#fff}
+.fans-cta-ic{font-size:2rem}
+.fans-cta-tt{font-weight:800;font-size:1.15rem;margin-top:6px}
+.fans-cta-sb{font-size:.86rem;opacity:.93;max-width:440px;margin:7px auto 0;line-height:1.65}
+.fans-cta-btn{margin-top:14px;padding:12px 22px;border-radius:12px;border:none;background:#fff;color:var(--a1);font-weight:800;cursor:pointer;font-size:.92rem}
+</style>
+    <div class="tab-pane" id="p-fans">
+      <div class="fans-head">
+        <div class="fans-head-tt"><span class="fans-head-ic">🏆</span><div><div class="fans-head-title">نجوم المنصة</div><div class="fans-head-sub">أكثر الطلاب تفاعلاً ومساهمةً في إثراء آراء المواد والتجميعات — شكراً لكم على عطائكم 💛</div></div></div>
+        <div class="fans-stat" id="fans-stat"></div>
+      </div>
+      <div id="fans-list"><div class="peers-loading">⏳ جاري التحميل...</div></div>
+      <div class="fans-cta">
+        <div class="fans-cta-ic">✍️</div>
+        <div class="fans-cta-tt">شارك وأفِد الطلاب</div>
+        <div class="fans-cta-sb">رأيك في المواد يساعد زملاءك على بناء جداولهم واجتياز تخصّصهم بثقة. قيّم موادك الآن وكن من نجوم المنصة القادمين!</div>
+        <button class="fans-cta-btn" onclick="fansGoShare()">✍️ شارك رأيك وقيّم موادك</button>
+      </div>
+    </div>
     <div class="tab-pane" id="p-countdown">
       <div class="card">
         <div class="card-h">⏳ العد التنازلي للتخرج</div>
@@ -2380,6 +2430,38 @@ function applyTabNames(){ try{ var map=(window.SITE_CFG&&SITE_CFG.tabNames)||{};
 function openTabNames(){ try{tuCloseDrawer();}catch(e){} var list=document.getElementById('tabname-list'); var modal=document.getElementById('tabname-modal'); if(!list||!modal)return; var items=document.querySelectorAll('.tab-rail .tab-item'); var map=(window.SITE_CFG&&SITE_CFG.tabNames)||{}; var h=''; items.forEach(function(it){ if(it.style.display==='none')return; var oc=it.getAttribute('onclick')||''; var m=oc.match(/goTab\('([^']+)'/); if(!m)return; var id=m[1]; var cur=(map[id]!=null?map[id]:(it.textContent||'').trim()); h+='<div class="tn-row"><input class="tn-inp" data-tid="'+id+'" value="'+String(cur).replace(/"/g,'&quot;')+'"></div>'; }); list.innerHTML=h; modal.classList.add('open'); }
 function closeTabNames(){ var m=document.getElementById('tabname-modal'); if(m)m.classList.remove('open'); }
 async function saveTabNames(){ window.SITE_CFG=window.SITE_CFG||{}; SITE_CFG.tabNames=SITE_CFG.tabNames||{}; var inps=document.querySelectorAll('#tabname-list .tn-inp'); inps.forEach(function(inp){ var id=inp.getAttribute('data-tid'); var v=(inp.value||'').trim(); if(v){SITE_CFG.tabNames[id]=v;}else{delete SITE_CFG.tabNames[id];} }); try{applyTabNames();}catch(e){} try{localStorage.setItem('tu_site_cfg',JSON.stringify(SITE_CFG));}catch(e){} if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN&&typeof scfgPublish==='function'){ try{await scfgPublish();}catch(e){} } else { try{toast('تم الحفظ ✅');}catch(e){} } closeTabNames(); }
+var fansBusy=false;
+async function renderFans(){
+  var wrap=document.getElementById('fans-list'); if(!wrap)return;
+  var stat=document.getElementById('fans-stat');
+  wrap.innerHTML='<div class="peers-loading">⏳ جاري تحميل نجوم المنصة...</div>';
+  if(typeof sbClient==='undefined'||!sbClient){ wrap.innerHTML='<div class="peers-loading">⚠️ لا يوجد اتصال بقاعدة البيانات</div>'; return; }
+  if(fansBusy)return; fansBusy=true;
+  try{
+    var res=await sbClient.from('course_reviews').select('user_id').eq('status','approved');
+    if(res.error){ wrap.innerHTML='<div class="peers-loading">⚠️ تعذّر التحميل — تأكد من إعداد قاعدة البيانات في Supabase</div>'; return; }
+    var rows=res.data||[]; var counts={};
+    rows.forEach(function(r){ if(!r.user_id)return; counts[r.user_id]=(counts[r.user_id]||0)+1; });
+    var uids=Object.keys(counts); var totalC=rows.length;
+    if(!uids.length){ wrap.innerHTML='<div class="fans-empty"><div class="fans-empty-ic">🌟</div><div class="fans-empty-tt">كن أول نجوم المنصة!</div><div class="fans-empty-sb">شارك رأيك وقيّم موادك لتظهر هنا وتساعد زملاءك في اختيار جداولهم.</div></div>'; if(stat)stat.innerHTML=''; return; }
+    uids.sort(function(a,b){ return counts[b]-counts[a]; });
+    var top=uids.slice(0,5);
+    var profMap={};
+    try{ var pr=await sbClient.from('profiles').select('user_id,name,username,avatar').in('user_id',top); (pr&&pr.data?pr.data:[]).forEach(function(p){ profMap[p.user_id]=p; }); }catch(e){}
+    if(stat)stat.innerHTML='<span class="fans-stat-chip">👥 '+uids.length+' مشارِك</span><span class="fans-stat-chip">📝 '+totalC+' مشاركة</span>';
+    var medals=['🥇','🥈','🥉','🏅','🏅'];
+    var thanks=['بطل المنصة الأول — شكراً لعطائك الكبير 💛','مساهم رائع، لك جزيل الشكر 💙','عطاء مميّز نشكرك عليه 💚','شكراً لمشاركاتك القيّمة 🙌','شكراً لدعمك زملاءك 🙌'];
+    wrap.innerHTML=top.map(function(uid,ix){
+      var p=profMap[uid]||{}; var nm=(p.name||'طالب مجهول');
+      var letter=((String(nm).trim()[0])||'؟');
+      var av=p.avatar?('<img src="'+esc(p.avatar)+'" alt="">'):('<span>'+esc(letter)+'</span>');
+      var uname=p.username?('<div class="fan-uname">@'+esc(p.username)+'</div>'):'';
+      return '<div class="fan-card rank'+(ix+1)+'"><div class="fan-rank">'+medals[ix]+'</div><div class="fan-av">'+av+'</div><div class="fan-info"><div class="fan-name">'+esc(nm)+'</div>'+uname+'<div class="fan-thanks">'+thanks[ix]+'</div></div><div class="fan-count"><b>'+counts[uid]+'</b><span>مشاركة</span></div></div>';
+    }).join('');
+  }catch(e){ wrap.innerHTML='<div class="peers-loading">⚠️ تعذّر الاتصال</div>'; }
+  finally{ fansBusy=false; }
+}
+function fansGoShare(){ try{ var items=document.querySelectorAll('.tab-item'); for(var i=0;i<items.length;i++){ var oc=items[i].getAttribute('onclick')||''; if(oc.indexOf("goTab('plan'")>=0){ items[i].click(); return; } } if(typeof goTab==='function')goTab('plan'); }catch(e){} }
 function tuBuildDrawer(){
   var list=document.getElementById('tu-drawer-list'); if(!list)return;
   var items=document.querySelectorAll('.tab-rail .tab-item'); list.innerHTML='';
