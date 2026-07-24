@@ -2368,6 +2368,15 @@ function tuBuildDrawer(){
     b.onclick=function(){ try{it.click();}catch(e){} tuCloseDrawer(); };
     list.appendChild(b);
   });
+  try{
+    var xtra=[];
+    xtra.push({t:'🔄 تغيير التخصص',f:function(){ if(typeof changeSpec==='function') changeSpec(); }});
+    if(typeof CURRENT_USER!=='undefined' && CURRENT_USER){ xtra.push({t:'🚪 تسجيل الخروج',f:function(){ if(typeof authLogout==='function') authLogout(); },danger:true}); }
+    if(xtra.length){
+      var hr=document.createElement('div'); hr.style.cssText='height:1px;background:var(--bor);margin:8px 6px'; list.appendChild(hr);
+      xtra.forEach(function(x){ var b2=document.createElement('button'); b2.className='tu-drawer-item'; b2.textContent=x.t; if(x.danger)b2.style.color='var(--r,#e5544b)'; b2.onclick=function(){ tuCloseDrawer(); try{x.f();}catch(e){} }; list.appendChild(b2); });
+    }
+  }catch(e){}
 }
 function tuOpenDrawer(){ tuBuildDrawer(); var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.add('open'); if(o)o.classList.add('open'); }
 function tuCloseDrawer(){ var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.remove('open'); if(o)o.classList.remove('open'); }
