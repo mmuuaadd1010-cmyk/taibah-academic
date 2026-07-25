@@ -1224,7 +1224,7 @@ html,body{background:#05060d!important}
     <div class="tg-ico">✈️</div>
     <h2 id="tg-h">قناة المنصة الرسمية على تيليجرام</h2>
     <p>تابع قناتنا الرسمية على تيليجرام للاطلاع على آخر تحديثات التخصصات والمنصة بشكل عام. ننصحك بالانضمام قبل المتابعة.</p>
-    <a class="tg-link" href="https://t.me/taibahiacademic" target="_blank" rel="noopener">https://t.me/taibahiacademic</a>
+    <a class="tg-link" href="https://t.me/taibahiacademic" target="_blank" rel="noopener">انضم إلى قناتنا على تيليجرام</a>
     <button class="tg-ok" onclick="tgGateOk()">موافق، متابعة</button>
   </div>
 </div>
@@ -5281,6 +5281,47 @@ html.pwa-app #tu-bottom-nav{ background:rgba(10,12,20,.97) !important; border-to
 html.pwa-app #site-support{ bottom:calc(90px + env(safe-area-inset-bottom, 0px)) !important; z-index:9997 !important; }
 html.pwa-app .lp-fab, html.pwa-app #tu-top, html.pwa-app .fab{ bottom:calc(90px + env(safe-area-inset-bottom, 0px)) !important; z-index:9997 !important; }
 html.pwa-app .toast{ bottom:calc(104px + env(safe-area-inset-bottom, 0px)) !important; }
+</style>
+<style id="tu-pro-css">
+::selection{ background:rgba(110,160,255,.30); }
+*{ -webkit-tap-highlight-color:transparent; }
+*::-webkit-scrollbar{ width:9px; height:9px; }
+*::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.14); border-radius:20px; }
+*::-webkit-scrollbar-thumb:hover{ background:rgba(255,255,255,.22); }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{ outline:2px solid var(--a1, #6ea0ff); outline-offset:2px; border-radius:8px; }
+#tg-gate .tg-card{ border-radius:24px !important; padding:38px 30px !important; box-shadow:0 30px 80px rgba(0,0,0,.6) !important; }
+#tg-gate .tg-link{ display:inline-flex !important; align-items:center; gap:8px; justify-content:center; margin:4px auto 20px !important; padding:13px 20px !important; border-radius:14px !important; font-weight:700 !important; }
+#tg-gate .tg-ok{ border-radius:14px !important; padding:14px 22px !important; font-weight:700 !important; letter-spacing:.2px; transition:filter .15s ease, transform .12s ease; }
+#tg-gate .tg-ok:active{ transform:scale(.98); }
+#tg-gate .tg-ico{ box-shadow:0 10px 30px rgba(34,158,217,.4) !important; }
+#site-announce{ padding:11px 16px !important; font-weight:700 !important; letter-spacing:.1px; }
+button{ transition:transform .12s ease, filter .15s ease, box-shadow .18s ease; }
+button:active{ transform:translateY(1px); }
+</style>
+<style id="tu-polish2-css">
+/* ---- smoothness ---- */
+html{ scroll-behavior:smooth; }
+body{ -webkit-overflow-scrolling:touch; }
+.tab-pane.on{ animation:tuPaneIn .34s cubic-bezier(.22,1,.36,1) both; }
+
+/* ---- landing hero headline: gradient + tighter ---- */
+.lp-hero h1{ line-height:1.14 !important; letter-spacing:-.5px !important; background:linear-gradient(118deg, var(--t, #ffffff) 32%, var(--a1, #6ea0ff) 72%, var(--a3, #39d0ff)) !important; -webkit-background-clip:text !important; background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+
+/* ---- cards: professional hover lift ---- */
+.lp-fcard, .lp-fic, .set-card, .peer-card, .spec-card, .info-card{ transition:transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease, border-color .22s ease; }
+.lp-fcard:hover, .set-card:hover, .spec-card:hover, .info-card:hover{ transform:translateY(-4px); box-shadow:0 18px 44px rgba(0,0,0,.34); border-color:var(--a1, #6ea0ff); }
+.lp-fcard:hover .lp-fic{ transform:scale(1.08) translateY(-2px); }
+.spec-card:hover{ border-color:rgba(110,160,255,.5); }
+
+/* ---- CTA + nav + stats ---- */
+.lp-cta-in{ box-shadow:0 30px 90px rgba(91,140,255,.16) !important; }
+.lp-nav{ transition:background .3s ease, box-shadow .3s ease; }
+.lp-stat{ transition:transform .2s ease; }
+.lp-stat:hover{ transform:translateY(-3px); }
+
+/* ---- primary buttons: subtle depth ---- */
+.lp-cta .lp-btn-primary, .lp-btn-primary{ transition:transform .14s ease, box-shadow .2s ease, filter .18s ease; }
+.lp-btn-primary:hover{ transform:translateY(-2px); box-shadow:0 14px 34px rgba(91,140,255,.42); }
 </style>
 </body>
 </html>
