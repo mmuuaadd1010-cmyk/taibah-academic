@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>(function(){try{var v=localStorage.getItem("tu_theme");if(v==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="theme-color" content="#05060d">
@@ -1157,7 +1158,6 @@ body{
 <script>(function(){try{var u=location.origin+location.pathname;var c=document.getElementById('tu-canonical');if(c)c.href=u;var o=document.getElementById('tu-ogurl');if(o)o.setAttribute('content',u);}catch(e){}})();</script>
 <style id="tu-mono-lock">
 html,body{background:var(--bg)}
-.theme-btn,.lp-theme,#theme-btn,#lp-theme,#lp-theme-btn{display:none!important}
 .spec-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:12px!important;background:transparent!important;border:0!important;border-radius:0!important;overflow:visible!important}
 @media(max-width:640px){.spec-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}}
 .spec-card{opacity:1!important;animation:none!important;background:linear-gradient(160deg,var(--s2),var(--s1))!important;border:1px solid var(--bor)!important;border-bottom:1px solid var(--bor)!important;border-radius:18px!important;padding:20px 12px 16px!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:11px!important;position:relative!important;text-align:center!important;justify-content:flex-start!important;overflow:hidden!important}
@@ -1233,6 +1233,37 @@ html,body{background:var(--bg)}
 .spec-crumb span{font-size:.74rem;color:var(--t2)}
 #s-spec .spec-grid{max-width:760px;margin:0 auto}
 #s-spec .spec-card.cur{border-color:var(--a1)!important;box-shadow:var(--ring)}
+</style>
+<style id="tu-theme-light">
+html[data-theme="light"]{
+  --bg:#f5f7fa;--s1:#ffffff;--s2:#ffffff;--s3:#eef1f5;--s4:#e2e7ee;
+  --bor:#e2e7ee;--bor2:#d3dae3;--bor3:#bcc5d1;
+  --a1:#2f6fd0;--a2:#3d81e3;--a3:#1f5bb0;
+  --g:#149469;--r:#d24840;--y:#b07d10;--o:#c26d1f;--pk:#b8558f;
+  --t:#141a21;--t2:#4f5c6b;--t3:#7b8896;
+  --grad:linear-gradient(135deg,#2f6fd0,#4f8ef7);
+  --grad3:linear-gradient(135deg,#2f6fd0,#4f8ef7,#7bb4ff);
+  --glass:rgba(255,255,255,.86);
+  --shadow:0 14px 34px -18px rgba(20,26,33,.28);
+  --shadow-sm:0 6px 16px -10px rgba(20,26,33,.24);
+  --ring:0 0 0 2px rgba(47,111,208,.26);
+  color-scheme:light;
+}
+html[data-theme="light"] .amb-blob{opacity:.22}
+html[data-theme="light"] .nav-gpa-val{color:#141a21!important;-webkit-text-fill-color:#141a21!important}
+html[data-theme="light"] .spec-card:hover{box-shadow:0 12px 28px rgba(47,111,208,.18)}
+html[data-theme="light"] .app-nav{box-shadow:0 1px 0 var(--bor)}
+html[data-theme="light"] .col-card,html[data-theme="light"] .spec-card{box-shadow:var(--shadow-sm)}
+html[data-theme="light"] img.tu-logo-img{background:#0c1014!important;border-radius:8px}
+.theme-btn,#theme-btn{display:flex!important}
+#theme-btn{background:var(--s2);border:1px solid var(--bor);border-radius:10px;width:38px;height:38px;font-size:1.05rem;line-height:1;cursor:pointer;color:var(--t);align-items:center;justify-content:center;transition:transform .25s,border-color .2s,color .2s}
+#theme-btn:hover{border-color:var(--a1);color:var(--a1);transform:rotate(18deg) scale(1.08)}
+</style>
+<style id="tu-yanbu-note">
+#spec-yanbu-note{display:flex;gap:11px;align-items:flex-start;text-align:right;direction:rtl;max-width:760px;margin:14px auto 18px;background:var(--s1);border:1px solid var(--bor);border-inline-start:3px solid var(--a1);border-radius:14px;padding:13px 15px}
+#spec-yanbu-note .syn-ic{flex:0 0 26px;height:26px;border-radius:50%;background:var(--s3);color:var(--a1);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;margin-top:1px}
+#spec-yanbu-note b{display:block;font-size:.85rem;color:var(--t);margin-bottom:4px}
+#spec-yanbu-note p{font-size:.78rem;color:var(--t2);line-height:1.7}
 </style>
 </head>
 <body>
@@ -1598,6 +1629,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <div class="logo-mark brand-c tu-logo-img" style="width:50px;height:50px;margin-bottom:12px" role="img" aria-label="TU Academic"></div>
     <h2 id="spec-step-title">في أي كلية تدرس؟</h2>
     <p id="spec-step-sub">اختر كليتك، ثم تخصصك.</p>
+  <div id="spec-yanbu-note"><span class="syn-ic">ℹ</span><div><b>طلاب فرع ينبع</b><p>بعض تخصصات ينبع مدرجة ضمن كليات المدينة لتشابه الخطط، وبعضها مستقلة. إذا ما وجدت تخصصك في كليات ينبع، ابحث عنه داخل كليات المدينة أو من خلال البحث فوق.</p></div></div>
   </div>
   <input class="srch" type="text" id="spec-srch" placeholder="🔍 ابحث عن تخصص..." oninput="renderSpecs()" style="max-width:420px;margin:0 auto 18px;display:block">
   <div id="specexp-card" style="display:none;max-width:680px;margin:0 auto 18px;background:var(--s2,#1a1f25);border:1px solid var(--bor,#28303a);border-radius:16px;padding:16px;text-align:right;direction:rtl">
@@ -1622,6 +1654,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
       <div class="nav-spec-pill" id="nav-spec-pill" onclick="changeSpec()">التخصص ‹</div>
     </div>
     <div class="nav-right">
+      <button id="theme-btn" onclick="toggleTheme()" title="تغيير المزاج" aria-label="تغيير المزاج">☀️</button>
       <button class="tu-menu-btn" onclick="tuOpenDrawer()" title="القائمة" aria-label="القائمة">☰</button>
       <div class="nav-gpa"><div class="nav-gpa-val" id="nav-gpa">–</div><div class="nav-gpa-lbl">معدلك</div></div>
     </div>
@@ -2382,8 +2415,31 @@ window.onload=()=>{
 };
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');});const el=document.getElementById(id);el.classList.add('active');try{localStorage.setItem('tu_view_screen',id);}catch(e){}}
 
-function toggleTheme(){}
-function syncThemeBtn(){}
+function tuThemeGet(){try{var v=localStorage.getItem('tu_theme');return (v==='light')?'light':'dark';}catch(e){return 'dark';}}
+function tuThemeApply(m){
+  var root=document.documentElement;
+  if(m==='light'){root.setAttribute('data-theme','light');}else{root.removeAttribute('data-theme');}
+  try{localStorage.setItem('tu_theme',m);}catch(e){}
+  try{var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content',m==='light'?'#f5f7fa':'#05060d');}catch(e){}
+  syncThemeBtn();
+  try{if(typeof renderCharts==='function'&&document.getElementById('s-app')&&document.getElementById('s-app').classList.contains('active'))renderCharts();}catch(e){}
+}
+function toggleTheme(){tuThemeApply(tuThemeGet()==='light'?'dark':'light');}
+function syncThemeBtn(){
+  var light=tuThemeGet()==='light';
+  var ids=['theme-btn','theme-btn-auth'];
+  for(var i=0;i<ids.length;i++){
+    var b=document.getElementById(ids[i]);
+    if(!b)continue;
+    b.textContent=light?'🌙':'☀️';
+    b.title=light?'الوضع الليلي':'الوضع الصباحي';
+    b.setAttribute('aria-label',b.title);
+  }
+}
+window.authToggleTheme=toggleTheme;window.lpTheme=toggleTheme;window.chamberSetTheme=tuThemeApply;window.lpSyncTheme=syncThemeBtn;
+try{tuThemeApply(tuThemeGet());}catch(e){}
+document.addEventListener('DOMContentLoaded',function(){try{syncThemeBtn();}catch(e){}});
+
 
 /* ===== ONBOARD ===== */
 function goToSpec(){var inp=document.getElementById('inp-name');var n=((inp&&inp.value)||'').trim();if(!n){if(inp){inp.classList.add('shake');setTimeout(function(){inp.classList.remove('shake');},500);try{inp.focus();}catch(e){}}toast('\u0623\u062f\u062e\u0644 \u0627\u0633\u0645\u0643 \u0623\u0648\u0644\u0627\u064b \u270d\ufe0f');return;}student.name=n;saveSt();showScreen('s-spec');renderSpecs();try{window.scrollTo(0,0);}catch(e){}}
@@ -4505,9 +4561,6 @@ async function sendChat(){
 </style>
 <script>
 (function(){
-  window.toggleTheme=function(){};window.lpTheme=function(){};window.authToggleTheme=function(){};
-  window.syncThemeBtn=function(){};window.lpSyncTheme=function(){};window.chamberSetTheme=function(){};
-  try{document.documentElement.removeAttribute('data-theme');localStorage.removeItem('tu_pro_theme');}catch(e){}
 })();
 var chatChannel=null;
 function chatBubbleHTML(m,me){
@@ -5382,7 +5435,6 @@ window.addEventListener('load',function(){ setTimeout(function(){
 },1800); });
 </script>
 <script>
-window.toggleTheme=function(){};window.authToggleTheme=function(){};window.lpTheme=function(){};
 </script>
 <style>
 .pim-overlay{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.82);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;font-family:'Tajawal',sans-serif}
