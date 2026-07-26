@@ -5451,5 +5451,31 @@ html[data-theme="light"], html[data-theme="light"] body{background:#ffffff !impo
 /* remove decorative aurora blobs so it is truly solid black / white */
 .amb-blob{display:none !important}
 </style>
+<script>
+/* tu-theme-force v2 : bulletproof black/white toggle (forces inline background) */
+function tuSetTheme(mode){
+  var h=document.documentElement, b=document.body;
+  if(mode==="light"){ h.setAttribute("data-theme","light"); }
+  else { mode="dark"; h.removeAttribute("data-theme"); }
+  try{ localStorage.setItem("tu_pro_theme", mode); }catch(e){}
+  var bg = mode==="light" ? "#ffffff" : "#000000";
+  var fg = mode==="light" ? "#0b0e1a" : "#e6eaff";
+  try{ h.style.setProperty("background", bg, "important"); }catch(e){}
+  try{ if(b){ b.style.setProperty("background", bg, "important"); b.style.setProperty("color", fg, "important"); } }catch(e){}
+  try{ var tb=document.getElementById("theme-btn"); if(tb) tb.textContent = mode==="light" ? "☀️" : "🌙"; }catch(e){}
+  try{ var lt=document.getElementById("lp-theme-btn"); if(lt) lt.textContent = mode==="light" ? "☀️" : "🌙"; }catch(e){}
+}
+window.toggleTheme = function(){
+  var cur = document.documentElement.getAttribute("data-theme")==="light" ? "light" : "dark";
+  tuSetTheme(cur==="light" ? "dark" : "light");
+  try{ if(typeof renderHome==="function") renderHome(); }catch(e){}
+  try{ if(document.getElementById("p-chart") && document.getElementById("p-chart").classList.contains("on") && typeof renderCharts==="function") renderCharts(); }catch(e){}
+};
+window.lpTheme = function(){ window.toggleTheme(); try{ if(typeof lpSyncTheme==="function") lpSyncTheme(); }catch(e){} };
+(function(){
+  function tuThemeInit(){ var m="dark"; try{ var v=localStorage.getItem("tu_pro_theme"); if(v==="light") m="light"; }catch(e){} tuSetTheme(m); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", tuThemeInit); else tuThemeInit();
+})();
+</script>
 </body>
 </html>
