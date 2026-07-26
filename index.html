@@ -5443,5 +5443,13 @@ async function tuLoadSpecCounts(){
 }
 </script>
 <style id="tu-theme-btn-fix">.theme-btn,#theme-btn,.lp-theme,#lp-theme,#lp-theme-btn{display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important}</style>
+<style id="tu-theme-solid">
+/* force the PAGE background (html + body) to follow the theme */
+/* beats the earlier rule html,body{background:#05060d!important} via higher specificity */
+html:not([data-theme="light"]), html:not([data-theme="light"]) body{background:#000000 !important}
+html[data-theme="light"], html[data-theme="light"] body{background:#ffffff !important}
+/* remove decorative aurora blobs so it is truly solid black / white */
+.amb-blob{display:none !important}
+</style>
 </body>
 </html>
