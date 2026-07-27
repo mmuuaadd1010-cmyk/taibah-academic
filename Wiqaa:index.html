@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>وقاء · Wiqaa — منصة المراقبة البيئية والصحية</title>
+<style>
+:root{
+  --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --soft2:#F0EFED;
+  --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --green:#46A171; --green-soft:#E8F1EC;
+  --orange:#D5803B; --orange-soft:#FBEBDE; --red:#E56458; --red-soft:#FCE9E7;
+  --radius:8px; --radius-lg:12px;
+  --shadow:0 1px 2px rgba(0,0,0,.05), 0 4px 12px rgba(0,0,0,.04);
+  --font:"Noto Sans Arabic",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+[data-theme="dark"]{
+  --text:#FFFFFF; --text2:rgba(255,255,255,.65); --canvas:#191919; --soft:#202020; --soft2:#383836;
+  --border:rgba(255,255,255,.20); --blue:#5E9FE8; --blue-soft:rgba(94,159,232,.12);
+  --green:#72BC8F; --green-soft:rgba(114,188,143,.12); --orange:#DE9255; --orange-soft:rgba(222,146,85,.12);
+  --red:#E97366; --red-soft:rgba(233,115,102,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--canvas);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+
+/* ---------- Top bar ---------- */
+header.top{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--canvas) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.top-in{max-width:1120px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.01em}
+.mark{width:32px;height:32px;flex:none}
+.top nav{margin-inline-start:auto;display:flex;align-items:center;gap:4px}
+.nav-link{padding:8px 12px;border-radius:var(--radius);color:var(--text2);text-decoration:none;font-size:14px;font-weight:500}
+.nav-link:hover{background:var(--soft2);color:var(--text)}
+.nav-link.active{color:var(--blue);background:var(--blue-soft)}
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--border);background:var(--canvas);color:var(--text);border-radius:var(--radius);cursor:pointer}
+.icon-btn:hover{background:var(--soft2)}
+.icon-btn:focus-visible,.nav-link:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ---------- Hero ---------- */
+.hero{padding:72px 0 48px;border-bottom:1px solid var(--border)}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.15;letter-spacing:-.02em;font-weight:700;max-width:16ch}
+.hero p{margin-top:16px;color:var(--text2);font-size:18px;max-width:56ch}
+.hero .cta{margin-top:32px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;border:1px solid transparent}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{filter:brightness(.94)}
+.btn-ghost{background:var(--canvas);color:var(--text);border-color:var(--border)}
+.btn-ghost:hover{background:var(--soft2)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--green-soft);color:var(--green);font-size:13px;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+
+/* ---------- Sections ---------- */
+section{padding:56px 0}
+.sec-head{margin-bottom:24px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.sec-head h2{margin-top:8px;font-size:28px;letter-spacing:-.015em}
+.sec-head p{margin-top:8px;color:var(--text2);max-width:60ch}
+
+/* ---------- Dashboard ---------- */
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.select{min-height:44px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--canvas);color:var(--text);font-family:inherit;font-size:14px;font-weight:500}
+.stamp{margin-inline-start:auto;color:var(--text2);font-size:13px;font-variant-numeric:tabular-nums}
+
+.grid-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{background:var(--canvas);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.card.soft{background:var(--soft)}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.kpi-label{font-size:13px;font-weight:600;color:var(--text2)}
+.kpi-val{margin-top:12px;font-size:34px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi-val span{font-size:15px;font-weight:600;color:var(--text2);margin-inline-start:4px}
+.kpi-foot{margin-top:10px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text2)}
+.spark{width:100%;height:38px;margin-top:12px;display:block}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.b-ok{background:var(--green-soft);color:var(--green)}
+.b-warn{background:var(--orange-soft);color:var(--orange)}
+.b-crit{background:var(--red-soft);color:var(--red)}
+
+.grid-main{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+.card-head h3{font-size:16px;font-weight:700}
+.card-head p{font-size:13px;color:var(--text2)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--text2);margin-top:12px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:6px;vertical-align:middle}
+#chart{width:100%;height:260px;display:block;margin-top:12px}
+
+.dev{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dev:last-child{border-bottom:0;padding-bottom:0}
+.dev .st{width:10px;height:10px;border-radius:50%;flex:none}
+.dev b{font-size:14px;font-weight:600;display:block}
+.dev small{color:var(--text2);font-size:12.5px}
+.dev .rssi{margin-inline-start:auto;font-size:12.5px;color:var(--text2);font-variant-numeric:tabular-nums}
+
+/* heatmap */
+.heat{display:grid;grid-template-columns:auto repeat(12,minmax(28px,1fr));gap:4px;margin-top:16px;overflow-x:auto;padding-bottom:4px}
+.heat .rowlab{font-size:12px;color:var(--text2);display:flex;align-items:center;padding-inline-end:8px;white-space:nowrap}
+.heat .cell{aspect-ratio:1;border-radius:4px;min-width:28px}
+.heat .collab{font-size:11px;color:var(--text2);text-align:center;font-variant-numeric:tabular-nums}
+.scale{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--text2)}
+.scale .ramp{height:8px;flex:1;max-width:200px;border-radius:4px;background:linear-gradient(to left,#E8F1EC,#72BC8F,#EAC26B,#DE9255,#E56458)}
+
+/* table */
+.tbl-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:start;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;padding:0 12px 10px;white-space:nowrap}
+td{padding:14px 12px;border-top:1px solid var(--border);white-space:nowrap;font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--soft)}
+.empty{padding:32px;text-align:center;color:var(--text2);font-size:14px}
+
+/* arch */
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:8px}
+.node{background:var(--soft);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center;position:relative}
+.node b{display:block;font-size:13.5px}
+.node small{color:var(--text2);font-size:11.5px}
+.node::after{content:"←";position:absolute;inset-inline-start:-13px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:14px}
+.node:first-child::after{content:""}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat h4{font-size:15px;margin-bottom:6px}
+.feat p{font-size:13.5px;color:var(--text2)}
+.feat .ic{width:36px;height:36px;border-radius:var(--radius);background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;margin-bottom:12px;font-size:18px}
+
+footer{border-top:1px solid var(--border);padding:32px 0;color:var(--text2);font-size:13.5px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+footer .sep{margin-inline-start:auto}
+
+@media (max-width:900px){
+  .grid-kpi{grid-template-columns:repeat(2,1fr)}
+  .grid-main{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr}
+  .flow{grid-template-columns:repeat(2,1fr)}
+  .node::after{content:""}
+}
+@media (max-width:560px){
+  .wrap,.top-in{padding-inline:20px}
+  .hero{padding:48px 0 32px}
+  .grid-kpi{grid-template-columns:1fr}
+  .top nav .nav-link{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 2.5 27 6.6v9.1c0 6.7-4.4 12.2-11 14.8-6.6-2.6-11-8.1-11-14.8V6.6L16 2.5Z" fill="none" stroke="#2783DE" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M10.5 16.5h3l2-4.5 2.6 8 2-3.5h2.4" fill="none" stroke="#46A171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>وقاء <span style="color:var(--text2);font-weight:600">Wiqaa</span></span>
+    </div>
+    <nav>
+      <a class="nav-link active" href="#dashboard">لوحة المراقبة</a>
+      <a class="nav-link" href="#alerts">التنبيهات</a>
+      <a class="nav-link" href="#arch">كيف يعمل</a>
+      <button class="icon-btn" id="themeBtn" aria-label="تبديل الوضع الليلي">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <span class="pill"><span class="dot"></span> النظام يعمل · بيانات مباشرة</span>
+      <h1>مراقبة بيئية وصحية لحظية، من الحسّاس إلى الشاشة.</h1>
+      <p>وقاء يجمع قراءات الحرارة والرطوبة وجودة الهواء والمؤشرات الحيوية من لوحة ESP32، ويحوّلها إلى تنبيهات مفهومة قبل أن تتحول إلى خطر.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#dashboard">افتح لوحة المراقبة</a>
+        <a class="btn btn-ghost" href="#arch">كيف يعمل النظام</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">لوحة المراقبة</div>
+        <h2>القراءات الحالية</h2>
+      </div>
+
+      <div class="bar">
+        <select class="select" id="deviceSel" aria-label="ا��تيار الجهاز"></select>
+        <select class="select" id="rangeSel" aria-label="النطاق الزمني">
+          <option value="30">آخر 30 دقيقة</option>
+          <option value="180" selected>آخر 3 ساعات</option>
+          <option value="1440">آخر 24 ساعة</option>
+        </select>
+        <span class="stamp" id="stamp">—</span>
+      </div>
+
+      <div class="grid-kpi" id="kpis"></div>
+
+      <div class="grid-main">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>الاتجاه الزمني</h3>
+              <p>قيم مُطبَّعة لمقارنة المؤشرات على محور واحد</p>
+            </div>
+          </div>
+          <canvas id="chart" role="img" aria-label="مخطط زمني لقراءات الحساسات"></canvas>
+          <div class="legend" id="legend"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>الأجهزة</h3><p>حالة الاتصال وقوة الإشارة</p></div></div>
+          <div id="devList"></div>
+          <div class="card soft" style="margin-top:16px;padding:14px">
+            <div style="font-size:12.5px;color:var(--text2)">معدل الإرسال</div>
+            <div style="font-size:20px;font-weight:700;margin-top:4px">كل ٣٠ ثانية</div>
+            <div style="font-size:12.5px;color:var(--text2);margin-top:6px">٢ من ٣ أجهزة ترسل الآن · ٢٫٤ ألف قراءة محفوظة</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-head">
+          <div><h3>خريطة حرارية · جودة الهواء PM2.5</h3><p>متوسط كل ساعة خلال آخر ٤ أيام</p></div>
+        </div>
+        <div class="heat" id="heat"></div>
+        <div class="scale"><span>جيد</span><span class="ramp"></span><span>خطر</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERTS -->
+  <section id="alerts" style="background:var(--soft);border-block:1px solid var(--border)">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">التنبيهات</div>
+        <h2>تجاوزات الحدود</h2>
+        <p>يُصدر النظام تنبيهًا تلقائيًا عند خروج أي مؤشر عن نطاقه الآمن، مع تسجيل وقت البداية والقيمة المسجَّلة.</p>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>الخطورة</th><th>المؤشر</th><th>القيمة</th><th>الحد</th><th>الجهاز</th><th>الوقت</th></tr></thead>
+            <tbody id="alertRows"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="alertEmpty" hidden>لا توجد تنبيهات نشطة · جميع المؤشرات داخل النطاق الآمن ✅</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCH -->
+  <section id="arch">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">المعمارية</div>
+        <h2>كيف تصل القراءة إلى الشاشة</h2>
+      </div>
+      <div class="flow">
+        <div class="node"><b>الحسّاسات</b><small>حرارة · رطوبة · هواء</small></div>
+        <div class="node"><b>ESP32</b><small>قراءة وتجميع</small></div>
+        <div class="node"><b>Wi-Fi / TLS</b><small>إرسال مشفّر</small></div>
+        <div class="node"><b>API</b><small>تحقّق وتصفية</small></div>
+        <div class="node"><b>قاعدة بيانات</b><small>سلاسل زمنية</small></div>
+        <div class="node" style="background:var(--blue-soft);border-color:var(--blue)"><b>لوحة وقاء</b><small>عرض مباشر</small></div>
+      </div>
+
+      <div class="grid3" style="margin-top:32px">
+        <div class="card feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg></div><h4>تحديث لحظي</h4><p>يستقبل المتصفح القراءة الجديدة لحظة وصولها دون إعادة تحميل الصفحة.</p></div>
+        <div class="card feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v10H4z"/><path d="M8 11h8M8 14h5"/></svg></div><h4>لا تفقد قرا��ة</h4><p>عند انقطاع الشبكة يخزّن الجهاز القراءات محليًا ويعيد إرسالها عند عودة الاتصال.</p></div>
+        <div class="card feat"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="M8 15l4-6 3 3 4-6"/></svg></div><h4>سجل تاريخي</h4><p>كل قراءة تُحفظ وتُجمَّع تلقائيًا لعرض الاتجاهات عبر الساعات والأيام.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;width:100%">
+    <span>وقاء · Wiqaa</span>
+    <span class="sep" id="srcNote">وضع العرض التجريبي — البيانات مُحاكاة حتى ربط الـ ESP32</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   Wiqaa front-end
+   يعمل تلقائيًا مع الـ API الحقيقي إن وُجد، وإلا يُشغّل بيانات محاكاة.
+   ============================================================ */
+const API_BASE = window.WIQAA_API || "";   // مثال: "https://api.wiqaa.sa"
+let USE_API = Boolean(API_BASE);
+
+const METRICS = [
+  { key:"temperature", label:"درجة الحرارة", unit:"°م",   color:"#DE9255", base:31,  amp:2.2, min:15, max:55,  warn:38, crit:43, dec:1 },
+  { key:"humidity",    label:"الرطوبة",      unit:"%",     color:"#5E9FE8", base:44,  amp:6,   min:5,  max:95,  warn:70, crit:80, dec:0 },
+  { key:"pm25",        label:"جزيئات PM2.5", unit:"µg/m³", color:"#BF8EDA", base:19,  amp:9,   min:0,  max:160, warn:35, crit:55, dec:1 },
+  { key:"co2",         label:"ثاني أكسيد الكربون", unit:"ppm", color:"#72BC8F", base:640, amp:120, min:380,max:2500,warn:1000,crit:1500, dec:0 }
+];
+
+const DEVICES = [
+  { id:"wiqaa-001", name:"وحدة المختبر",  location:"المبنى أ · الدور الأول", status:"online",  rssi:-58 },
+  { id:"wiqaa-002", name:"وحدة الورشة",   location:"المبنى ب · الورشة",     status:"online",  rssi:-71 },
+  { id:"wiqaa-003", name:"وحدة المستودع", location:"المستودع الخارجي",       status:"offline", rssi:null }
+];
+
+/* ---------- محاكاة سلسلة زمنية مستقرة (deterministic) ---------- */
+function seeded(i, salt){ const x = Math.sin(i*12.9898 + salt*78.233) * 43758.5453; return x - Math.floor(x); }
+function series(metric, points, salt){
+  const out = [];
+  for(let i=0;i<points;i++){
+    const wave = Math.sin(i/9 + salt) * metric.amp + Math.sin(i/3.5) * metric.amp*0.35;
+    const noise = (seeded(i, salt) - .5) * metric.amp * .55;
+    let v = metric.base + wave + noise;
+    if(i > points*0.82 && metric.key==="pm25") v += (i - points*0.82) * 1.9;   // حدث تجاوز واقعي
+    if(i > points*0.9  && metric.key==="co2")  v += (i - points*0.9) * 22;
+    out.push(Math.min(metric.max, Math.max(metric.min, v)));
+  }
+  return out;
+}
+
+let state = { device: DEVICES[0].id, minutes: 180, data:{}, times:[] };
+
+function buildData(){
+  const points = 72;
+  const step = (state.minutes*60*1000)/points;
+  const now = Date.now();
+  state.times = Array.from({length:points}, (_,i)=> new Date(now - (points-1-i)*step));
+  const salt = DEVICES.findIndex(d=>d.id===state.device) + 1;
+  METRICS.forEach(m => state.data[m.key] = series(m, points, salt*1.7));
+}
+
+function level(m, v){ return v>=m.crit ? "crit" : v>=m.warn ? "warn" : "ok"; }
+const LVL = { ok:{cls:"b-ok",txt:"طبيعي"}, warn:{cls:"b-warn",txt:"تحذير"}, crit:{cls:"b-crit",txt:"خطر"} };
+const fmt = (v,d)=> v.toLocaleString("ar-EG",{minimumFractionDigits:d,maximumFractionDigits:d});
+const clock = d=> d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"});
+
+/* ---------- KPI cards ---------- */
+function renderKPIs(){
+  const host = document.getElementById("kpis");
+  host.innerHTML = METRICS.map(m=>{
+    const arr = state.data[m.key];
+    const v = arr[arr.length-1], prev = arr[arr.length-8] ?? v;
+    const diff = v - prev, lv = LVL[level(m,v)];
+    const arrow = diff > 0.4 ? "▲" : diff < -0.4 ? "▼" : "■";
+    return `<article class="card">
+      <div class="kpi-top">
+        <span class="kpi-label">${m.label}</span>
+        <span class="badge ${lv.cls}">${lv.txt}</span>
+      </div>
+      <div class="kpi-val">${fmt(v,m.dec)}<span>${m.unit}</span></div>
+      <div class="kpi-foot">${arrow} ${fmt(Math.abs(diff),m.dec)} ${m.unit} خلال آخر قراءات</div>
+      <canvas class="spark" data-metric="${m.key}" aria-hidden="true"></canvas>
+    </article>`;
+  }).join("");
+  document.querySelectorAll(".spark").forEach(c=>{
+    const m = METRICS.find(x=>x.key===c.dataset.metric);
+    drawSpark(c, state.data[m.key], m.color);
+  });
+}
+
+function hidpi(canvas, h){
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth || 300;
+  const H = h || canvas.clientHeight || 100;
+  canvas.width = w*dpr; canvas.height = H*dpr;
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,H);
+  return { ctx, w, h:H };
+}
+
+function drawSpark(canvas, arr, color){
+  const { ctx, w, h } = hidpi(canvas, 38);
+  const mn = Math.min(...arr), mx = Math.max(...arr), rng = (mx-mn)||1;
+  const X = i => (i/(arr.length-1))*w;
+  const Y = v => h-3 - ((v-mn)/rng)*(h-8);
+  ctx.beginPath();
+  arr.forEach((v,i)=> i? ctx.lineTo(X(i),Y(v)) : ctx.moveTo(X(i),Y(v)));
+  ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin="round"; ctx.stroke();
+  ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+  const g = ctx.createLinearGradient(0,0,0,h);
+  g.addColorStop(0, color+"33"); g.addColorStop(1, color+"00");
+  ctx.fillStyle = g; ctx.fill();
+}
+
+/* ---------- Main chart (normalized 0..1) ---------- */
+function drawChart(){
+  const canvas = document.getElementById("chart");
+  const { ctx, w, h } = hidpi(canvas, 260);
+  const css = getComputedStyle(document.body);
+  const border = css.getPropertyValue("--border").trim();
+  const text2  = css.getPropertyValue("--text2").trim();
+  const padT=14, padB=28, padS=8;
+
+  ctx.strokeStyle = border; ctx.lineWidth = 1;
+  ctx.font = `11px ${css.fontFamily}`; ctx.fillStyle = text2;
+  for(let i=0;i<=4;i++){
+    const y = padT + (h-padT-padB)*(i/4);
+    ctx.beginPath(); ctx.moveTo(padS,y); ctx.lineTo(w-padS,y); ctx.stroke();
+  }
+  const n = state.times.length;
+  const X = i => w-padS - (i/(n-1))*(w-padS*2);   // RTL: الأقدم يمينًا
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  [0, Math.floor(n/2), n-1].forEach(i=> ctx.fillText(clock(state.times[i]), X(i), h-padB+8));
+
+  METRICS.forEach(m=>{
+    const arr = state.data[m.key];
+    const Y = v => padT + (h-padT-padB) * (1 - (v-m.min)/(m.max-m.min));
+    ctx.beginPath();
+    arr.forEach((v,i)=> i? ctx.lineTo(X(i),Y(v)) : ctx.moveTo(X(i),Y(v)));
+    ctx.strokeStyle=m.color; ctx.lineWidth=2.2; ctx.lineJoin="round"; ctx.lineCap="round"; ctx.stroke();
+    const last = arr[arr.length-1];
+    ctx.beginPath(); ctx.arc(X(n-1), Y(last), 3.6, 0, Math.PI*2);
+    ctx.fillStyle=m.color; ctx.fill();
+  });
+
+  document.getElementById("legend").innerHTML = METRICS.map(m=>{
+    const a = state.data[m.key];
+    return `<span><i style="background:${m.color}"></i>${m.label} · ${fmt(a[a.length-1],m.dec)} ${m.unit}</span>`;
+  }).join("");
+}
+
+/* ---------- Devices ---------- */
+function renderDevices(){
+  document.getElementById("devList").innerHTML = DEVICES.map(d=>{
+    const on = d.status==="online";
+    const col = on ? "var(--green)" : "var(--text2)";
+    return `<div class="dev">
+      <span class="st" style="background:${col}"></span>
+      <span><b>${d.name}</b><small>${d.location}</small></span>
+      <span class="rssi">${on ? d.rssi+" dBm" : "غير متصل"}</span>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- Heatmap ---------- */
+function renderHeat(){
+  const host = document.getElementById("heat");
+  const days = ["اليوم","أمس","قبل يومين","قبل ٣ أيام"];
+  const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
+  const ramp = v => { // v: 0..1
+    const stops = [[232,241,236],[114,188,143],[234,194,107],[222,146,85],[229,100,88]];
+    const t = Math.min(.999, Math.max(0,v)) * (stops.length-1);
+    const i = Math.floor(t), f = t-i;
+    const c = stops[i].map((a,k)=> Math.round(a + (stops[i+1][k]-a)*f));
+    return `rgb(${c.join(",")})`;
+  };
+  let html = `<div></div>` + hours.map(hh=>`<div class="collab">${hh}</div>`).join("");
+  days.forEach((d,di)=>{
+    html += `<div class="rowlab">${d}</div>`;
+    hours.forEach((hh,hi)=>{
+      const s = seeded(di*13+hi, 4.2);
+      const load = 0.18 + s*0.5 + (hh>=10&&hh<=16 ? 0.3 : 0) - (di*0.05);
+      const val = Math.max(0, Math.min(1, load));
+      html += `<div class="cell" style="background:${ramp(val)}" title="${d} · الساعة ${hh} · ${fmt(val*70,1)} µg/m³"></div>`;
+    });
+  });
+  host.innerHTML = html;
+}
+
+/* ---------- Alerts ---------- */
+function renderAlerts(){
+  const rows = [];
+  METRICS.forEach(m=>{
+    const arr = state.data[m.key];
+    for(let i=arr.length-1;i>=0 && rows.length<8;i--){
+      const lv = level(m, arr[i]);
+      if(lv!=="ok"){
+        rows.push({ lv, m, v:arr[i], t:state.times[i], dev: DEVICES.find(d=>d.id===state.device).name });
+        break;
+      }
+    }
+  });
+  const tb = document.getElementById("alertRows");
+  document.getElementById("alertEmpty").hidden = rows.length>0;
+  tb.innerHTML = rows.map(r=>`<tr>
+    <td><span class="badge ${LVL[r.lv].cls}">${LVL[r.lv].txt}</span></td>
+    <td>${r.m.label}</td>
+    <td>${fmt(r.v,r.m.dec)} ${r.m.unit}</td>
+    <td>${fmt(r.lv==="crit"?r.m.crit:r.m.warn,0)} ${r.m.unit}</td>
+    <td>${r.dev}</td>
+    <td>${clock(r.t)}</td>
+  </tr>`).join("");
+}
+
+/* ---------- Live tick ---------- */
+function tick(){
+  METRICS.forEach(m=>{
+    const arr = state.data[m.key];
+    const last = arr[arr.length-1];
+    const next = Math.min(m.max, Math.max(m.min, last + (Math.random()-.5)*m.amp*.4));
+    arr.push(next); arr.shift();
+  });
+  const step = (state.minutes*60*1000)/state.times.length;
+  state.times.push(new Date(state.times[state.times.length-1].getTime()+step));
+  state.times.shift();
+  renderKPIs(); drawChart(); renderAlerts(); stampNow();
+}
+
+function stampNow(){
+  document.getElementById("stamp").textContent = "آخر تحديث " + new Date().toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+}
+
+function renderAll(){ buildData(); renderKPIs(); drawChart(); renderDevices(); renderHeat(); renderAlerts(); stampNow(); }
+
+/* ---------- Wire up ---------- */
+document.getElementById("deviceSel").innerHTML = DEVICES.map(d=>`<option value="${d.id}">${d.name}</option>`).join("");
+document.getElementById("deviceSel").onchange = e => { state.device = e.target.value; renderAll(); };
+document.getElementById("rangeSel").onchange  = e => { state.minutes = +e.target.value; renderAll(); };
+
+const themeBtn = document.getElementById("themeBtn");
+const startDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+document.documentElement.dataset.theme = startDark ? "dark" : "light";
+themeBtn.onclick = () => {
+  document.documentElement.dataset.theme = document.documentElement.dataset.theme==="dark" ? "light" : "dark";
+  drawChart(); renderKPIs();
+};
+
+window.addEventListener("resize", ()=>{ drawChart(); renderKPIs(); });
+renderAll();
+if(!USE_API) setInterval(tick, 5000);
+
+/* ---------- الاتصال بالـ API الحقيقي (يُستخدم عند نشر الـ backend) ----------
+async function pullLive(){
+  const r = await fetch(`${API_BASE}/api/v1/devices/${state.device}/latest`);
+  const json = await r.json();   // { readings: [{metric, value, ts}] }
+  ...
+}
+const es = new EventSource(`${API_BASE}/api/v1/stream`);
+es.onmessage = e => { const d = JSON.parse(e.data); ... };
+-------------------------------------------------------------------------- */
+</script>
+</body>
+</html>
