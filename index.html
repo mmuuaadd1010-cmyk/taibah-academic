@@ -1519,6 +1519,137 @@ html[data-theme="light"] .plan-editbar .pe-btn.on,html[data-theme="light"] .plan
   #plan-cnt .c-acts button{padding:9px 18px}
 }
 </style>
+<style id="tu-flow-v6">
+/* ============ WELCOME SCREEN ============ */
+#s-welcome{display:none}
+#s-welcome.active{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:0;position:relative;overflow:hidden}
+.wel-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
+.wel-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
+.wel-orb.o1{width:320px;height:320px;background:var(--a1);top:-110px;right:-90px}
+.wel-orb.o2{width:280px;height:280px;background:var(--g);bottom:-100px;left:-80px;opacity:.38}
+.wel-in{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;padding:34px 22px 26px;max-width:520px;margin:0 auto;width:100%}
+.wel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:auto;padding-top:6px}
+.wel-brand{display:flex;align-items:center;gap:10px}
+.wel-logo{width:44px;height:44px;border-radius:13px;background:var(--grad,linear-gradient(135deg,var(--a1),var(--a3)));display:grid;place-items:center;font-weight:900;font-size:.95rem;color:#fff;letter-spacing:.5px;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.wel-brand b{display:block;font-size:.98rem;line-height:1.25;color:var(--t)}
+.wel-brand small{display:block;font-size:.7rem;color:var(--t3)}
+.wel-theme{width:42px;height:42px;border-radius:12px;border:1px solid var(--bor2);background:var(--s2);color:var(--t);font-size:1.15rem;cursor:pointer;display:grid;place-items:center;transition:.18s}
+.wel-theme:active{transform:scale(.93)}
+.wel-hero{text-align:center;padding:30px 0 8px}
+.wel-ring{width:132px;height:132px;margin:0 auto 24px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--a1) 0turn,var(--a1) .78turn,var(--bor) .78turn,var(--bor) 1turn)}
+.wel-ring::after{content:'';position:absolute;inset:11px;border-radius:50%;background:var(--s1)}
+.wel-ring b{position:relative;z-index:1;font-size:1.75rem;font-weight:900;color:var(--a1);letter-spacing:-1px}
+.wel-ring i{position:relative;z-index:1;position:absolute;bottom:34px;font-size:.62rem;color:var(--t3);font-style:normal}
+.wel-hero h1{font-size:1.72rem;line-height:1.45;margin:0 0 12px;color:var(--t);font-weight:900}
+.wel-hero h1 span{background:var(--grad,linear-gradient(135deg,var(--a1),var(--a3)));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.wel-hero p{font-size:.92rem;line-height:1.95;color:var(--t2);margin:0 auto;max-width:400px}
+.wel-feats{display:grid;gap:10px;margin:26px 0 22px}
+.wel-feat{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:15px;background:var(--s2);border:1px solid var(--bor);text-align:right}
+.wel-feat span.ic{width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;font-size:1.12rem;background:var(--s3)}
+.wel-feat b{display:block;font-size:.87rem;color:var(--t);margin-bottom:2px}
+.wel-feat small{display:block;font-size:.73rem;color:var(--t3);line-height:1.6}
+.wel-acts{display:grid;gap:11px;margin-top:6px}
+.wel-cta{padding:16px;border-radius:16px;border:0;background:var(--grad,linear-gradient(135deg,var(--a1),var(--a3)));color:#fff;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 12px 30px rgba(31,91,176,.32);transition:.18s}
+.wel-cta:active{transform:scale(.975)}
+.wel-ghost{padding:14px;border-radius:16px;background:transparent;border:1px solid var(--bor2);color:var(--t2);font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit}
+.wel-note{text-align:center;font-size:.7rem;color:var(--t3);margin-top:16px;line-height:1.8}
+
+/* ============ ONBOARDING TOUR ============ */
+#s-tour{display:none}
+#s-tour.active{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:0}
+.tour-in{flex:1;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:20px 20px 24px}
+.tour-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tour-step{font-size:.72rem;color:var(--t3);font-weight:700}
+.tour-skip{background:transparent;border:0;color:var(--t3);font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;padding:8px 4px;text-decoration:underline}
+.tour-stage{flex:1;display:flex;flex-direction:column;justify-content:center}
+.tour-slide{display:none;text-align:center;animation:tourIn .34s ease both}
+.tour-slide.on{display:block}
+@keyframes tourIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.tour-art{width:100%;max-width:290px;margin:0 auto 26px;border-radius:22px;background:var(--s2);border:1px solid var(--bor);padding:16px;box-shadow:0 18px 44px rgba(0,0,0,.16);text-align:right}
+.tour-art-h{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.74rem;font-weight:800;color:var(--t2)}
+.tour-art-h em{font-style:normal;font-size:.95rem}
+.tour-mini{height:11px;border-radius:6px;background:var(--s4);margin-bottom:8px}
+.tour-mini.w70{width:70%}.tour-mini.w45{width:45%}.tour-mini.w88{width:88%}
+.tour-bar{height:9px;border-radius:6px;background:var(--s4);overflow:hidden;margin-bottom:10px}
+.tour-bar i{display:block;height:100%;border-radius:6px;background:var(--a1)}
+.tour-bar.g i{background:var(--g)}.tour-bar.r i{background:var(--r)}.tour-bar.y i{background:var(--y)}
+.tour-gpa{width:96px;height:96px;margin:4px auto 10px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--g) 0turn,var(--g) .82turn,var(--bor) .82turn,var(--bor) 1turn)}
+.tour-gpa::after{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--s2)}
+.tour-gpa b{position:relative;z-index:1;font-size:1.32rem;font-weight:900;color:var(--g)}
+.tour-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:11px;background:var(--s3);margin-bottom:7px}
+.tour-row span{flex:1}
+.tour-row .t1{height:9px;border-radius:5px;background:var(--bor3);width:100%;display:block;margin-bottom:5px}
+.tour-row .t2{height:7px;border-radius:5px;background:var(--bor2);width:55%;display:block}
+.tour-row em{font-style:normal;font-size:.66rem;font-weight:800;padding:4px 8px;border-radius:7px;background:var(--a1);color:#fff}
+.tour-row em.ok{background:var(--g)}.tour-row em.bad{background:var(--r)}
+.tour-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.tour-grid i{display:block;height:22px;border-radius:5px;background:var(--s4)}
+.tour-grid i.f{background:var(--a1);opacity:.85}
+.tour-grid i.f2{background:var(--g);opacity:.8}
+.tour-slide h2{font-size:1.34rem;font-weight:900;color:var(--t);margin:0 0 10px;line-height:1.45}
+.tour-slide p{font-size:.9rem;line-height:1.95;color:var(--t2);margin:0 auto;max-width:390px}
+.tour-foot{padding-top:20px}
+.tour-dots{display:flex;justify-content:center;gap:7px;margin-bottom:18px}
+.tour-dot{width:8px;height:8px;border-radius:50%;background:var(--bor3);transition:.22s;cursor:pointer;border:0;padding:0}
+.tour-dot.on{width:26px;border-radius:5px;background:var(--a1)}
+.tour-cta{width:100%;padding:16px;border-radius:16px;border:0;background:var(--grad,linear-gradient(135deg,var(--a1),var(--a3)));color:#fff;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 12px 30px rgba(31,91,176,.3);transition:.18s}
+.tour-cta:active{transform:scale(.975)}
+@media(min-width:620px){.wel-hero h1{font-size:2rem}.tour-art{max-width:330px}}
+</style>
+
+<style id="tu-theme-final-v6">
+/* =========================================================
+   FINAL THEME LAYER  --  single source of truth.
+   light = white surfaces + near-black text
+   dark  = near-black surfaces + near-white text
+   ========================================================= */
+html[data-theme="light"]{
+  --bg:#f4f6f9;--s1:#ffffff;--s2:#ffffff;--s3:#eef1f5;--s4:#e3e8ef;
+  --bor:#e2e7ee;--bor2:#d2d9e2;--bor3:#b8c2cf;
+  --t:#0f1620;--t2:#4a5765;--t3:#75828f;
+  --a1:#1f5bb0;--a2:#2f6fd0;--a3:#17498f;
+  --g:#0f7a55;--r:#c23a32;--y:#8a6209;--o:#a85714;--pk:#a1447c;
+  --glass:rgba(255,255,255,.86);
+  --grad:linear-gradient(135deg,#2f6fd0,#17498f);
+  color-scheme:light;
+}
+html[data-theme="dark"]{
+  --bg:#0b0f14;--s1:#11161c;--s2:#151b23;--s3:#1b222b;--s4:#232c37;
+  --bor:#222a35;--bor2:#2d3844;--bor3:#3b4855;
+  --t:#eef2f5;--t2:#a3b0bd;--t3:#7e8b98;
+  --a1:#5b9dfd;--a2:#7bb4ff;--a3:#9fd0ff;
+  --g:#3ecf8e;--r:#f0645c;--y:#e8c05a;--o:#e39a5c;--pk:#d98fc0;
+  --grad:linear-gradient(135deg,#5b9dfd,#9fd0ff);
+  color-scheme:dark;
+}
+html[data-theme="light"] body,html[data-theme="dark"] body{background:var(--bg)!important;color:var(--t)!important}
+
+/* unclassed / unstyled elements can never fight the theme */
+html[data-theme="light"] :is(div,p,span,li,td,th,label,small,b,strong,i,em,h1,h2,h3,h4,h5,h6):not([class]):not([style]),
+html[data-theme="dark"] :is(div,p,span,li,td,th,label,small,b,strong,i,em,h1,h2,h3,h4,h5,h6):not([class]):not([style]){color:inherit!important}
+
+/* card-like surfaces */
+html[data-theme="light"] :is(.card,.stat-box,.stat-box2,.info-card,.auth-card,.tg-card,.abs-card,.act-cell,.scfg-sec,.wel-feat,.tour-art,.tour-slide){background:#ffffff!important;border-color:var(--bor)!important;color:var(--t)!important}
+html[data-theme="dark"] :is(.card,.stat-box,.stat-box2,.info-card,.auth-card,.tg-card,.abs-card,.act-cell,.scfg-sec,.wel-feat,.tour-art,.tour-slide){background:var(--s2)!important;border-color:var(--bor)!important;color:var(--t)!important}
+
+/* text on genuinely filled/coloured surfaces stays white in BOTH themes */
+html[data-theme="light"] :is(.wel-cta,.tour-cta,.wel-logo,.tour-row em,.tour-dot.on,.btn-prim,.btn-next,.lp-btn-primary,.lp-nav-cta,.pe-save,.pe-btn.on,.abs-badge,.toast,.lp-fab),
+html[data-theme="light"] :is(.wel-cta,.tour-cta) *{color:#ffffff!important}
+
+/* form controls */
+html[data-theme="light"] :is(input,select,textarea){background:#ffffff!important;color:var(--t)!important;border-color:var(--bor2)!important}
+html[data-theme="dark"] :is(input,select,textarea){background:var(--s1)!important;color:var(--t)!important;border-color:var(--bor2)!important}
+html[data-theme="light"] ::placeholder{color:var(--t3)!important;opacity:1}
+html[data-theme="dark"] ::placeholder{color:var(--t3)!important;opacity:1}
+
+/* restore the muted secondary tone the blanket safety rule flattened */
+:is(.wel-hero p,.tour-slide p,.wel-feat small,.tour-art-h){color:var(--t2)!important}
+:is(.wel-note,.tour-step,.wel-brand small){color:var(--t3)!important}
+
+/* the theme switch must be visible & legible on every screen */
+html[data-theme="light"] :is(#theme-btn,.wel-theme){background:#ffffff!important;color:#0f1620!important;border:1px solid var(--bor2)!important}
+html[data-theme="dark"] :is(#theme-btn,.wel-theme){background:var(--s2)!important;color:var(--t)!important;border:1px solid var(--bor2)!important}
+</style>
 </head>
 <body>
 <style>
@@ -1554,7 +1685,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5b9dfd"/><stop offset="50%" stop-color="#6aa9ff"/><stop offset="100%" stop-color="#39d0ff"/></linearGradient></defs></svg>
 
 <!-- SCREEN 0: AUTH -->
-<div class="screen active" id="s-auth">
+<div class="screen" id="s-auth">
  <div class="lp">
   <div class="lp-progress" id="lp-progress"></div>
   <a class="lp-fab" href="https://x.com/chamber_tu" target="_blank" rel="noopener" aria-label="تواصل عبر إكس">𝕏</a>
@@ -1854,6 +1985,128 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 </div>
 
 <!-- SCREEN 1: INFO -->
+<!-- ================= WELCOME ================= -->
+<div class="screen" id="s-welcome">
+  <div class="wel-bg"><span class="wel-orb o1"></span><span class="wel-orb o2"></span></div>
+  <div class="wel-in">
+    <div class="wel-top">
+      <div class="wel-brand">
+        <div class="wel-logo">TU</div>
+        <div><b>TU Academic</b><small>جامعة طيبة</small></div>
+      </div>
+      <button class="wel-theme" id="wel-theme-btn" onclick="welTheme()" aria-label="تغيير المطرح">🌙</button>
+    </div>
+
+    <div class="wel-hero">
+      <div class="wel-ring"><b>4.88</b><i>معدلك</i></div>
+      <h1>رحلتك الجامعية<br><span>منظّمة من البداية</span></h1>
+      <p>معدلك التراكمي، خطتك الدراسية، غيابك وجدولك — كلّه في تطبيق واحد، بدون تعقيد.</p>
+    </div>
+
+    <div class="wel-feats">
+      <div class="wel-feat"><span class="ic">📈</span><div><b>معدل لحطي</b><small>أضف درجاتك وشاهد الناتج فوراً</small></div></div>
+      <div class="wel-feat"><span class="ic">🚫</span><div><b>حاسبة الحرمان</b><small>ينبّهك قبل ما توصل للـ ٪٢٥</small></div></div>
+      <div class="wel-feat"><span class="ic">🗂️</span><div><b>خطة قابلة للتعديل</b><small>أضف واحذف موادك بحرية</small></div></div>
+    </div>
+
+    <div class="wel-acts">
+      <button class="wel-cta" onclick="welStart()">البداية من هنا</button>
+      <button class="wel-ghost" onclick="welTour()">شوف التطبيق أولاً</button>
+    </div>
+    <div class="wel-note">مجاني بالكامل · بياناتك تبقى عندك</div>
+  </div>
+</div>
+
+<!-- ================= ONBOARDING TOUR ================= -->
+<div class="screen" id="s-tour">
+  <div class="tour-in">
+    <div class="tour-head">
+      <span class="tour-step" id="tour-step">١ من ٤</span>
+      <button class="tour-skip" onclick="tourDone()">تخطّي</button>
+    </div>
+
+    <div class="tour-stage">
+      <!-- 1 : GPA -->
+      <div class="tour-slide on" data-i="0">
+        <div class="tour-art">
+          <div class="tour-art-h"><em>📈</em> معدلي التراكمي</div>
+          <div class="tour-gpa"><b>4.88</b></div>
+          <div class="tour-bar g"><i style="width:88%"></i></div>
+          <div class="tour-mini w70"></div>
+          <div class="tour-mini w45"></div>
+        </div>
+        <h2>معدلك يتحدّث لحظياً</h2>
+        <p>أدخل درجات موادك والتطبيق يحسب المعدل التراكمي والفصلي تلقائياً — بدون أي حساب يدوي.</p>
+      </div>
+
+      <!-- 2 : PLAN -->
+      <div class="tour-slide" data-i="1">
+        <div class="tour-art">
+          <div class="tour-art-h"><em>🗂️</em> خطتي الدراسية</div>
+          <div class="tour-row"><span><i class="t1"></i><i class="t2"></i></span><em class="ok">A+</em></div>
+          <div class="tour-row"><span><i class="t1"></i><i class="t2"></i></span><em class="ok">B+</em></div>
+          <div class="tour-row"><span><i class="t1"></i><i class="t2"></i></span><em>—</em></div>
+        </div>
+        <h2>خطتك بيدك أنت</h2>
+        <p>كل مستوى ومواده جاهزة لتخصّصك، وتقدر تضيف أو تحذف أي مادة متى ما احتجت.</p>
+      </div>
+
+      <!-- 3 : ABSENCE -->
+      <div class="tour-slide" data-i="2">
+        <div class="tour-art">
+          <div class="tour-art-h"><em>🚫</em> حاسبة الحرمان</div>
+          <div class="tour-row"><span><i class="t1"></i><i class="t2"></i></span><em class="ok">٢/٦</em></div>
+          <div class="tour-bar g"><i style="width:33%"></i></div>
+          <div class="tour-row"><span><i class="t1"></i><i class="t2"></i></span><em class="bad">٧/٦</em></div>
+          <div class="tour-bar r"><i style="width:100%"></i></div>
+        </div>
+        <h2>لا توصل للحرمان</h2>
+        <p>حدّد مستواك وعدد محاضراتك، والتطبيق يحسب لك حد الـ ٪٢٥ وينبّهك قبل الخطر.</p>
+      </div>
+
+      <!-- 4 : SCHEDULE -->
+      <div class="tour-slide" data-i="3">
+        <div class="tour-art">
+          <div class="tour-art-h"><em>🗓️</em> جدولي الأسبوعي</div>
+          <div class="tour-grid">
+            <i class="f"></i><i></i><i class="f"></i><i></i><i class="f2"></i>
+            <i></i><i class="f2"></i><i></i><i class="f"></i><i></i>
+            <i class="f"></i><i></i><i class="f2"></i><i></i><i class="f"></i>
+            <i></i><i class="f"></i><i></i><i class="f2"></i><i></i>
+          </div>
+        </div>
+        <h2>جدولك يترتّب لوحده</h2>
+        <p>اختر مواد فصلك والتطبيق يولّد الجدول، مع أهداف ومؤقّت مراجعة يساعدونك تلتزم.</p>
+      </div>
+    </div>
+
+    <div class="tour-foot">
+      <div class="tour-dots" id="tour-dots">
+        <button class="tour-dot on" onclick="tourShow(0)" aria-label="1"></button>
+        <button class="tour-dot" onclick="tourShow(1)" aria-label="2"></button>
+        <button class="tour-dot" onclick="tourShow(2)" aria-label="3"></button>
+        <button class="tour-dot" onclick="tourShow(3)" aria-label="4"></button>
+      </div>
+      <button class="tour-cta" id="tour-cta" onclick="tourNext()">التالي</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* first-paint router: decide welcome vs auth before anything renders */
+(function(){
+  try{
+    var seen=false;
+    try{ seen = localStorage.getItem('tu_flow_welcome')==='1'; }catch(e){}
+    var w=document.getElementById('s-welcome'), a=document.getElementById('s-auth');
+    if(seen){ if(a) a.classList.add('active'); }
+    else { if(w) w.classList.add('active'); }
+  }catch(e){
+    var a2=document.getElementById('s-auth'); if(a2) a2.classList.add('active');
+  }
+})();
+</script>
+
 <div class="screen" id="s-info">
   <div class="info-card">
     <div class="logo-wrap">
@@ -2725,10 +2978,57 @@ const PALETTE=['#5b9dfd','#6aa9ff','#3ecf8e','#e8c05a','#f0645c','#39d0ff','#f55
 window.onload=()=>{
   syncThemeBtn();
   if(student.name && student.spec){loadApp();}
+  else if(!tuFlowSeen('welcome')){showScreenRaw('s-welcome');}
   else if(student.name){showScreen('s-spec');renderSpecs();}
   else{showScreen('s-info');}
 };
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');});const el=document.getElementById(id);el.classList.add('active');try{localStorage.setItem('tu_view_screen',id);}catch(e){}try{if(typeof tuFabSync==='function')tuFabSync(id);}catch(e){}}
+function showScreenRaw(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');});const el=document.getElementById(id);if(!el)return;el.classList.add('active');try{localStorage.setItem('tu_view_screen',id);}catch(e){}try{if(typeof tuFabSync==='function')tuFabSync(id);}catch(e){}}
+
+/* ===== ONBOARDING FLOW: welcome -> auth -> tour -> app ===== */
+function tuFlowSeen(k){try{return localStorage.getItem('tu_flow_'+k)==='1';}catch(e){return false;}}
+function tuFlowMark(k){try{localStorage.setItem('tu_flow_'+k,'1');}catch(e){}}
+
+var TU_TOUR_NEXT='s-info', TU_TOUR_I=0, TU_TOUR_N=4;
+
+/* any attempt to reach the name/spec steps is intercepted once, for the tour */
+function showScreen(id){
+  if((id==='s-info'||id==='s-spec') && !tuFlowSeen('tour')){
+    TU_TOUR_NEXT=id; tourShow(0); return showScreenRaw('s-tour');
+  }
+  return showScreenRaw(id);
+}
+
+function welTheme(){ try{ toggleTheme(); }catch(e){} welSyncTheme(); }
+function welSyncTheme(){
+  try{
+    var b=document.getElementById('wel-theme-btn'); if(!b)return;
+    b.textContent = (tuThemeGet()==='light') ? '\u2600\uFE0F' : '\uD83C\uDF19';
+  }catch(e){}
+}
+function welStart(){ tuFlowMark('welcome'); showScreenRaw('s-auth'); try{window.scrollTo(0,0);}catch(e){} }
+function welTour(){ tuFlowMark('welcome'); TU_TOUR_NEXT='s-auth'; tourShow(0); showScreenRaw('s-tour'); try{window.scrollTo(0,0);}catch(e){} }
+
+function tourShow(i){
+  if(i<0)i=0; if(i>TU_TOUR_N-1)i=TU_TOUR_N-1;
+  TU_TOUR_I=i;
+  var sl=document.querySelectorAll('#s-tour .tour-slide');
+  for(var a=0;a<sl.length;a++){ sl[a].classList.toggle('on', a===i); }
+  var dt=document.querySelectorAll('#s-tour .tour-dot');
+  for(var b=0;b<dt.length;b++){ dt[b].classList.toggle('on', b===i); }
+  var st=document.getElementById('tour-step');
+  if(st){ var ar=['\u0661','\u0662','\u0663','\u0664']; st.textContent = ar[i]+' \u0645\u0646 \u0664'; }
+  var c=document.getElementById('tour-cta');
+  if(c) c.textContent = (i>=TU_TOUR_N-1) ? '\u0627\u0628\u062f\u0623 \u0627\u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645' : '\u0627\u0644\u062a\u0627\u0644\u064a';
+  try{window.scrollTo(0,0);}catch(e){}
+}
+function tourNext(){ if(TU_TOUR_I>=TU_TOUR_N-1){ tourDone(); } else { tourShow(TU_TOUR_I+1); } }
+function tourDone(){
+  tuFlowMark('tour'); tuFlowMark('welcome');
+  var n = TU_TOUR_NEXT || 's-info';
+  showScreenRaw(n);
+  if(n==='s-spec'){ try{ renderSpecs(); }catch(e){} }
+  try{window.scrollTo(0,0);}catch(e){}
+}
 
 function tuThemeGet(){try{var v=localStorage.getItem('tu_theme');return (v==='light')?'light':'dark';}catch(e){return 'dark';}}
 function tuThemeApply(m){
@@ -4723,9 +5023,10 @@ const _origSet=localStorage.setItem.bind(localStorage);
 localStorage.setItem=function(k,v){ _origSet(k,v); try{ if(!PULLING && typeof k==='string' && k.indexOf('tu_pro_')===0 && k!=='tu_pro_ts' && k!=='tu_pro_uid'){ _origSet('tu_pro_ts', String(Date.now())); if(CURRENT_USER){ scheduleCloudPush(); } } }catch(e){} };
 
 function routeLocal(){
-  if(student.name && student.spec){loadApp();}
-  else if(student.name){showScreen('s-spec');renderSpecs();}
-  else{showScreen('s-info');}
+  if(student.name && student.spec){loadApp();return;}
+  if(!tuFlowSeen('welcome')){showScreenRaw('s-welcome');try{welSyncTheme();}catch(e){}return;}
+  if(student.name){showScreen('s-spec');renderSpecs();return;}
+  showScreen('s-info');
 }
 function reloadStateFromLS(){
   student = JSON.parse(localStorage.getItem('tu_pro_st')) || {name:'', spec:null};
@@ -4919,6 +5220,16 @@ async function authBoot(){
 }
 window.onload=function(){
   try{ syncThemeBtn(); }catch(e){}
+  try{ welSyncTheme(); }catch(e){}
+  try{
+    if(!tuFlowSeen('welcome') && !(student && student.name && student.spec)){
+      showScreenRaw('s-welcome');
+      try{ if(typeof goAuthScreen==='function') goAuthScreen('forms'); }catch(e){}
+      try{ authBootEntry(); }catch(e){}
+      if(!tuFlowSeen('welcome')) showScreenRaw('s-welcome');
+      return;
+    }
+  }catch(e){}
   authBootEntry();
 };
 
