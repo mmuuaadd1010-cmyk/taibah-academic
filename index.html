@@ -1600,6 +1600,23 @@ input:focus,select:focus,textarea:focus,.field-inp:focus,.auth-input:focus,.srch
 hr,.divider,.sec-title::after{border-color:#151a20!important;background:#151a20!important}
 </style>
 
+
+<style id="fixed-black-runtime-css">
+#theme-btn,#theme-btn-auth,#tu-theme-fab,.lp-theme,#lp-theme,#lp-theme-btn{display:none!important}
+html,body{background:#050608!important;background-image:none!important}
+</style>
+<script id="fixed-black-runtime">
+function tuEnforceBlack(){
+ var r=document.documentElement,b=document.body,vals={bg:'#050608',s1:'#080a0d',s2:'#0b0e12',s3:'#10141a',s4:'#151a21',bor:'#11151a',bor2:'#161b22',bor3:'#20262e',a1:'#4d8dff',a2:'#73a7ff',a3:'#a9c7ff',t:'#f5f7fa',t2:'#b1bac6',t3:'#778291'};
+ r.removeAttribute('data-theme');Object.keys(vals).forEach(function(k){r.style.setProperty('--'+k,vals[k],'important');});
+ r.style.setProperty('--grad','linear-gradient(135deg,#2563eb,#2563eb)','important');r.style.setProperty('--shadow','none','important');r.style.setProperty('--shadow-sm','none','important');
+ if(b){b.style.setProperty('background','#050608','important');b.style.setProperty('background-image','none','important');}
+ var st=document.getElementById('site-custom-css');if(st)st.textContent='';
+ try{localStorage.setItem('tu_theme','dark');}catch(e){}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){tuEnforceBlack();setTimeout(tuEnforceBlack,50);setTimeout(tuEnforceBlack,1200);});else tuEnforceBlack();
+</script>
+
 </head>
 <body>
 <style>
@@ -2873,15 +2890,14 @@ function showScreen(id){document.querySelectorAll('.screen').forEach(s=>{s.class
 
 function tuThemeGet(){try{var v=localStorage.getItem('tu_theme');return (v==='light')?'light':'dark';}catch(e){return 'dark';}}
 function tuThemeApply(m){
-  var root=document.documentElement;
-  if(m==='light'){root.setAttribute('data-theme','light');}else{root.removeAttribute('data-theme');}
-  try{localStorage.setItem('tu_theme',m);}catch(e){}
-  try{var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content',m==='light'?'#f5f7fa':'var(--bg)');}catch(e){}
-  syncThemeBtn();
+  try{tuEnforceBlack();}catch(e){}
+  try{localStorage.setItem('tu_theme','dark');}catch(e){}
+  try{var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content','#050608');}catch(e){}
+  try{syncThemeBtn();}catch(e){}
   try{if(typeof renderCharts==='function'&&document.getElementById('s-app')&&document.getElementById('s-app').classList.contains('active'))renderCharts();}catch(e){}
   try{if(typeof admRenderAttendance==='function')admRenderAttendance();}catch(e){}
 }
-function toggleTheme(){tuThemeApply(tuThemeGet()==='light'?'dark':'light');}
+function toggleTheme(){tuThemeApply('dark');try{toast('الثيم الأسود ثابت');}catch(e){}}
 function syncThemeBtn(){
   var light=tuThemeGet()==='light';
   var ids=['theme-btn','theme-btn-auth','tu-theme-fab','lp-theme','lp-theme-btn'];
@@ -5659,7 +5675,9 @@ function scfgRewrite(sel,url){if(!url)return;try{var a=document.querySelectorAll
 function scfgTabText(btn,txt){for(var i=0;i<btn.childNodes.length;i++){if(btn.childNodes[i].nodeType===3&&btn.childNodes[i].textContent.trim()){btn.childNodes[i].textContent=txt;return;}}btn.insertBefore(document.createTextNode(txt),btn.firstChild);}
 function scfgApply(c){
  c=c||{}; var r=document.documentElement, b=document.body;
- var col=c.colors||{};
+ // Keep content settings, but block all remotely saved theme layers.
+ var col={}; c.shadow='none'; c.bgMode='solid'; c.bgSolid='#050608'; c.css='';
+ try{tuEnforceBlack();}catch(e){};
  for(var i=0;i<SCFG_COLS.length;i++){var k=SCFG_COLS[i];if(col[k]){r.style.setProperty('--'+k,col[k],'important');}}
  if(col.a1){r.style.setProperty('--g',col.a1,'important');r.style.setProperty('--grad','linear-gradient(135deg,'+col.a1+','+(col.a2||col.a1)+')','important');}
  if(col.bg&&b){b.style.background=col.bg;}
@@ -5680,7 +5698,7 @@ function scfgApply(c){
  if(c.tagline){var tg2=document.querySelectorAll('.lp-brand small');for(var i=0;i<tg2.length;i++){tg2[i].textContent=c.tagline;}var si=document.querySelector('#s-info p');if(si)si.textContent=c.tagline;}
  scfgFavicon(c.faviconEmoji);
  // custom css
- var st=document.getElementById('site-custom-css');if(!st){st=document.createElement('style');st.id='site-custom-css';document.head.appendChild(st);}st.textContent=c.css||'';
+ var st=document.getElementById('site-custom-css');if(!st){st=document.createElement('style');st.id='site-custom-css';document.head.appendChild(st);}st.textContent='';
  // custom html home
  var hh=document.getElementById('site-html-home');if(c.htmlHome){if(!hh){hh=document.createElement('div');hh.id='site-html-home';var ph=document.getElementById('p-home');if(ph)ph.insertBefore(hh,ph.firstChild);else document.body.appendChild(hh);}hh.innerHTML=c.htmlHome;}else if(hh){hh.innerHTML='';}
  // socials
@@ -5762,12 +5780,12 @@ function scfgApply(c){
 }
 function scfgSet(k,v){if(v===''||v===false)delete SITE_CFG[k];else SITE_CFG[k]=v;scfgApply(SITE_CFG);}
 function scfgSetIn(g,k,v){SITE_CFG[g]=SITE_CFG[g]||{};SITE_CFG[g][k]=v;scfgApply(SITE_CFG);}
-function scfgSetColor(k,v){SITE_CFG.colors=SITE_CFG.colors||{};SITE_CFG.colors[k]=v;scfgApply(SITE_CFG);}
+function scfgSetColor(k,v){try{tuEnforceBlack();toast('الثيم الأسود ثابت');}catch(e){}}
 function scfgSetSocial(k,v){SITE_CFG.socials=SITE_CFG.socials||{};SITE_CFG.socials[k]=v;scfgApply(SITE_CFG);}
 function scfgSetSeo(k,v){SITE_CFG.seo=SITE_CFG.seo||{};SITE_CFG.seo[k]=v;scfgApply(SITE_CFG);}
 function scfgToggleTab(id,on){SITE_CFG.hiddenTabs=SITE_CFG.hiddenTabs||[];var a=SITE_CFG.hiddenTabs;var idx=a.indexOf(id);if(on){if(idx>=0)a.splice(idx,1);}else{if(idx<0)a.push(id);}scfgApply(SITE_CFG);}
 function scfgSetTabLabelCfg(id,label){SITE_CFG.tabLabels=SITE_CFG.tabLabels||{};if(label&&label.trim()){SITE_CFG.tabLabels[id]=label.trim();}else{delete SITE_CFG.tabLabels[id];}scfgApply(SITE_CFG);}
-function scfgPreset(k){var p=SCFG_PRESETS[k];if(!p)return;SITE_CFG.colors=JSON.parse(JSON.stringify(p));SITE_CFG.bgMode='solid';SITE_CFG.bgSolid=p.bg;scfgApply(SITE_CFG);try{scfgInitPanel();}catch(e){}try{toast('🎨 تم تطبيق الثيم');}catch(e){}}
+function scfgPreset(k){try{tuEnforceBlack();toast('الثيم الأسود ثابت');}catch(e){}}
 function scfgRunJs(code){if(!code)return;try{(new Function(code))();}catch(e){try{alert('خطأ في الكود: '+e.message);}catch(_){}}}
 function scfgPopupMaybe(c){var p=(c||{}).popup||{};if(!p.on||!p.body)return;try{if(sessionStorage.getItem('tu_pu_seen'))return;}catch(e){}var ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px';var bd=(''+p.body).replace(/</g,'&lt;');ov.innerHTML='<div style="background:var(--s1,var(--bg));border:1px solid var(--bor,var(--s4));border-radius:16px;max-width:440px;padding:26px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:1.3rem;font-weight:800;margin-bottom:12px;color:var(--t,#eef2f5)">'+((p.title||'').replace(/</g,'&lt;'))+'</div><div style="color:var(--t2,#aab4c5);line-height:1.8;margin-bottom:18px">'+bd+'</div><button style="padding:11px 26px;border:none;border-radius:10px;background:var(--grad,#6ea8fe);color:var(--bg);font-weight:800;cursor:pointer">'+((p.btn||'حسنًا').replace(/</g,'&lt;'))+'</button></div>';ov.querySelector('button').onclick=function(){ov.remove();try{sessionStorage.setItem('tu_pu_seen','1');}catch(e){}};document.body.appendChild(ov);}
 function scfgRedirectMaybe(c){var u=(c||{}).redirect;if(!u)return;var isAdm=(typeof IS_ADMIN!=='undefined'&&IS_ADMIN);if(isAdm)return;if(location.search.indexOf('noredirect')>=0)return;setTimeout(function(){location.href=u;},1500);}
@@ -5794,7 +5812,7 @@ function scfgSubscribeRealtime(){
   }catch(e){}
 }
 
-async function scfgLoad(){var __db=null,__ls=null;try{if(sbClient){var r=await sbClient.from('site_config').select('config').eq('id',1).maybeSingle();if(r&&!r.error&&r.data&&r.data.config){__db=r.data.config||{};}}}catch(e){}try{var ls=localStorage.getItem('tu_site_cfg');if(ls)__ls=JSON.parse(ls)||null;}catch(e){}if(__db){SITE_CFG=__db;try{if(__ls&&__ls.extraSpecs&&__ls.extraSpecs.length){SITE_CFG.extraSpecs=SITE_CFG.extraSpecs||[];var __have={};for(var i=0;i<SITE_CFG.extraSpecs.length;i++){var it=SITE_CFG.extraSpecs[i];if(it&&it.spec&&it.spec.id)__have[it.spec.id]=1;}var __del={};try{var __hd=(SITE_CFG.hiddenSpecs||[]).concat(__ls.hiddenSpecs||[]);for(var d=0;d<__hd.length;d++){var __x=__hd[d];var __xid=(typeof __x==='string')?__x:(__x&&__x.id);if(__xid)__del[__xid]=1;}}catch(e){}var __merged=0;for(var j=0;j<__ls.extraSpecs.length;j++){var lit=__ls.extraSpecs[j];if(lit&&lit.spec&&lit.spec.id&&!__have[lit.spec.id]&&!__del[lit.spec.id]){SITE_CFG.extraSpecs.push(lit);__have[lit.spec.id]=1;__merged++;}}window.__SCFG_UNSYNCED=__merged;}}catch(e){}}else if(__ls){SITE_CFG=__ls;}try{localStorage.setItem('tu_site_cfg',JSON.stringify(SITE_CFG));}catch(e){}scfgApply(SITE_CFG);try{scfgMergeSpecs();}catch(e){}scfgPopupMaybe(SITE_CFG);scfgRedirectMaybe(SITE_CFG);scfgRunJs((SITE_CFG||{}).js);try{if(window.__SCFG_UNSYNCED>0){setTimeout(function(){try{if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN&&typeof toast==='function')toast('⚠️ لديك '+window.__SCFG_UNSYNCED+' تخصص محفوظ محليًا وغير منشور — افتح لوحة المطور واضغط نشر للجميع لحفظه.');}catch(e){}},4000);}}catch(e){}}
+async function scfgLoad(){var __db=null,__ls=null;try{if(sbClient){var r=await sbClient.from('site_config').select('config').eq('id',1).maybeSingle();if(r&&!r.error&&r.data&&r.data.config){__db=r.data.config||{};}}}catch(e){}try{var ls=localStorage.getItem('tu_site_cfg');if(ls)__ls=JSON.parse(ls)||null;}catch(e){}if(__db){SITE_CFG=__db;try{if(__ls&&__ls.extraSpecs&&__ls.extraSpecs.length){SITE_CFG.extraSpecs=SITE_CFG.extraSpecs||[];var __have={};for(var i=0;i<SITE_CFG.extraSpecs.length;i++){var it=SITE_CFG.extraSpecs[i];if(it&&it.spec&&it.spec.id)__have[it.spec.id]=1;}var __del={};try{var __hd=(SITE_CFG.hiddenSpecs||[]).concat(__ls.hiddenSpecs||[]);for(var d=0;d<__hd.length;d++){var __x=__hd[d];var __xid=(typeof __x==='string')?__x:(__x&&__x.id);if(__xid)__del[__xid]=1;}}catch(e){}var __merged=0;for(var j=0;j<__ls.extraSpecs.length;j++){var lit=__ls.extraSpecs[j];if(lit&&lit.spec&&lit.spec.id&&!__have[lit.spec.id]&&!__del[lit.spec.id]){SITE_CFG.extraSpecs.push(lit);__have[lit.spec.id]=1;__merged++;}}window.__SCFG_UNSYNCED=__merged;}}catch(e){}}else if(__ls){SITE_CFG=__ls;}try{localStorage.setItem('tu_site_cfg',JSON.stringify(SITE_CFG));}catch(e){}scfgApply(SITE_CFG);try{scfgMergeSpecs();}catch(e){}scfgPopupMaybe(SITE_CFG);scfgRedirectMaybe(SITE_CFG);try{tuEnforceBlack();}catch(e){}try{if(window.__SCFG_UNSYNCED>0){setTimeout(function(){try{if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN&&typeof toast==='function')toast('⚠️ لديك '+window.__SCFG_UNSYNCED+' تخصص محفوظ محليًا وغير منشور — افتح لوحة المطور واضغط نشر للجميع لحفظه.');}catch(e){}},4000);}}catch(e){}}
 async function scfgPublish(){try{localStorage.setItem('tu_site_cfg',JSON.stringify(SITE_CFG));}catch(e){}if(!sbClient){alert('لا يوجد اتصال بقاعدة البيانات');return;}if(typeof IS_ADMIN==='undefined'||!IS_ADMIN){alert('هذه الميزة للمطوّر فقط');return;}try{var r=await sbClient.from('site_config').upsert({id:1,config:SITE_CFG,updated_at:new Date().toISOString()},{onConflict:'id'});if(r&&r.error){alert('تعذّر النشر: '+r.error.message);return;}try{toast('🌍 تم النشر لجميع الزوار');}catch(_){alert('🌍 تم النشر لجميع الزوار');}}catch(e){alert('تعذّر النشر');}}
 async function scfgResetAll(){if(!confirm('استعادة كل الإعدادات الافتراضية للجميع؟'))return;SITE_CFG={};scfgApply(SITE_CFG);await scfgPublish();location.reload();}
 function scfgAiFillColleges(){var sel=document.getElementById('scfg-ai-college');if(!sel)return;var cur=sel.value;sel.innerHTML='';try{for(var i=0;i<SPECS.length;i++){var o=document.createElement('option');o.value=SPECS[i].college;o.textContent=SPECS[i].college;sel.appendChild(o);}}catch(e){}var n=document.createElement('option');n.value='__new__';n.textContent='➕ كلية جديدة';sel.appendChild(n);if(cur){try{sel.value=cur;}catch(e){}}}
