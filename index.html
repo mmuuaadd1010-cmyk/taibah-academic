@@ -2448,40 +2448,53 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 .plnr-weeknav-mid{text-align:center;font-size:.78rem;color:var(--t2);font-weight:700}
 .plnr-weeknav-mid b{color:var(--t);font-size:.88rem}
 .plnr-today-btn{background:none;border:1px dashed var(--bor2)!important;font-size:.68rem!important;font-weight:700!important;padding:6px 10px!important;color:var(--a1)!important}
-.plnr-days{display:flex;flex-direction:column;gap:10px}
-.plnr-day{background:var(--s2);border:1px solid var(--bor);border-radius:16px;padding:13px 14px;position:relative;overflow:hidden}
-.plnr-day.is-today{border-color:var(--a1);box-shadow:0 0 0 1px var(--a1) inset}
-.plnr-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.plnr-day-name{display:flex;align-items:center;gap:8px}
-.plnr-day-name b{font-size:.95rem;color:var(--t)}
-.plnr-day-date{font-size:.7rem;color:var(--t2);font-weight:700}
-.plnr-today-tag{background:var(--a1);color:#fff;font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:99px}
-.plnr-events{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
-.plnr-ev{display:flex;align-items:center;gap:6px;background:rgba(232,192,90,.1);border:1px solid rgba(232,192,90,.35);border-radius:9px;padding:6px 9px;font-size:.72rem;color:var(--y);font-weight:700;line-height:1.4}
-.plnr-ev.holiday{background:rgba(240,100,92,.1);border-color:rgba(240,100,92,.35);color:var(--r)}
-.plnr-ev.exam{background:rgba(217,143,192,.1);border-color:rgba(217,143,192,.35);color:var(--pk)}
-.plnr-tasks{display:flex;flex-direction:column;gap:6px}
-.plnr-task{display:flex;align-items:center;gap:8px;background:var(--s3);border:1px solid var(--bor);border-radius:10px;padding:7px 9px}
-.plnr-task.done{opacity:.5}
+.plnr-board-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--bor);background:var(--s1)}
+.plnr-board{display:grid;grid-auto-flow:column;grid-auto-columns:158px;min-width:100%}
+.plnr-col{border-inline-end:1px solid var(--bor);display:flex;flex-direction:column}
+.plnr-col:last-child{border-inline-end:none}
+.plnr-col.is-today{background:linear-gradient(180deg,rgba(91,157,253,.10),transparent 90px)}
+.plnr-col-head{position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--bor);padding:10px 8px 8px;text-align:center;z-index:2}
+.plnr-col.is-today .plnr-col-head{background:var(--a1)}
+.plnr-col.is-today .plnr-col-head *{color:#fff!important}
+.plnr-col-name{font-size:.78rem;font-weight:800;color:var(--t)}
+.plnr-col-date{font-size:.65rem;color:var(--t2);font-weight:700;margin-top:2px}
+.plnr-col-body{padding:8px;display:flex;flex-direction:column;gap:6px;flex:1}
+.plnr-events{display:flex;flex-direction:column;gap:5px}
+.plnr-ev{background:var(--s2);border-inline-start:3px solid var(--y);border-radius:6px;padding:5px 7px;font-size:.66rem;color:var(--t);font-weight:700;line-height:1.4}
+.plnr-ev.holiday{border-color:var(--r)}
+.plnr-ev.exam{border-color:var(--pk)}
+.plnr-ev.registration,.plnr-ev.start{border-color:var(--g)}
+.plnr-ev.admin{border-color:var(--a1)}
+.plnr-tasks{display:flex;flex-direction:column;gap:5px}
+.plnr-task{display:flex;align-items:flex-start;gap:6px;background:var(--s2);border:1px solid var(--bor);border-radius:8px;padding:6px 7px}
+.plnr-task.done{opacity:.48}
 .plnr-task.done .plnr-task-text{text-decoration:line-through}
-.plnr-check{width:19px;height:19px;border-radius:6px;border:2px solid var(--bor3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff}
+.plnr-check{width:16px;height:16px;border-radius:5px;border:2px solid var(--bor3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;margin-top:1px}
 .plnr-check.on{background:var(--g);border-color:var(--g)}
-.plnr-task-text{flex:1;font-size:.8rem;color:var(--t);word-break:break-word}
-.plnr-task-del{background:none;border:none;color:var(--t3);font-size:.85rem;cursor:pointer;padding:2px 4px;flex-shrink:0}
+.plnr-task-text{flex:1;font-size:.7rem;color:var(--t);word-break:break-word;line-height:1.35}
+.plnr-task-del{background:none;border:none;color:var(--t3);font-size:.72rem;cursor:pointer;padding:1px 2px;flex-shrink:0}
 .plnr-task-del:hover{color:var(--r)}
-.plnr-addrow{display:flex;gap:6px;margin-top:8px}
-.plnr-addrow input{flex:1;background:var(--s1);border:1px solid var(--bor);border-radius:9px;padding:8px 10px;color:var(--t);font-family:inherit;font-size:.78rem}
-.plnr-addrow button{background:var(--a1);border:none;color:#fff;border-radius:9px;padding:0 13px;font-weight:800;cursor:pointer;font-size:.9rem}
-.plnr-empty-tasks{font-size:.72rem;color:var(--t3);padding:2px 2px 4px}
+.plnr-empty-tasks{font-size:.63rem;color:var(--t3);text-align:center;padding:6px 2px}
+.plnr-addrow{display:flex;gap:4px;padding:6px 8px 9px;border-top:1px solid var(--bor);margin-top:auto}
+.plnr-addrow input{flex:1;min-width:0;background:var(--s1);border:1px solid var(--bor);border-radius:7px;padding:6px 7px;color:var(--t);font-family:inherit;font-size:.68rem}
+.plnr-addrow button{background:var(--a1);border:none;color:#fff;border-radius:7px;padding:0 9px;font-weight:800;cursor:pointer;font-size:.8rem;flex-shrink:0}
 .plnr-cal-toggle{text-align:center;margin-top:14px}
 .plnr-cal-toggle button{background:var(--s2);border:1px solid var(--bor);color:var(--t2);border-radius:99px;padding:9px 16px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit}
-.plnr-cal-list{margin-top:12px;display:none;flex-direction:column;gap:7px}
-.plnr-cal-list.open{display:flex}
-.plnr-cal-item{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bor);border-radius:12px;padding:9px 11px}
-.plnr-cal-item.past{opacity:.42}
-.plnr-cal-ic{font-size:1.15rem;flex-shrink:0}
-.plnr-cal-tt{flex:1;font-size:.78rem;color:var(--t);font-weight:700;line-height:1.5}
-.plnr-cal-dt{font-size:.66rem;color:var(--t2);font-weight:700;white-space:nowrap;flex-shrink:0}
+.plnr-cal-wrap{margin-top:12px;display:none;overflow-x:auto;border-radius:12px;border:1px solid var(--bor)}
+.plnr-cal-wrap.open{display:block}
+.plnr-cal-table{width:100%;border-collapse:collapse;font-size:.74rem;min-width:520px}
+.plnr-cal-table th{background:var(--s2);color:var(--t2);font-size:.68rem;font-weight:800;text-align:right;padding:9px 10px;border-bottom:1px solid var(--bor);position:sticky;top:0}
+.plnr-cal-table td{padding:8px 10px;border-bottom:1px solid var(--bor);color:var(--t);vertical-align:top}
+.plnr-cal-table tr:last-child td{border-bottom:none}
+.plnr-cal-table tr.past{opacity:.4}
+.plnr-cal-table tr:hover td{background:var(--s3)}
+.plnr-cal-hijri{color:var(--t3);font-size:.66rem;display:block;margin-top:2px}
+.plnr-cal-type{display:inline-block;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.plnr-cal-type.holiday{background:rgba(240,100,92,.15);color:var(--r)}
+.plnr-cal-type.exam{background:rgba(217,143,192,.15);color:var(--pk)}
+.plnr-cal-type.start,.plnr-cal-type.registration{background:rgba(62,207,142,.15);color:var(--g)}
+.plnr-cal-type.deadline{background:rgba(232,192,90,.15);color:var(--y)}
+.plnr-cal-type.admin{background:rgba(91,157,253,.15);color:var(--a1)}
 </style>
     <div class="tab-pane" id="p-planner">
       <div class="plnr-hero">
@@ -2512,12 +2525,17 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
           <button onclick="plnrShiftWeek(1)">التالي ▶</button>
         </div>
         <div style="text-align:center;margin-bottom:12px"><button class="plnr-today-btn" onclick="plnrGoToday()">🎯 ارجع لأسبوعي الحالي</button></div>
-        <div class="plnr-days" id="plnr-days"></div>
+        <div class="plnr-board-wrap"><div class="plnr-board" id="plnr-days"></div></div>
       </div>
 
       <div class="card">
-        <div class="plnr-cal-toggle"><button onclick="plnrToggleCal()" id="plnr-cal-btn">📖 عرض كل محطات التقويم الجامعي 1448هـ</button></div>
-        <div class="plnr-cal-list" id="plnr-cal-list"></div>
+        <div class="plnr-cal-toggle"><button onclick="plnrToggleCal()" id="plnr-cal-btn">📖 عرض كل محطات التقويم الجامعي 1448هـ (جدول)</button></div>
+        <div class="plnr-cal-wrap" id="plnr-cal-wrap">
+          <table class="plnr-cal-table">
+            <thead><tr><th>الحدث</th><th>النوع</th><th>التاريخ</th></tr></thead>
+            <tbody id="plnr-cal-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -6816,7 +6834,7 @@ function plnrEventsForDay(dateObj){
     return t>=s&&t<=e;
   });
 }
-function plnrEvClass(type){if(type==='holiday')return 'holiday';if(type==='exam')return 'exam';return '';}
+function plnrEvClass(type){return type||'';}
 
 function plnrGoToday(){plnrViewWeek=plnrCurrentWeekNum();plnrRender();}
 function plnrShiftWeek(delta){
@@ -6843,21 +6861,23 @@ function plnrDelTask(dayISO,id){
   plnrSave();plnrRender();
 }
 
+var PLNR_TYPE_LBL={holiday:'إجازة',exam:'اختبارات',start:'بداية',registration:'تسجيل',deadline:'موعد نهائي',admin:'إداري'};
 function plnrToggleCal(){
-  var el=document.getElementById('plnr-cal-list');var btn=document.getElementById('plnr-cal-btn');
-  if(!el)return;
-  var open=el.classList.toggle('open');
-  if(open&&!el.dataset.built){
+  var wrap=document.getElementById('plnr-cal-wrap');var btn=document.getElementById('plnr-cal-btn');
+  if(!wrap)return;
+  var open=wrap.classList.toggle('open');
+  var tbody=document.getElementById('plnr-cal-tbody');
+  if(open&&tbody&&!tbody.dataset.built){
     var t=+plnrToday();
-    el.innerHTML=TU_CAL_EVENTS.map(function(ev){
+    tbody.innerHTML=TU_CAL_EVENTS.map(function(ev){
       var s=+plnrDateOnly(plnrParse(ev.s));var e=ev.e?+plnrDateOnly(plnrParse(ev.e)):s;
       var isPast=t>e;
       var rangeTxt=ev.e?(plnrFmt(plnrParse(ev.s))+' – '+plnrFmt(plnrParse(ev.e))):plnrFmt(plnrParse(ev.s));
-      return '<div class="plnr-cal-item'+(isPast?' past':'')+'"><span class="plnr-cal-ic">'+ev.icon+'</span><span class="plnr-cal-tt">'+ev.title+'<br><span style="color:var(--t3);font-size:.66rem">'+ev.h+' هـ</span></span><span class="plnr-cal-dt">'+rangeTxt+'</span></div>';
+      return '<tr class="'+(isPast?'past':'')+'"><td>'+ev.icon+' '+ev.title+'</td><td><span class="plnr-cal-type '+ev.type+'">'+(PLNR_TYPE_LBL[ev.type]||ev.type)+'</span></td><td>'+rangeTxt+'<span class="plnr-cal-hijri">'+ev.h+' هـ</span></td></tr>';
     }).join('');
-    el.dataset.built='1';
+    tbody.dataset.built='1';
   }
-  btn.textContent=open?'📕 إخفاء محطات التقويم':'📖 عرض كل محطات التقويم الجامعي 1448هـ';
+  btn.textContent=open?'📕 إخفاء الجدول':'📖 عرض كل محطات التقويم الجامعي 1448هـ (جدول)';
 }
 
 function plnrRender(){
@@ -6891,17 +6911,19 @@ function plnrRender(){
     var iso=plnrISO(d);
     var isToday=(iso===todayISO);
     var evs=plnrEventsForDay(d);
-    var evHtml=evs.map(function(ev){return '<div class="plnr-ev '+plnrEvClass(ev.type)+'">'+ev.icon+' '+ev.title+'</div>';}).join('');
+    var evHtml=evs.map(function(ev){return '<div class="plnr-ev '+plnrEvClass(ev.type)+'" title="'+ev.title.replace(/"/g,'')+'">'+ev.icon+' '+ev.title+'</div>';}).join('');
     var tasks=plnrData.tasks[iso]||[];
     var taskHtml=tasks.length?tasks.map(function(t){
       return '<div class="plnr-task'+(t.done?' done':'')+'"><div class="plnr-check'+(t.done?' on':'')+'" onclick="plnrToggleTask(\''+iso+'\',\''+t.id+'\')">'+(t.done?'✓':'')+'</div><div class="plnr-task-text">'+t.text.replace(/</g,'&lt;')+'</div><button class="plnr-task-del" onclick="plnrDelTask(\''+iso+'\',\''+t.id+'\')">✕</button></div>';
-    }).join(''):'<div class="plnr-empty-tasks">لا مهام بعد — ضيف أول مهمة لك 👇</div>';
+    }).join(''):'<div class="plnr-empty-tasks">لا مهام</div>';
     var inpId='plnr-inp-'+iso;
-    return '<div class="plnr-day'+(isToday?' is-today':'')+'">'+
-      '<div class="plnr-day-head"><div class="plnr-day-name"><b>'+PLNR_DAYNAMES[idx]+'</b><span class="plnr-day-date">'+plnrFmt(d)+'</span></div>'+(isToday?'<span class="plnr-today-tag">اليوم</span>':'')+'</div>'+
-      (evHtml?'<div class="plnr-events">'+evHtml+'</div>':'')+
-      '<div class="plnr-tasks">'+taskHtml+'</div>'+
-      '<div class="plnr-addrow"><input type="text" id="'+inpId+'" placeholder="أضف مهمة ليوم '+PLNR_DAYNAMES[idx]+'..." onkeydown="if(event.key===\'Enter\')plnrAddTask(\''+iso+'\',\''+inpId+'\')"><button onclick="plnrAddTask(\''+iso+'\',\''+inpId+'\')">+</button></div>'+
+    return '<div class="plnr-col'+(isToday?' is-today':'')+'">'+
+      '<div class="plnr-col-head"><div class="plnr-col-name">'+PLNR_DAYNAMES[idx]+(isToday?' • اليوم':'')+'</div><div class="plnr-col-date">'+plnrFmt(d)+'</div></div>'+
+      '<div class="plnr-col-body">'+
+        (evHtml?'<div class="plnr-events">'+evHtml+'</div>':'')+
+        '<div class="plnr-tasks">'+taskHtml+'</div>'+
+      '</div>'+
+      '<div class="plnr-addrow"><input type="text" id="'+inpId+'" placeholder="+ مهمة" onkeydown="if(event.key===\'Enter\')plnrAddTask(\''+iso+'\',\''+inpId+'\')"><button onclick="plnrAddTask(\''+iso+'\',\''+inpId+'\')">+</button></div>'+
       '</div>';
   }).join('');
   var wrap=document.getElementById('plnr-days');
