@@ -2128,6 +2128,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <button class="tab-item" onclick="goTab('target',this)">🎯 الهدف</button>
     <button class="tab-item" onclick="goTab('goals',this)">✅ أهدافي</button>
     <button class="tab-item" onclick="goTab('schedule',this)">📅 جدولي</button>
+    <button class="tab-item" onclick="goTab('planner',this)">🗓️ بلانر طيبة</button>
     <button class="tab-item" onclick="goTab('peers',this)">👥 الزملاء<span class="peers-badge" id="peers-badge"></span></button>
     <button class="tab-item" onclick="goTab('compare',this)">⚖️ مقارنة تخصصين</button>
     <button class="tab-item" onclick="goTab('countdown',this)">⏳ التخرج</button>
@@ -2420,6 +2421,103 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <div id="my-sch-banner"></div>
         <div class="sch-view" id="schedule-grid-wrap"></div>
         <div class="sch-actions no-print"><button class="btn-add-goal" style="flex:1" onclick="openSchAdd()">إضافة مادة</button><button class="btn-ghost" style="flex:1" onclick="exportSchPDF()">طباعة / PDF</button><button class="btn-ghost" style="flex:1" onclick="exportSchImage()">حفظ كصورة</button></div>
+      </div>
+    </div>
+
+    <!-- PLANNER -->
+    <style id="plnr-css">
+.plnr-hero{background:linear-gradient(135deg,rgba(91,157,253,.15),rgba(57,208,255,.06));border:1px solid var(--bor);border-radius:18px;padding:16px 16px 14px;margin-bottom:14px;position:relative;overflow:hidden}
+.plnr-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(160px 100px at 92% -20%,rgba(57,208,255,.20),transparent);pointer-events:none}
+.plnr-hero-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;flex-wrap:wrap}
+.plnr-week-badge{background:var(--grad);color:#fff;font-weight:800;font-size:.82rem;padding:7px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.plnr-hijri{font-size:.72rem;color:var(--t2);font-weight:700}
+.plnr-prog-wrap{margin-top:12px;position:relative;z-index:1}
+.plnr-prog-lbl{display:flex;justify-content:space-between;font-size:.7rem;color:var(--t2);margin-bottom:5px;font-weight:700}
+.plnr-prog-bar{height:9px;border-radius:99px;background:var(--s3);overflow:hidden;border:1px solid var(--bor)}
+.plnr-prog-fill{height:100%;border-radius:99px;background:var(--grad3);transition:width .6s ease}
+.plnr-next{margin-top:13px;background:var(--glass);border:1px solid var(--bor);border-radius:14px;padding:11px 13px;position:relative;z-index:1;backdrop-filter:blur(3px)}
+.plnr-next-lbl{font-size:.68rem;color:var(--t2);font-weight:700;margin-bottom:4px}
+.plnr-next-tt{font-weight:800;color:var(--t);font-size:.9rem;line-height:1.5}
+.plnr-next-cd{display:flex;gap:7px;margin-top:9px}
+.plnr-cd-u{flex:1;background:var(--s2);border:1px solid var(--bor);border-radius:10px;padding:7px 3px;text-align:center}
+.plnr-cd-v{font-size:1.15rem;font-weight:800;color:var(--a1);font-variant-numeric:tabular-nums}
+.plnr-cd-l{font-size:.58rem;color:var(--t3);margin-top:1px}
+.plnr-weeknav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.plnr-weeknav button{background:var(--s2);border:1px solid var(--bor);color:var(--t);border-radius:10px;padding:9px 12px;font-weight:800;cursor:pointer;font-family:inherit}
+.plnr-weeknav button:hover{border-color:var(--a1);color:var(--a1)}
+.plnr-weeknav-mid{text-align:center;font-size:.78rem;color:var(--t2);font-weight:700}
+.plnr-weeknav-mid b{color:var(--t);font-size:.88rem}
+.plnr-today-btn{background:none;border:1px dashed var(--bor2)!important;font-size:.68rem!important;font-weight:700!important;padding:6px 10px!important;color:var(--a1)!important}
+.plnr-days{display:flex;flex-direction:column;gap:10px}
+.plnr-day{background:var(--s2);border:1px solid var(--bor);border-radius:16px;padding:13px 14px;position:relative;overflow:hidden}
+.plnr-day.is-today{border-color:var(--a1);box-shadow:0 0 0 1px var(--a1) inset}
+.plnr-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.plnr-day-name{display:flex;align-items:center;gap:8px}
+.plnr-day-name b{font-size:.95rem;color:var(--t)}
+.plnr-day-date{font-size:.7rem;color:var(--t2);font-weight:700}
+.plnr-today-tag{background:var(--a1);color:#fff;font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:99px}
+.plnr-events{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.plnr-ev{display:flex;align-items:center;gap:6px;background:rgba(232,192,90,.1);border:1px solid rgba(232,192,90,.35);border-radius:9px;padding:6px 9px;font-size:.72rem;color:var(--y);font-weight:700;line-height:1.4}
+.plnr-ev.holiday{background:rgba(240,100,92,.1);border-color:rgba(240,100,92,.35);color:var(--r)}
+.plnr-ev.exam{background:rgba(217,143,192,.1);border-color:rgba(217,143,192,.35);color:var(--pk)}
+.plnr-tasks{display:flex;flex-direction:column;gap:6px}
+.plnr-task{display:flex;align-items:center;gap:8px;background:var(--s3);border:1px solid var(--bor);border-radius:10px;padding:7px 9px}
+.plnr-task.done{opacity:.5}
+.plnr-task.done .plnr-task-text{text-decoration:line-through}
+.plnr-check{width:19px;height:19px;border-radius:6px;border:2px solid var(--bor3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff}
+.plnr-check.on{background:var(--g);border-color:var(--g)}
+.plnr-task-text{flex:1;font-size:.8rem;color:var(--t);word-break:break-word}
+.plnr-task-del{background:none;border:none;color:var(--t3);font-size:.85rem;cursor:pointer;padding:2px 4px;flex-shrink:0}
+.plnr-task-del:hover{color:var(--r)}
+.plnr-addrow{display:flex;gap:6px;margin-top:8px}
+.plnr-addrow input{flex:1;background:var(--s1);border:1px solid var(--bor);border-radius:9px;padding:8px 10px;color:var(--t);font-family:inherit;font-size:.78rem}
+.plnr-addrow button{background:var(--a1);border:none;color:#fff;border-radius:9px;padding:0 13px;font-weight:800;cursor:pointer;font-size:.9rem}
+.plnr-empty-tasks{font-size:.72rem;color:var(--t3);padding:2px 2px 4px}
+.plnr-cal-toggle{text-align:center;margin-top:14px}
+.plnr-cal-toggle button{background:var(--s2);border:1px solid var(--bor);color:var(--t2);border-radius:99px;padding:9px 16px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit}
+.plnr-cal-list{margin-top:12px;display:none;flex-direction:column;gap:7px}
+.plnr-cal-list.open{display:flex}
+.plnr-cal-item{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bor);border-radius:12px;padding:9px 11px}
+.plnr-cal-item.past{opacity:.42}
+.plnr-cal-ic{font-size:1.15rem;flex-shrink:0}
+.plnr-cal-tt{flex:1;font-size:.78rem;color:var(--t);font-weight:700;line-height:1.5}
+.plnr-cal-dt{font-size:.66rem;color:var(--t2);font-weight:700;white-space:nowrap;flex-shrink:0}
+</style>
+    <div class="tab-pane" id="p-planner">
+      <div class="plnr-hero">
+        <div class="plnr-hero-top">
+          <span class="plnr-week-badge">🗓️ <span id="plnr-week-badge-txt">—</span></span>
+          <span class="plnr-hijri" id="plnr-hijri-txt">—</span>
+        </div>
+        <div class="plnr-prog-wrap">
+          <div class="plnr-prog-lbl"><span>تقدّم الفصل الدراسي الأول</span><span id="plnr-prog-pct">0%</span></div>
+          <div class="plnr-prog-bar"><div class="plnr-prog-fill" id="plnr-prog-fill" style="width:0%"></div></div>
+        </div>
+        <div class="plnr-next">
+          <div class="plnr-next-lbl">⏳ أقرب حدث رسمي</div>
+          <div class="plnr-next-tt" id="plnr-next-tt">جاري التحميل...</div>
+          <div class="plnr-next-cd">
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="plnr-cd-d">–</div><div class="plnr-cd-l">يوم</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="plnr-cd-h">–</div><div class="plnr-cd-l">ساعة</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="plnr-cd-m">–</div><div class="plnr-cd-l">دقيقة</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="plnr-cd-s">–</div><div class="plnr-cd-l">ثانية</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:12px 14px">
+        <div class="plnr-weeknav">
+          <button onclick="plnrShiftWeek(-1)">◀ السابق</button>
+          <div class="plnr-weeknav-mid">الأسبوع <b id="plnr-wk-num">–</b><br><span id="plnr-wk-range">–</span></div>
+          <button onclick="plnrShiftWeek(1)">التالي ▶</button>
+        </div>
+        <div style="text-align:center;margin-bottom:12px"><button class="plnr-today-btn" onclick="plnrGoToday()">🎯 ارجع لأسبوعي الحالي</button></div>
+        <div class="plnr-days" id="plnr-days"></div>
+      </div>
+
+      <div class="card">
+        <div class="plnr-cal-toggle"><button onclick="plnrToggleCal()" id="plnr-cal-btn">📖 عرض كل محطات التقويم الجامعي 1448هـ</button></div>
+        <div class="plnr-cal-list" id="plnr-cal-list"></div>
       </div>
     </div>
 
@@ -3217,7 +3315,7 @@ function tuBuildDrawer(){
 }
 function tuOpenDrawer(){ tuBuildDrawer(); var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.add('open'); if(o)o.classList.add('open'); }
 function tuCloseDrawer(){ var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.remove('open'); if(o)o.classList.remove('open'); }
-function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}}
+function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}if(id==='planner'){plnrRender();}}
 
 /* ===== GRADES / PLAN ===== */
 const GRADES=[['A+',5],['A',4.75],['B+',4.5],['B',4],['C+',3.5],['C',3],['D+',2.5],['D',2],['F',1]];
@@ -6657,6 +6755,183 @@ async function tuLoadSpecCounts(){
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
   setTimeout(bind,900);
 })();
+</script>
+
+<script>
+/* ================= بلانر طيبة — مزامن مع التقويم الجامعي الرسمي 1448هـ ================= */
+// المصدر: التقويم الجامعي الرسمي لجامعة طيبة — الفصل الدراسي الأول 1448هـ
+// ملاحظة: التواريخ الميلادية محسوبة تقويميًا وقد تختلف يوم واحد عن إعلان أم القرى الرسمي — إجازة اليوم الوطني تُحدَّث سنويًا حسب قرار مجلس الوزراء.
+var TU_CAL_WEEKS=[
+  {n:1,s:"2026-08-23",e:"2026-08-27"},{n:2,s:"2026-08-30",e:"2026-09-03"},{n:3,s:"2026-09-06",e:"2026-09-10"},
+  {n:4,s:"2026-09-13",e:"2026-09-17"},{n:5,s:"2026-09-20",e:"2026-09-24"},{n:6,s:"2026-09-27",e:"2026-10-01"},
+  {n:7,s:"2026-10-04",e:"2026-10-08"},{n:8,s:"2026-10-11",e:"2026-10-15"},{n:9,s:"2026-10-18",e:"2026-10-22"},
+  {n:10,s:"2026-10-25",e:"2026-10-29"},{n:11,s:"2026-11-01",e:"2026-11-05"},{n:12,s:"2026-11-08",e:"2026-11-12"},
+  {n:13,s:"2026-11-15",e:"2026-11-19"},{n:14,s:"2026-11-29",e:"2026-12-03"},{n:15,s:"2026-12-06",e:"2026-12-10"},
+  {n:16,s:"2026-12-13",e:"2026-12-17"},{n:17,s:"2026-12-20",e:"2026-12-24"},{n:18,s:"2026-12-27",e:"2026-12-31"},
+  {n:19,s:"2027-01-03",e:"2027-01-07"}
+];
+var TU_CAL_EVENTS=[
+  {s:"2026-08-20",e:"2026-08-22",h:"1448/03/07 - 03/09",title:"الحذف والإضافة لمقررات التخصص الأساسي",icon:"🔀",type:"admin"},
+  {s:"2026-08-23",h:"1448/03/10",title:"بداية الدراسة للفصل الدراسي الأول 1448هـ",icon:"🎓",type:"start"},
+  {s:"2026-09-24",e:"2026-09-27",h:"1448/04/12 - 04/15",title:"إجازة اليوم الوطني السعودي (الأسبوع الخامس)",icon:"🇸🇦",type:"holiday"},
+  {s:"2026-10-12",e:"2026-10-15",h:"1448/04/30 - 05/04",title:"تسجيل الرغبات للفصل الدراسي الثاني 1448هـ",icon:"📝",type:"registration"},
+  {s:"2026-10-14",h:"1448/05/03",title:"آخر موعد للانسحاب بعذر من مقرر",icon:"⚠️",type:"deadline"},
+  {s:"2026-10-25",e:"2026-10-29",h:"1448/05/14 - 05/18",title:"الاختبارات النصفية لمقررات المتطلبات العامة (الأسبوع العاشر)",icon:"📚",type:"exam"},
+  {s:"2026-10-28",h:"1448/05/17",title:"آخر موعد للاعتذار عن الفصل الدراسي (النظام الفصلي)",icon:"⚠️",type:"deadline"},
+  {s:"2026-11-19",e:"2026-11-28",h:"1448/06/09 - 06/18",title:"إجازة الخريف (بعد دوام الخميس — الأسبوع الثالث عشر)",icon:"🍂",type:"holiday"},
+  {s:"2026-11-29",h:"1448/06/19",title:"استئناف الدراسة بعد إجازة الخريف (الأسبوع الرابع عشر)",icon:"🔔",type:"start"},
+  {s:"2026-12-02",h:"1448/06/22",title:"آخر موعد للانسحاب النهائي من الجامعة هذا الفصل",icon:"⚠️",type:"deadline"},
+  {s:"2026-12-20",e:"2026-12-24",h:"1448/07/11 - 07/15",title:"الاختبارات النهائية (عام + اختياري + عملي) — الأسبوع السابع عشر",icon:"📝",type:"exam"},
+  {s:"2026-12-27",e:"2027-01-07",h:"1448/07/18 - 07/29",title:"الاختبارات النهائية (تخصصي + حر) — الأسبوعان الثامن والتاسع عشر",icon:"📝",type:"exam"},
+  {s:"2027-01-07",e:"2027-01-16",h:"1448/07/29 - 08/08",title:"إجازة منتصف العام الجامعي",icon:"🌴",type:"holiday"},
+  {s:"2027-01-10",h:"1448/08/02",title:"إغلاق أعمال الفصل الدراسي الأول 1448هـ",icon:"🏁",type:"admin"}
+];
+var PLNR_DAYNAMES=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
+var plnrData=JSON.parse(localStorage.getItem('tu_pro_planner'))||{tasks:{}};
+var plnrViewWeek=null; // رقم الأسبوع المعروض حاليًا
+var plnrTimerStarted=false;
+
+function plnrSave(){localStorage.setItem('tu_pro_planner',JSON.stringify(plnrData));}
+function plnrDateOnly(d){var x=new Date(d);x.setHours(0,0,0,0);return x;}
+function plnrToday(){return plnrDateOnly(new Date());}
+function plnrParse(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function plnrFmt(d){var mo=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];return d.getDate()+' '+mo[d.getMonth()];}
+function plnrISO(d){var y=d.getFullYear(),m=(''+(d.getMonth()+1)).padStart(2,'0'),da=(''+d.getDate()).padStart(2,'0');return y+'-'+m+'-'+da;}
+
+function plnrCurrentWeekNum(){
+  var t=plnrToday();
+  if(t<plnrDateOnly(plnrParse(TU_CAL_WEEKS[0].s)))return 1;
+  for(var i=0;i<TU_CAL_WEEKS.length;i++){
+    var w=TU_CAL_WEEKS[i];
+    if(t<=plnrDateOnly(plnrParse(w.e))||i===TU_CAL_WEEKS.length-1)return w.n;
+  }
+  return 1;
+}
+function plnrWeekByNum(n){for(var i=0;i<TU_CAL_WEEKS.length;i++)if(TU_CAL_WEEKS[i].n===n)return TU_CAL_WEEKS[i];return TU_CAL_WEEKS[0];}
+function plnrWeekDays(n){var w=plnrWeekByNum(n);var start=plnrParse(w.s);var out=[];for(var i=0;i<5;i++){var d=new Date(start);d.setDate(d.getDate()+i);out.push(d);}return out;}
+function plnrEventsForDay(dateObj){
+  var t=+plnrDateOnly(dateObj);
+  return TU_CAL_EVENTS.filter(function(ev){
+    var s=+plnrDateOnly(plnrParse(ev.s));var e=ev.e?+plnrDateOnly(plnrParse(ev.e)):s;
+    return t>=s&&t<=e;
+  });
+}
+function plnrEvClass(type){if(type==='holiday')return 'holiday';if(type==='exam')return 'exam';return '';}
+
+function plnrGoToday(){plnrViewWeek=plnrCurrentWeekNum();plnrRender();}
+function plnrShiftWeek(delta){
+  if(plnrViewWeek==null)plnrViewWeek=plnrCurrentWeekNum();
+  var nn=plnrViewWeek+delta;
+  if(nn<1)nn=1;if(nn>19)nn=19;
+  plnrViewWeek=nn;plnrRender();
+}
+
+function plnrAddTask(dayISO,inputId){
+  var inp=document.getElementById(inputId);if(!inp)return;
+  var txt=inp.value.trim();if(!txt)return;
+  if(!plnrData.tasks[dayISO])plnrData.tasks[dayISO]=[];
+  plnrData.tasks[dayISO].push({id:Date.now()+Math.random().toString(36).slice(2,6),text:txt,done:false});
+  inp.value='';plnrSave();plnrRender();
+}
+function plnrToggleTask(dayISO,id){
+  var list=plnrData.tasks[dayISO]||[];
+  var it=list.find(function(x){return x.id===id;});
+  if(it){it.done=!it.done;plnrSave();plnrRender();}
+}
+function plnrDelTask(dayISO,id){
+  plnrData.tasks[dayISO]=(plnrData.tasks[dayISO]||[]).filter(function(x){return x.id!==id;});
+  plnrSave();plnrRender();
+}
+
+function plnrToggleCal(){
+  var el=document.getElementById('plnr-cal-list');var btn=document.getElementById('plnr-cal-btn');
+  if(!el)return;
+  var open=el.classList.toggle('open');
+  if(open&&!el.dataset.built){
+    var t=+plnrToday();
+    el.innerHTML=TU_CAL_EVENTS.map(function(ev){
+      var s=+plnrDateOnly(plnrParse(ev.s));var e=ev.e?+plnrDateOnly(plnrParse(ev.e)):s;
+      var isPast=t>e;
+      var rangeTxt=ev.e?(plnrFmt(plnrParse(ev.s))+' – '+plnrFmt(plnrParse(ev.e))):plnrFmt(plnrParse(ev.s));
+      return '<div class="plnr-cal-item'+(isPast?' past':'')+'"><span class="plnr-cal-ic">'+ev.icon+'</span><span class="plnr-cal-tt">'+ev.title+'<br><span style="color:var(--t3);font-size:.66rem">'+ev.h+' هـ</span></span><span class="plnr-cal-dt">'+rangeTxt+'</span></div>';
+    }).join('');
+    el.dataset.built='1';
+  }
+  btn.textContent=open?'📕 إخفاء محطات التقويم':'📖 عرض كل محطات التقويم الجامعي 1448هـ';
+}
+
+function plnrRender(){
+  if(plnrViewWeek==null)plnrViewWeek=plnrCurrentWeekNum();
+  var curWeek=plnrCurrentWeekNum();
+  var w=plnrWeekByNum(plnrViewWeek);
+  var badgeTxt=document.getElementById('plnr-week-badge-txt');
+  if(badgeTxt)badgeTxt.textContent=(plnrViewWeek===curWeek?'أنت الآن في الأسبوع '+curWeek:'الأسبوع الدراسي '+curWeek);
+  var hijriTxt=document.getElementById('plnr-hijri-txt');
+  if(hijriTxt)hijriTxt.textContent='الفصل الدراسي الأول 1448هـ — جامعة طيبة';
+
+  // progress bar
+  var termStart=+plnrDateOnly(plnrParse(TU_CAL_WEEKS[0].s));
+  var termEnd=+plnrDateOnly(plnrParse("2027-01-10"));
+  var now=+plnrToday();
+  var pct=Math.round(((now-termStart)/(termEnd-termStart))*100);
+  pct=Math.max(0,Math.min(100,pct));
+  var fill=document.getElementById('plnr-prog-fill'),pctEl=document.getElementById('plnr-prog-pct');
+  if(fill)fill.style.width=pct+'%';
+  if(pctEl)pctEl.textContent=(now<termStart?'لم يبدأ بعد':now>termEnd?'انتهى ✅':pct+'%');
+
+  // week nav labels
+  var wkNumEl=document.getElementById('plnr-wk-num'),wkRangeEl=document.getElementById('plnr-wk-range');
+  if(wkNumEl)wkNumEl.textContent=plnrViewWeek;
+  if(wkRangeEl)wkRangeEl.textContent=plnrFmt(plnrParse(w.s))+' – '+plnrFmt(plnrParse(w.e));
+
+  // days grid
+  var days=plnrWeekDays(plnrViewWeek);
+  var todayISO=plnrISO(plnrToday());
+  var daysHtml=days.map(function(d,idx){
+    var iso=plnrISO(d);
+    var isToday=(iso===todayISO);
+    var evs=plnrEventsForDay(d);
+    var evHtml=evs.map(function(ev){return '<div class="plnr-ev '+plnrEvClass(ev.type)+'">'+ev.icon+' '+ev.title+'</div>';}).join('');
+    var tasks=plnrData.tasks[iso]||[];
+    var taskHtml=tasks.length?tasks.map(function(t){
+      return '<div class="plnr-task'+(t.done?' done':'')+'"><div class="plnr-check'+(t.done?' on':'')+'" onclick="plnrToggleTask(\''+iso+'\',\''+t.id+'\')">'+(t.done?'✓':'')+'</div><div class="plnr-task-text">'+t.text.replace(/</g,'&lt;')+'</div><button class="plnr-task-del" onclick="plnrDelTask(\''+iso+'\',\''+t.id+'\')">✕</button></div>';
+    }).join(''):'<div class="plnr-empty-tasks">لا مهام بعد — ضيف أول مهمة لك 👇</div>';
+    var inpId='plnr-inp-'+iso;
+    return '<div class="plnr-day'+(isToday?' is-today':'')+'">'+
+      '<div class="plnr-day-head"><div class="plnr-day-name"><b>'+PLNR_DAYNAMES[idx]+'</b><span class="plnr-day-date">'+plnrFmt(d)+'</span></div>'+(isToday?'<span class="plnr-today-tag">اليوم</span>':'')+'</div>'+
+      (evHtml?'<div class="plnr-events">'+evHtml+'</div>':'')+
+      '<div class="plnr-tasks">'+taskHtml+'</div>'+
+      '<div class="plnr-addrow"><input type="text" id="'+inpId+'" placeholder="أضف مهمة ليوم '+PLNR_DAYNAMES[idx]+'..." onkeydown="if(event.key===\'Enter\')plnrAddTask(\''+iso+'\',\''+inpId+'\')"><button onclick="plnrAddTask(\''+iso+'\',\''+inpId+'\')">+</button></div>'+
+      '</div>';
+  }).join('');
+  var wrap=document.getElementById('plnr-days');
+  if(wrap)wrap.innerHTML=daysHtml;
+
+  plnrUpdateNextEvent();
+  if(!plnrTimerStarted){plnrTimerStarted=true;setInterval(plnrUpdateNextEvent,1000);}
+}
+
+function plnrUpdateNextEvent(){
+  var ttEl=document.getElementById('plnr-next-tt');
+  if(!ttEl)return; // التبويب مو مفتوح
+  var now=new Date();
+  // ابحث عن أقرب حدث لم يبدأ بعد، أو لو بدأ ولسا ما انتهى بيّن نهايته
+  var best=null,bestTarget=null,bestLabel='';
+  for(var i=0;i<TU_CAL_EVENTS.length;i++){
+    var ev=TU_CAL_EVENTS[i];
+    var s=plnrParse(ev.s);
+    var e=ev.e?plnrParse(ev.e):s;
+    e=new Date(e.getFullYear(),e.getMonth(),e.getDate(),23,59,59);
+    if(now<s){ if(!bestTarget||s<bestTarget){best=ev;bestTarget=s;bestLabel='يبدأ خلال';} }
+    else if(now>=s&&now<=e){ if(!bestTarget){best=ev;bestTarget=e;bestLabel='ينتهي خلال';} }
+  }
+  if(!best){ttEl.textContent='لا مزيد من الأحداث المتبقية في هذا الفصل 🎉';['plnr-cd-d','plnr-cd-h','plnr-cd-m','plnr-cd-s'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent='–';});return;}
+  ttEl.textContent=best.icon+' '+best.title+' ('+bestLabel+')';
+  var diff=bestTarget-now;if(diff<0)diff=0;
+  var d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000),s2=Math.floor(diff%60000/1000);
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  set('plnr-cd-d',d);set('plnr-cd-h',h);set('plnr-cd-m',m);set('plnr-cd-s',s2);
+}
 </script>
 </body>
 </html>
