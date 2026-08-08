@@ -1893,16 +1893,16 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <div id="tg-gate" class="tg-hidden" role="dialog" aria-modal="true" aria-labelledby="tg-h">
   <div class="tg-card">
-    <div class="tg-ico">✈️</div>
-    <h2 id="tg-h">قناة المنصة الرسمية على تيليجرام</h2>
-    <p>تابع قناتنا الرسمية على تيليجرام للاطلاع على آخر تحديثات التخصصات والمنصة بشكل عام. ننصحك بالانضمام قبل المتابعة.</p>
-    <a class="tg-link" href="https://t.me/taibahiacademic" target="_blank" rel="noopener">انضم إلى قناتنا على تيليجرام</a>
-    <button class="tg-ok" onclick="tgGateOk()">موافق، متابعة</button>
+    <div class="tg-ico">🎁</div>
+    <h2 id="tg-h">نوزّع اشتراكات مجانية!</h2>
+    <p>انضم لقناتنا الرسمية على تيليجرام عشان تكون أول واحد يعرف — نوزّع اشتراكات مجانية بشكل دوري وما نبيك تفوّتها. خلك موجود أول بأول 🎁</p>
+    <a class="tg-link" href="https://t.me/taibahiacademic" target="_blank" rel="noopener">🎁 اضغط هنا وانضم الحين</a>
+    <button class="tg-ok" onclick="tgGateOk()">تم، أنا داخل</button>
   </div>
 </div>
 <script>
 function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var g=document.getElementById('tg-gate');if(g)g.classList.add('tg-hidden');}
-(function(){try{if(sessionStorage.getItem('tu_tg_gate')==='1'){var g=document.getElementById('tg-gate');if(g)g.classList.add('tg-hidden');}}catch(e){}})();
+(function(){try{if(sessionStorage.getItem('tu_tg_gate')==='1'){var g=document.getElementById('tg-gate');if(g)g.classList.add('tg-hidden');}else{var g2=document.getElementById('tg-gate');if(g2)g2.classList.remove('tg-hidden');}}catch(e){}})();
 </script>
 
 <div class="ambient"><div class="amb-blob"></div><div class="amb-blob"></div><div class="amb-blob"></div></div>
