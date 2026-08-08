@@ -3071,6 +3071,11 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <div id="adm-materials"></div>
       </div>
       <div class="card">
+        <div class="card-h">🎟️ أكواد الاشتراك المستخدمة</div>
+        <input class="t-inp" type="text" id="adm-subcodes-search" placeholder="🔍 ابحث بالكود أو الاسم أو اليوزرنيم" oninput="drawAdminSubCodes(this.value)" style="margin-bottom:12px">
+        <div id="adm-subcodes"></div>
+      </div>
+      <div class="card">
         <div class="card-h">👥 كل مستخدمي المنصة</div>
         <input class="t-inp" type="text" id="adm-users-search" placeholder="🔍 ابحث بالاسم أو اليوزرنيم أو البريد" oninput="drawAdminUsers(this.value)" style="margin-bottom:12px">
         <div id="adm-users"></div>
@@ -6359,7 +6364,7 @@ function scfgMergeSpecs(){
   try{if(typeof scfgRefreshSpecUIs==='function')scfgRefreshSpecUIs();}catch(e){}
  }catch(e){try{console.error('custom_specs_merge',e);}catch(_){} }
 }
-function onAdminTab(){ loadAdminReviews(); loadAdminMaterials(); loadAdminUsers(); try{scfgInitPanel();}catch(_){} try{admLoadAttendance();}catch(_){} }
+function onAdminTab(){ loadAdminReviews(); loadAdminMaterials(); loadAdminUsers(); loadAdminSubCodes(); try{scfgInitPanel();}catch(_){} try{admLoadAttendance();}catch(_){} }
 /* ===== ADMIN: attendance chart ===== */
 var TU_ATT_MODE='hour', TU_ATT_CHART=null, TU_ATT_ROWS=null;
 function admAttMode(m){
@@ -6587,6 +6592,42 @@ function drawAdminUsers(q){
     var roleBadge=isAdm?'<span class="adm-st-badge ok">🛡️ مطوّر</span>':'';
     var toggleBtn='<button class="'+(isAdm?'btn-danger':'btn-add-goal')+'" style="width:100%;margin-top:8px" onclick="adminToggleRole(\''+esc(p.user_id)+'\','+(isAdm?'true':'false')+')">'+(isAdm?'⬇️ إزالة صلاحية المطوّر':'⬆️ ترقية إلى مطوّر')+'</button>';
     return '<div class="peer-card"><div class="peer-top"><div class="peer-av">'+av+'</div><div class="peer-meta"><div class="peer-name">'+esc(p.name||'طالب')+' '+roleBadge+'</div><div class="peer-uname">'+(p.username?('@'+esc(p.username)):'')+'</div><div class="peer-tags"><span class="peer-lvl">'+esc(spName)+'</span></div></div></div><button class="peer-msg-btn" onclick="openChatAdmin(\''+esc(p.user_id)+'\')">💬 مراسلة</button>'+toggleBtn+'</div>';
+  }).join('');
+}
+var adminSubCodesCache=[];
+async function loadAdminSubCodes(){
+  var wrap=document.getElementById('adm-subcodes'); if(!wrap||!sbClient)return;
+  wrap.innerHTML='<div class="peers-loading">☁️ جارٍ التحميل...</div>';
+  try{
+    var res=await sbClient.from('subscription_codes').select('id,code,plan_type,created_at,redeemed_by,redeemed_at,disabled').not('redeemed_by','is',null).order('redeemed_at',{ascending:false});
+    if(res.error){ wrap.innerHTML='<div class="peers-loading">⚠️ تعذّر التحميل — تأكد من صلاحيات المطوّر في قاعدة البيانات</div>'; return; }
+    var rows=res.data||[];
+    var uids=Array.from(new Set(rows.map(function(r){return r.redeemed_by;}).filter(Boolean)));
+    var profMap={};
+    if(uids.length){
+      try{ var pr=await sbClient.from('profiles').select('user_id,name,username,email').in('user_id',uids); (pr.data||[]).forEach(function(p){ profMap[p.user_id]=p; }); }catch(e){}
+    }
+    adminSubCodesCache=rows.map(function(r){ var p=profMap[r.redeemed_by]||{}; return {code:r.code,plan_type:r.plan_type,redeemed_at:r.redeemed_at,redeemed_by:r.redeemed_by,name:p.name||'',username:p.username||'',email:p.email||''}; });
+    var si=document.getElementById('adm-subcodes-search'); var q=(si?si.value:'').trim().toLowerCase();
+    drawAdminSubCodes(q);
+  }catch(e){ wrap.innerHTML='<div class="peers-loading">⚠️ تعذّر الاتصال</div>'; }
+}
+function drawAdminSubCodes(q){
+  var wrap=document.getElementById('adm-subcodes'); if(!wrap)return;
+  q=(q||'').toLowerCase();
+  var list=adminSubCodesCache.filter(function(r){ if(!q)return true; return ((r.code||'').toLowerCase().indexOf(q)>=0||(r.name||'').toLowerCase().indexOf(q)>=0||(r.username||'').toLowerCase().indexOf(q)>=0||(r.email||'').toLowerCase().indexOf(q)>=0); });
+  if(!list.length){ wrap.innerHTML='<div class="peers-loading">ما فيه أكواد مستخدمة بعد</div>'; return; }
+  wrap.innerHTML=list.map(function(r){
+    var planLbl=r.plan_type==='year'?'12 شهر':'5 أشهر';
+    var dt=r.redeemed_at?new Date(r.redeemed_at).toLocaleString('ar-SA'):'—';
+    var who=esc(r.name||'مستخدم غير معروف')+(r.username?(' <span style="color:var(--t2)">@'+esc(r.username)+'</span>'):'');
+    var emailLine=r.email?('<div style="font-size:.72rem;color:var(--t3);margin-top:2px">'+esc(r.email)+'</div>'):'';
+    return '<div class="sub-code-row" style="flex-direction:column;align-items:stretch;gap:6px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center"><code>'+esc(r.code)+'</code><span style="font-size:.72rem;color:var(--t2)">'+planLbl+'</span></div>'+
+      '<div style="font-size:.84rem;color:var(--t)">👤 '+who+'</div>'+
+      emailLine+
+      '<div style="font-size:.7rem;color:var(--t3)">🕓 '+dt+'</div>'+
+    '</div>';
   }).join('');
 }
 async function adminToggleRole(uid,current){
