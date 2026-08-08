@@ -1856,75 +1856,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <style id="subscription-css">
 .sub-hero,.sub-card{background:var(--s2);border:1px solid var(--bor);border-radius:18px;padding:18px;margin-bottom:14px}.sub-hero{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(91,157,253,.16),rgba(62,207,142,.06))}.sub-icon{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:var(--grad);font-size:1.55rem;box-shadow:0 10px 28px -12px var(--a1)}.sub-hero h2,.sub-card h3{margin:0;color:var(--t)}.sub-hero p,.sub-admin-head p{margin:4px 0 0;color:var(--t2);font-size:.8rem}.sub-chip{margin-inline-start:auto;border:1px solid var(--bor2);background:var(--s3);color:var(--t2);padding:6px 11px;border-radius:999px;font-size:.72rem;font-weight:800}.sub-chip.active{color:var(--g);border-color:rgba(62,207,142,.4);background:rgba(62,207,142,.1)}.sub-muted,.sub-note{color:var(--t2);font-size:.82rem;line-height:1.8}.sub-label{display:block;color:var(--t2);font-size:.76rem;margin:14px 0 7px}.sub-redeem{display:flex;gap:8px}.sub-input,.sub-admin select,.sub-admin input{min-width:0;flex:1;background:var(--bg);border:1px solid var(--bor);border-radius:11px;color:var(--t);padding:12px;font:700 .88rem Tajawal,sans-serif;outline:none}.sub-redeem button,.sub-generate,.sub-setup button{border:0;border-radius:11px;background:var(--grad);color:#fff;padding:11px 18px;font:800 .84rem Tajawal,sans-serif;cursor:pointer}.sub-msg{display:none;margin-top:10px;border-radius:10px;padding:10px 12px;font-size:.78rem}.sub-msg.ok{display:block;color:var(--g);background:rgba(62,207,142,.1)}.sub-msg.err{display:block;color:var(--r);background:rgba(240,100,92,.1)}.sub-admin{border-color:rgba(91,157,253,.35)}.sub-admin-head{display:flex;justify-content:space-between;align-items:center}.sub-admin-head>span{color:var(--a2);font-size:.7rem;font-weight:800}.sub-admin-grid{display:grid;grid-template-columns:1fr 120px;gap:10px;margin:15px 0}.sub-admin-grid label span{display:block;color:var(--t2);font-size:.7rem;margin-bottom:6px}.sub-admin-grid select,.sub-admin-grid input{width:100%}.sub-generate{width:100%}.sub-code-row{display:flex;align-items:center;gap:8px;margin-top:8px;background:var(--bg);border:1px solid var(--bor);border-radius:11px;padding:9px 11px}.sub-code-row code{direction:ltr;flex:1;color:var(--a3);font-weight:800}.sub-code-row button{border:1px solid var(--bor);background:var(--s3);color:var(--t);border-radius:8px;padding:6px 9px;cursor:pointer}.sub-setup{margin-top:14px;color:var(--t2);font-size:.75rem}.sub-setup summary{cursor:pointer;font-weight:800;color:var(--a2)}#s-app[data-current-tab="subscription"] .app-route-actions{display:none!important}@media(max-width:520px){.sub-redeem{flex-direction:column}.sub-redeem button{min-height:44px}.sub-admin-grid{grid-template-columns:1fr}.sub-hero{align-items:flex-start;flex-wrap:wrap}.sub-chip{margin-inline-start:0}}
 </style>
-<style id="subscription-marketing-css">
-.paid-launch-banner{
-  margin:10px 12px 0;
-  padding:13px 15px;
-  border:1px solid rgba(91,157,253,.30);
-  border-radius:16px;
-  background:linear-gradient(135deg,rgba(91,157,253,.13),rgba(62,207,142,.06));
-  display:flex;align-items:center;gap:12px;color:var(--t);
-  box-shadow:0 8px 28px rgba(0,0,0,.12);
-}
-.paid-launch-icon{font-size:1.45rem}
-.paid-launch-copy{flex:1;min-width:0}
-.paid-launch-copy strong{display:block;font-size:.82rem;color:var(--t)}
-.paid-launch-copy span{display:block;color:var(--t2);font-size:.70rem;line-height:1.6;margin-top:2px}
-.paid-launch-price{font-size:.72rem;color:var(--t2);white-space:nowrap}
-.paid-launch-price b{color:var(--g);font-size:.95rem}
-.paid-launch-banner button{
-  border:0;border-radius:10px;padding:9px 13px;background:var(--grad);color:#fff;
-  font:800 .72rem Tajawal,sans-serif;cursor:pointer;white-space:nowrap
-}
-.tab-item[data-premium="1"]{position:relative}
-.tab-item[data-premium="1"]::after{content:" 🔒";font-size:.66em;opacity:.7}
-.sub-launch-hero{
-  text-align:center;padding:24px 18px;margin-bottom:14px;border-radius:20px;
-  border:1px solid rgba(91,157,253,.30);
-  background:radial-gradient(circle at 50% -30%,rgba(91,157,253,.22),transparent 60%),
-             linear-gradient(135deg,rgba(91,157,253,.12),rgba(62,207,142,.05));
-}
-.sub-launch-badge{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(91,157,253,.14);color:var(--a1);font-weight:800;font-size:.72rem}
-.sub-launch-hero h2{font-size:1.45rem;margin:10px 0 5px;color:var(--t)}
-.sub-launch-hero p{max-width:620px;margin:0 auto;color:var(--t2);font-size:.82rem;line-height:1.85}
-.sub-launch-note{margin:12px auto 0;color:var(--y);font-size:.78rem;font-weight:800}
-.sub-pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.sub-plan-card{
-  position:relative;background:var(--s2);border:1px solid var(--bor);border-radius:20px;
-  padding:19px;overflow:hidden;box-shadow:0 12px 35px rgba(0,0,0,.12)
-}
-.sub-plan-card.featured{border-color:rgba(91,157,253,.55);box-shadow:0 12px 40px rgba(91,157,253,.12)}
-.sub-best{position:absolute;top:12px;left:12px;padding:5px 9px;border-radius:999px;background:rgba(245,197,66,.13);color:var(--y);font-size:.64rem;font-weight:900}
-.sub-plan-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.sub-plan-name{font-weight:900;color:var(--t);font-size:1rem}
-.sub-plan-tag{padding:5px 8px;border-radius:8px;background:rgba(91,157,253,.12);color:var(--a1);font-size:.63rem;font-weight:800}
-.sub-plan-tag.green{color:var(--g);background:rgba(62,207,142,.10)}
-.sub-price{display:flex;align-items:flex-end;gap:5px;margin-top:15px}
-.sub-price b{font-size:2.35rem;line-height:1;color:var(--t)}
-.sub-price span{font-size:.8rem;color:var(--t2);padding-bottom:3px}
-.sub-price-sub{color:var(--t2);font-size:.70rem;margin-top:5px}
-.sub-feature-list{list-style:none;padding:0;margin:15px 0 17px}
-.sub-feature-list li{font-size:.73rem;color:var(--t2);line-height:1.65;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.035)}
-.sub-feature-list li:last-child{border-bottom:0}
-.sub-pay-btn{width:100%;border:0;border-radius:12px;padding:12px;background:var(--grad);color:#fff;font:900 .82rem Tajawal,sans-serif;cursor:pointer;box-shadow:0 8px 20px rgba(91,157,253,.18)}
-.sub-pay-btn:hover{transform:translateY(-1px)}
-.sub-free-card{
-  display:flex;align-items:center;gap:12px;padding:14px 16px;margin-bottom:14px;
-  border-radius:16px;background:rgba(62,207,142,.06);border:1px solid rgba(62,207,142,.18)
-}
-.sub-free-icon{font-size:1.5rem}.sub-free-card strong{color:var(--t);font-size:.82rem}.sub-free-card p{margin:3px 0 0;color:var(--t2);font-size:.72rem;line-height:1.7}
-#sub-payment-modal{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,8,.78);backdrop-filter:blur(8px)}
-#sub-payment-modal.open{display:flex}
-.sub-payment-box{width:min(430px,100%);background:var(--s2);border:1px solid var(--bor2);border-radius:22px;padding:23px;text-align:center;box-shadow:0 25px 70px rgba(0,0,0,.5)}
-.sub-payment-icon{font-size:2.2rem}.sub-payment-box h3{margin:8px 0 6px;color:var(--t)}.sub-payment-box p{color:var(--t2);font-size:.82rem;line-height:1.8;margin:0 0 15px}.sub-payment-wait{padding:11px;border-radius:12px;background:rgba(245,197,66,.08);border:1px solid rgba(245,197,66,.18);color:var(--y);font-size:.76rem;font-weight:800}.sub-payment-close{margin-top:13px;border:1px solid var(--bor);background:var(--s3);color:var(--t);border-radius:11px;padding:10px 22px;font:800 .78rem Tajawal,sans-serif;cursor:pointer}
-@media(max-width:650px){
-  .paid-launch-banner{align-items:flex-start;flex-wrap:wrap}
-  .paid-launch-copy{flex-basis:calc(100% - 50px)}
-  .paid-launch-price{margin-right:50px}
-  .paid-launch-banner button{margin-right:auto}
-  .sub-pricing-grid{grid-template-columns:1fr}
-}
-</style>
 <style id="site-custom-css"></style><style id="scfg-derived">.card{box-shadow:none !important}</style></head>
 <body style="background: rgb(5, 6, 8) !important;">
 <style>
@@ -2392,33 +2323,23 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 </style>
     <div class="tab-rail">
     <button class="tab-item on" onclick="goTab('home',this)">🏠 الرئيسية</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('plan',this)">📋 الخطة</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('abs',this)">🚫 الغياب والحرمان</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('roadmap',this)">🗺️ صور خطتي</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('gen',this)">🧠 مولّد الجداول</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('chart',this)">📈 الإحصاء</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('pomo',this)">🍅 بومودورو</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('target',this)">😼 المعدل المستهدف</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('goals',this)">✅ أهدافي</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('schedule',this)">📅 جدولي</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('planner',this)">🗓️ تقويم الجامعة</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('peers',this)">👥 الزملاء</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('compare',this)">⚖️ مقارنة تخصصين</button>
-    <button class="tab-item" data-premium="1" onclick="goTab('countdown',this)">⏳ التخرج</button>
+    <button class="tab-item" onclick="goTab('plan',this)">📋 الخطة</button>
+    <button class="tab-item" onclick="goTab('abs',this)">🚫 الغياب والحرمان</button>
+    <button class="tab-item" onclick="goTab('roadmap',this)">🗺️ صور خطتي</button>
+    <button class="tab-item" onclick="goTab('gen',this)">🧠 مولّد الجداول</button>
+    <button class="tab-item" onclick="goTab('chart',this)">📈 الإحصاء</button>
+    <button class="tab-item" onclick="goTab('pomo',this)">🍅 بومودورو</button>
+    <button class="tab-item" onclick="goTab('target',this)">😼 المعدل المستهدف</button>
+    <button class="tab-item" onclick="goTab('goals',this)">✅ أهدافي</button>
+    <button class="tab-item" onclick="goTab('schedule',this)">📅 جدولي</button>
+    <button class="tab-item" onclick="goTab('planner',this)">🗓️ تقويم الجامعة</button>
+    <button class="tab-item" onclick="goTab('peers',this)">👥 الزملاء</button>
+    <button class="tab-item" onclick="goTab('compare',this)">⚖️ مقارنة تخصصين</button>
+    <button class="tab-item" onclick="goTab('countdown',this)">⏳ التخرج</button>
     <button class="tab-item" onclick="goTab('fans',this);renderFans()">🏆 نجوم المنصة</button>
     <button class="tab-item" onclick="goTab('subscription',this)">💎 اشتراكي</button>
     <button class="tab-item" onclick="goTab('settings',this)">⚙️ الإعدادات</button>
     <button class="tab-item" id="admin-tab-btn" style="display:none" onclick="goTab('admin',this)">🛠️ لوحة المطوّر</button>
-  </div>
-
-  <div class="paid-launch-banner" id="paid-launch-banner">
-    <div class="paid-launch-icon">💎</div>
-    <div class="paid-launch-copy">
-      <strong>تنبيه مهم: ابتداءً من 25 أغسطس 2026</strong>
-      <span>ستصبح معظم مزايا TU Academic مدفوعة للمساهمة في تغطية تكاليف قاعدة البيانات والذكاء الاصطناعي واستمرار تطوير المنصة.</span>
-    </div>
-    <div class="paid-launch-price">من <b>15 ريال</b> فقط</div>
-    <button onclick="goTab('subscription',document.querySelector('.tab-item[onclick*=&quot;subscription&quot;]'))">شاهد الباقات</button>
   </div>
 
   <div class="tab-body">
@@ -2929,107 +2850,10 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 
 
     <div class="tab-pane" id="p-subscription">
-      <section class="sub-launch-hero">
-        <div class="sub-launch-badge">🚀 ابتداءً من 25 أغسطس</div>
-        <h2>TU Academic Premium</h2>
-        <p>منصة أكاديمية تطورت معكم، والآن نحتاج دعمكم للاستمرار في تطويرها وتشغيل خدمات قاعدة البيانات والذكاء الاصطناعي.</p>
-        <div class="sub-launch-note">💡 الاشتراك أرخص من كوب قهوة — ويدعم استمرار المنصة وتطوير مزايا جديدة.</div>
-      </section>
-
-      <section class="sub-pricing-grid">
-        <article class="sub-plan-card">
-          <div class="sub-plan-top">
-            <span class="sub-plan-name">الترم الكامل</span>
-            <span class="sub-plan-tag">الأكثر استخدامًا</span>
-          </div>
-          <div class="sub-price"><b>15</b><span>ريال</span></div>
-          <div class="sub-price-sub">اشتراك لمدة 5 أشهر</div>
-          <ul class="sub-feature-list">
-            <li>✅ الوصول إلى الخطة الأكاديمية</li>
-            <li>✅ مولّد الجداول الذكي</li>
-            <li>✅ تتبع المعدل والإحصائيات</li>
-            <li>✅ الجدول الأسبوعي</li>
-            <li>✅ تقويم الجامعة والمهام</li>
-            <li>✅ المعدل المستهدف وأدوات التخطيط</li>
-            <li>✅ صور وخطط التخرج</li>
-            <li>✅ مزايا الذكاء الاصطناعي</li>
-            <li>✅ مزايا الزملاء والمقارنة</li>
-            <li>🔄 تحديثات ومزايا جديدة خلال مدة الاشتراك</li>
-          </ul>
-          <button class="sub-pay-btn" onclick="subGoPayment('term')">انتقل إلى صفحة الدفع</button>
-        </article>
-
-        <article class="sub-plan-card featured">
-          <div class="sub-best">🔥 أفضل قيمة</div>
-          <div class="sub-plan-top">
-            <span class="sub-plan-name">الاشتراك السنوي</span>
-            <span class="sub-plan-tag green">12 شهر</span>
-          </div>
-          <div class="sub-price"><b>30</b><span>ريال</span></div>
-          <div class="sub-price-sub">سنة كاملة — أوفر من الترمات</div>
-          <ul class="sub-feature-list">
-            <li>✅ جميع مزايا Premium</li>
-            <li>✅ الخطة الأكاديمية كاملة</li>
-            <li>✅ مولّد الجداول الذكي</li>
-            <li>✅ الإحصائيات وتتبع المعدل</li>
-            <li>✅ الجدول الأسبوعي والتقويم</li>
-            <li>✅ أدوات التخطيط والتخرج</li>
-            <li>✅ الذكاء الاصطناعي</li>
-            <li>✅ الزملاء ومقارنة التخصصات</li>
-            <li>✅ أولوية الوصول للمزايا الجديدة</li>
-            <li>💛 دعم استمرار TU Academic</li>
-          </ul>
-          <button class="sub-pay-btn" onclick="subGoPayment('year')">انتقل إلى صفحة الدفع</button>
-        </article>
-      </section>
-
-      <section class="sub-free-card">
-        <div class="sub-free-icon">🎁</div>
-        <div>
-          <strong>وش يبقى مجاني؟</strong>
-          <p>الحساب الأساسي، الصفحة الرئيسية، وإعدادات الحساب تبقى متاحة. أما حوالي 90% من أدوات المنصة المتقدمة فتكون ضمن Premium ابتداءً من 25 أغسطس.</p>
-        </div>
-      </section>
-
-      <section class="sub-hero">
-        <div class="sub-icon">💎</div>
-        <div><h2>اشتراكي</h2><p>فعّل مزايا المنصة باستخدام كود اشتراك صالح.</p></div>
-        <span id="sub-status-chip" class="sub-chip">غير مفعّل</span>
-      </section>
-
-      <section class="sub-card" id="sub-active-card">
-        <h3>حالة الاشتراك</h3>
-        <div id="sub-active-body" class="sub-muted">جاري التحقق...</div>
-      </section>
-
-      <section class="sub-card">
-        <h3>تفعيل كود</h3>
-        <label class="sub-label" for="sub-code-input">كود الاشتراك</label>
-        <div class="sub-redeem">
-          <input id="sub-code-input" class="sub-input" dir="ltr" autocomplete="off" placeholder="TU-XXXX-XXXX-XXXX">
-          <button onclick="subRedeem()" id="sub-redeem-btn">تفعيل</button>
-        </div>
-        <div id="sub-msg" class="sub-msg" role="status"></div>
-        <p class="sub-note">الترم الكامل مدته 5 أشهر، والاشتراك السنوي مدته 12 شهرًا من لحظة التفعيل.</p>
-      </section>
-
-      <section class="sub-card sub-admin" id="sub-admin-card" hidden="">
-        <div class="sub-admin-head">
-          <div><h3>مولّد أكواد الاشتراك</h3><p>خاص بحساب المطوّر</p></div>
-          <span>إدارة</span>
-        </div>
-        <div class="sub-admin-grid">
-          <label><span>نوع الاشتراك</span><select id="sub-plan"><option value="term">ترم كامل — 5 أشهر</option><option value="year">12 شهرًا</option></select></label>
-          <label><span>عدد الأكواد</span><input id="sub-count" type="number" min="1" max="50" value="1"></label>
-        </div>
-        <button class="sub-generate" onclick="subGenerateCodes()">توليد الأكواد</button>
-        <div id="sub-generated"></div>
-        <details class="sub-setup">
-          <summary>إعداد قاعدة البيانات لأول مرة</summary>
-          <p>يتطلب التفعيل جدول <code>subscription_codes</code> و<code>user_subscriptions</code> في Supabase. انسخ SQL من زر الإعداد وشغّله مرة واحدة.</p>
-          <button onclick="subCopySetup()">نسخ SQL الإعداد</button>
-        </details>
-      </section>
+      <section class="sub-hero"><div class="sub-icon">💎</div><div><h2>اشتراكي</h2><p>فعّل مزايا المنصة باستخدام كود اشتراك صالح.</p></div><span id="sub-status-chip" class="sub-chip">غير مفعّل</span></section>
+      <section class="sub-card" id="sub-active-card"><h3>حالة الاشتراك</h3><div id="sub-active-body" class="sub-muted">جاري التحقق...</div></section>
+      <section class="sub-card"><h3>تفعيل كود</h3><label class="sub-label" for="sub-code-input">كود الاشتراك</label><div class="sub-redeem"><input id="sub-code-input" class="sub-input" dir="ltr" autocomplete="off" placeholder="TU-XXXX-XXXX-XXXX"><button onclick="subRedeem()" id="sub-redeem-btn">تفعيل</button></div><div id="sub-msg" class="sub-msg" role="status"></div><p class="sub-note">الترم الكامل مدته 5 أشهر، والاشتراك السنوي مدته 12 شهرًا من لحظة التفعيل.</p></section>
+      <section class="sub-card sub-admin" id="sub-admin-card" hidden=""><div class="sub-admin-head"><div><h3>مولّد أكواد الاشتراك</h3><p>خاص بحساب المطوّر</p></div><span>إدارة</span></div><div class="sub-admin-grid"><label><span>نوع الاشتراك</span><select id="sub-plan"><option value="term">ترم كامل — 5 أشهر</option><option value="year">12 شهرًا</option></select></label><label><span>عدد الأكواد</span><input id="sub-count" type="number" min="1" max="50" value="1"></label></div><button class="sub-generate" onclick="subGenerateCodes()">توليد الأكواد</button><div id="sub-generated"></div><details class="sub-setup"><summary>إعداد قاعدة البيانات لأول مرة</summary><p>يتطلب التفعيل المشترك جدول <code>subscription_codes</code> في Supabase. انسخ SQL من زر الإعداد وشغّله مرة واحدة.</p><button onclick="subCopySetup()">نسخ SQL الإعداد</button></details></section>
     </div>
 
     <!-- PEERS -->
@@ -3746,45 +3570,7 @@ function tuBuildDrawer(){
 }
 function tuOpenDrawer(){ tuBuildDrawer(); var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.add('open'); if(o)o.classList.add('open'); }
 function tuCloseDrawer(){ var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.remove('open'); if(o)o.classList.remove('open'); }
-function tuSubscriptionIsActive(){
-  try{
-    var v=JSON.parse(localStorage.getItem('tu_subscription')||'null');
-    return !!(v&&v.expires_at&&new Date(v.expires_at)>new Date());
-  }catch(e){return false;}
-}
-function tuPremiumStarted(){
-  return new Date() >= new Date('2026-08-25T00:00:00+03:00');
-}
-function tuShowPremiumGate(id){
-  var names={
-    plan:'الخطة الأكاديمية',abs:'الغياب والحرمان',roadmap:'صور خطتي',gen:'مولّد الجداول',
-    chart:'الإحصاء',pomo:'بومودورو',target:'المعدل المستهدف',goals:'أهدافي',schedule:'الجدول الأسبوعي',
-    planner:'تقويم الجامعة',peers:'الزملاء',compare:'مقارنة تخصصين',countdown:'العد التنازلي للتخرج',fans:'نجوم المنصة'
-  };
-  var modal=document.getElementById('sub-payment-modal');
-  if(modal){
-    var box=modal.querySelector('.sub-payment-box');
-    var p=modal.querySelector('#sub-payment-plan');
-    if(box)box.querySelector('h3').textContent='🔒 '+(names[id]||'ميزة Premium');
-    if(p)p.textContent='هذه الميزة ضمن Premium ابتداءً من 25 أغسطس. اشترك بـ15 ريال للترم أو30 ريال للسنة.';
-    modal.classList.add('open');
-  }
-}
-function subGoPayment(plan){
-  var modal=document.getElementById('sub-payment-modal');
-  var p=document.getElementById('sub-payment-plan');
-  if(p)p.textContent=plan==='year'?'الاشتراك السنوي — 30 ريال':'الترم الكامل — 15 ريال';
-  if(modal)modal.classList.add('open');
-}
-function subClosePayment(){
-  var modal=document.getElementById('sub-payment-modal');
-  if(modal)modal.classList.remove('open');
-}
-function goTab(id,btn){
-  if(tuPremiumStarted() && ['plan','abs','roadmap','gen','chart','pomo','target','goals','schedule','planner','peers','compare','countdown','fans'].indexOf(id)>=0 && !tuSubscriptionIsActive()){
-    tuShowPremiumGate(id); return;
-  }
-  try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}var _app=document.getElementById('s-app');if(_app)_app.dataset.currentTab=id;document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}if(id==='planner'){plnrRender();}if(id==='subscription'){subInit();}}
+function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}var _app=document.getElementById('s-app');if(_app)_app.dataset.currentTab=id;document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}if(id==='planner'){plnrRender();}if(id==='subscription'){subInit();}}
 
 /* ===== GRADES / PLAN ===== */
 const GRADES=[['A+',5],['A',4.75],['B+',4.5],['B',4],['C+',3.5],['C',3],['D+',2.5],['D',2],['F',1]];
@@ -4197,18 +3983,7 @@ function schPrintDoc(){
     '<div class="pmeta">'+chips+'</div>';
   var foot='<div class="pfoot"><span>طيبة أكاديمي · TU Academic</span><span>'+m.date+'</span></div>';
   return '<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>الجدول الدراسي</title>'+
-    schPrintCSS()+'</head><body>'+head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n
-<div id="sub-payment-modal" onclick="if(event.target===this)subClosePayment()">
-  <div class="sub-payment-box">
-    <div class="sub-payment-icon">💳</div>
-    <h3>صفحة الدفع</h3>
-    <p id="sub-payment-plan">الاشتراك المحدد</p>
-    <div class="sub-payment-wait">⏳ لسى ما حطّينا طرق الدفع — انتظر، بنوفرها قريبًا.</div>
-    <button class="sub-payment-close" onclick="subClosePayment()">حسنًا، انتظر 💛</button>
-  </div>
-</div>
-
-</body></html>';
+    schPrintCSS()+'</head><body>'+head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n</body></html>';
 }
 function exportSchPDF(){
   if(!(scheduleData.items&&scheduleData.items.length))return toast('الجدول فارغ — أضف مواد أولاً');
@@ -7781,65 +7556,11 @@ window.subInit=async function(){var ad=document.getElementById('sub-admin-card')
 };
 window.subRedeem=async function(){var inp=document.getElementById('sub-code-input'),btn=document.getElementById('sub-redeem-btn');var code=(inp&&inp.value||'').trim().toUpperCase();if(!/^TU-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code))return subMsg('تأكد من كتابة الكود كاملًا بالصيغة الصحيحة.',false);var uid=subUserId();if(!uid)return subMsg('سجّل الدخول أولًا لتفعيل الاشتراك.',false);if(!sbClient)return subMsg('تعذّر الاتصال بخدمة التفعيل.',false);btn.disabled=true;btn.textContent='جاري التفعيل...';try{var q=await sbClient.from('subscription_codes').select('*').eq('code',code).maybeSingle();if(q.error)throw q.error;var row=q.data;if(!row)return subMsg('الكود غير موجود.',false);if(row.redeemed_by)return subMsg('هذا الكود مستخدم مسبقًا.',false);if(row.disabled)return subMsg('هذا الكود موقوف.',false);var months=row.plan_type==='year'?12:5,start=new Date(),end=new Date(start);end.setMonth(end.getMonth()+months);var up=await sbClient.from('subscription_codes').update({redeemed_by:uid,redeemed_at:start.toISOString()}).eq('id',row.id).is('redeemed_by',null).select();if(up.error||!up.data||!up.data.length)throw new Error('الكود استُخدم قبل لحظات');var rec={user_id:uid,code:code,plan_type:row.plan_type,starts_at:start.toISOString(),expires_at:end.toISOString()};var sv=await sbClient.from('user_subscriptions').upsert(rec,{onConflict:'user_id'});if(sv.error)throw sv.error;subSaveLocal(rec);subRender(rec);subMsg('تم تفعيل اشتراكك بنجاح 🎉',true);inp.value='';}catch(e){subMsg('تعذّر التفعيل: '+(e.message||'تحقق من الكود والمحاولة لاحقًا'),false);}finally{btn.disabled=false;btn.textContent='تفعيل';}};
 function subCode(){var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',parts=[];for(var p=0;p<3;p++){var x='';for(var i=0;i<4;i++)x+=chars[Math.floor(Math.random()*chars.length)];parts.push(x);}return 'TU-'+parts.join('-');}
-window.subGenerateCodes=async function(){if(!(typeof IS_ADMIN!=='undefined'&&IS_ADMIN))return;var plan=document.getElementById('sub-plan').value,n=Math.max(1,Math.min(50,Number(document.getElementById('sub-count').value)||1)),out=document.getElementById('sub-generated');try{if(!sbClient)throw new Error('لا يوجد اتصال');var r=await sbClient.rpc('generate_subscription_codes',{p_plan_type:plan,p_count:n});if(r.error)throw r.error;var rows=r.data||[];out.innerHTML=rows.map(function(x){return '<div class="sub-code-row"><code>'+x.code+'</code><span>'+(x.plan_type==='year'?'12 شهر':'5 أشهر')+'</span><button onclick="navigator.clipboard.writeText(\''+x.code+'\');toast(\'تم نسخ الكود\')">نسخ</button></div>';}).join('');if(typeof toast==='function')toast('تم توليد '+rows.length+' كود بنجاح 🎉');}catch(e){out.innerHTML='<div class="sub-msg err" style="display:block">تعذّر توليد الأكواد: '+(e.message||'نفّذ SQL الإعداد الجديد أولًا.')+'</div>';}};
-var SUB_SQL=`create table if not exists public.subscription_codes (
-  id bigint generated by default as identity primary key,
-  code text unique not null,
-  plan_type text not null check (plan_type in ('term','year')),
-  created_by uuid references auth.users(id),
-  created_at timestamptz not null default now(),
-  redeemed_by uuid references auth.users(id),
-  redeemed_at timestamptz,
-  disabled boolean not null default false
-);
+window.subGenerateCodes=async function(){if(!(typeof IS_ADMIN!=='undefined'&&IS_ADMIN))return;var plan=document.getElementById('sub-plan').value,n=Math.max(1,Math.min(50,Number(document.getElementById('sub-count').value)||1)),out=document.getElementById('sub-generated');try{if(!sbClient)throw new Error('لا يوجد اتصال');var r=await sbClient.rpc('generate_subscription_codes',{p_plan_type:plan,p_count:n});if(r.error)throw r.error;var rows=r.data||[];out.innerHTML=rows.map(function(x){return '<div class="sub-code-row"><code>'+x.code+'</code><span>'+(x.plan_type==='year'?'12 شهر':'5 أشهر')+'</span><button onclick="navigator.clipboard.writeText(\''+x.code+'\');toast(\'تم نسخ الكود\')">نسخ</button></div>';}).join('');toast('تم توليد '+rows.length+' كود بنجاح 🎉');}catch(e){out.innerHTML='<div class="sub-msg err" style="display:block">تعذّر توليد الأكواد: '+(e.message||'نفّذ SQL الإعداد الجديد أولًا.')+'</div>';}};
+var SUB_SQL=`create table if not exists public.subscription_codes (id bigint generated by default as identity primary key,code text unique not null,plan_type text not null check (plan_type in ('term','year')),created_by uuid references auth.users(id),created_at timestamptz default now(),redeemed_by uuid references auth.users(id),redeemed_at timestamptz,disabled boolean default false);create table if not exists public.user_subscriptions (user_id uuid primary key references auth.users(id),code text not null,plan_type text not null,starts_at timestamptz not null,expires_at timestamptz not null,updated_at timestamptz default now());alter table public.subscription_codes enable row level security;alter table public.user_subscriptions enable row level security;create policy "read codes for redemption" on public.subscription_codes for select to authenticated using (true);create policy "redeem unused code" on public.subscription_codes for update to authenticated using (redeemed_by is null) with check (redeemed_by=auth.uid());create policy "users read own subscription" on public.user_subscriptions for select to authenticated using (user_id=auth.uid());create policy "users write own subscription" on public.user_subscriptions for insert to authenticated with check (user_id=auth.uid());create policy "users update own subscription" on public.user_subscriptions for update to authenticated using (user_id=auth.uid());create policy "admins insert subscription codes" on public.subscription_codes for insert to authenticated with check (created_by=auth.uid() and exists (select 1 from public.profiles p where p.user_id=auth.uid() and p.is_admin=true));
 
-create table if not exists public.user_subscriptions (
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  code text not null,
-  plan_type text not null check (plan_type in ('term','year')),
-  starts_at timestamptz not null,
-  expires_at timestamptz not null,
-  updated_at timestamptz not null default now()
-);
-
-alter table public.subscription_codes enable row level security;
-alter table public.user_subscriptions enable row level security;
-
-drop policy if exists "read codes for redemption" on public.subscription_codes;
-drop policy if exists "redeem unused code" on public.subscription_codes;
-drop policy if exists "authenticated create subscription codes" on public.subscription_codes;
-drop policy if exists "admins insert subscription codes" on public.subscription_codes;
-drop policy if exists "users read own subscription" on public.user_subscriptions;
-drop policy if exists "users write own subscription" on public.user_subscriptions;
-drop policy if exists "users insert own subscription" on public.user_subscriptions;
-drop policy if exists "users update own subscription" on public.user_subscriptions;
-
-create policy "read codes for redemption"
-on public.subscription_codes for select to authenticated
-using (true);
-
-create policy "redeem unused code"
-on public.subscription_codes for update to authenticated
-using (redeemed_by is null and disabled = false)
-with check (redeemed_by = auth.uid());
-
-create policy "users read own subscription"
-on public.user_subscriptions for select to authenticated
-using (user_id = auth.uid());
-
-create policy "users insert own subscription"
-on public.user_subscriptions for insert to authenticated
-with check (user_id = auth.uid());
-
-create policy "users update own subscription"
-on public.user_subscriptions for update to authenticated
-using (user_id = auth.uid())
-with check (user_id = auth.uid());
-
-create or replace function public.generate_subscription_codes(
-  p_plan_type text,
-  p_count integer
-)
+-- Secure generator RPC
+create or replace function public.generate_subscription_codes(p_plan_type text, p_count integer)
 returns table(code text, plan_type text)
 language plpgsql
 security definer
@@ -7849,51 +7570,25 @@ declare
   i integer;
   new_code text;
   uid uuid := auth.uid();
-  admin_ok boolean;
+  admin_ok boolean := false;
 begin
-  if uid is null then
-    raise exception 'not_authenticated';
-  end if;
-
-  select coalesce(p.is_admin, false)
-    into admin_ok
-  from public.profiles p
-  where p.user_id = uid;
-
-  if not coalesce(admin_ok, false) then
-    raise exception 'not_admin';
-  end if;
-
-  if p_plan_type not in ('term','year') then
-    raise exception 'invalid_plan';
-  end if;
-
-  if p_count < 1 or p_count > 50 then
-    raise exception 'invalid_count';
-  end if;
-
+  if uid is null then raise exception 'not_authenticated'; end if;
+  select coalesce(p.is_admin,false) into admin_ok from public.profiles p where p.user_id=uid;
+  if not admin_ok then raise exception 'not_admin'; end if;
+  if p_plan_type not in ('term','year') then raise exception 'invalid_plan'; end if;
+  if p_count < 1 or p_count > 50 then raise exception 'invalid_count'; end if;
   for i in 1..p_count loop
     loop
-      new_code := 'TU-' ||
-        upper(substr(md5(random()::text || clock_timestamp()::text || i::text),1,4)) || '-' ||
-        upper(substr(md5(random()::text || clock_timestamp()::text || i::text),1,4)) || '-' ||
-        upper(substr(md5(random()::text || clock_timestamp()::text || i::text),1,4));
-
-      exit when not exists (
-        select 1 from public.subscription_codes sc where sc.code = new_code
-      );
+      new_code := 'TU-'||upper(substr(md5(random()::text||clock_timestamp()::text||i::text),1,4))||'-'||upper(substr(md5(random()::text||clock_timestamp()::text||i::text),1,4))||'-'||upper(substr(md5(random()::text||clock_timestamp()::text||i::text),1,4));
+      exit when not exists(select 1 from public.subscription_codes where subscription_codes.code=new_code);
     end loop;
-
-    insert into public.subscription_codes(code, plan_type, created_by)
-    values (new_code, p_plan_type, uid);
-
-    return query select new_code, p_plan_type;
+    insert into public.subscription_codes(code,plan_type,created_by) values(new_code,p_plan_type,uid);
+    return query select new_code,p_plan_type;
   end loop;
 end;
 $$;
-
-revoke all on function public.generate_subscription_codes(text, integer) from public;
-grant execute on function public.generate_subscription_codes(text, integer) to authenticated;`;
+revoke all on function public.generate_subscription_codes(text,integer) from public;
+grant execute on function public.generate_subscription_codes(text,integer) to authenticated;`;
 window.subCopySetup=function(){navigator.clipboard.writeText(SUB_SQL).then(function(){toast('تم نسخ SQL الإعداد');});};
 // Export the roadmap from plain inline styles to avoid transforms, overflow clipping and unsupported theme CSS.
 window.savePlanImage=window.exportPlanPoster=async function(){try{if(typeof currentPlan==='undefined'||!currentPlan||!currentPlan.levels||!currentPlan.levels.length)return toast('اختر تخصصك أولًا');if(typeof html2canvas==='undefined')return toast('جاري تحميل أداة الصور... حاول بعد لحظة');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.some(function(c){return !c.deleted;});});if(!levels.length)return toast('الخطة فارغة');var width=Math.max(1280,levels.length*190+96),root=document.createElement('div');root.dir='rtl';root.style.cssText='position:fixed;left:-20000px;top:0;width:'+width+'px;background:#08111f;color:#f8fafc;padding:38px;font-family:Tajawal,Arial,sans-serif;box-sizing:border-box;z-index:-1';var total=0,count=0;levels.forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;count++;}})});var title=(typeof currentSpec!=='undefined'&&currentSpec&&currentSpec.name)||'الخطة الدراسية',uni=(typeof currentUniversity==='function'&&currentUniversity()==='ksu')?'جامعة الملك سعود':((typeof currentUniversity==='function'&&currentUniversity()==='taibah')?'جامعة طيبة':'الجامعة المختارة');var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px"><div><div style="font-size:18px;font-weight:900;color:#7dd3fc">طيبة أكاديمي • '+uni+'</div><div style="font-size:34px;font-weight:900;margin-top:8px">خطة '+title+'</div><div style="color:#94a3b8;margin-top:7px">'+levels.length+' مستويات • '+count+' مقرر • '+total+' ساعة معتمدة</div></div><div style="font-size:14px;color:#94a3b8">'+new Date().toLocaleDateString('ar-SA')+'</div></div>';var cols='<div style="display:grid;grid-template-columns:repeat('+levels.length+',minmax(155px,1fr));gap:12px;align-items:start">';var colors=['#2563eb','#7c3aed','#0891b2','#0f766e','#15803d','#b45309','#be123c','#475569'];levels.forEach(function(l,ix){var hrs=0,cards='';(l.courses||[]).forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;cards+='<div style="background:linear-gradient(145deg,'+colors[ix%colors.length]+',#111827);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:10px 9px;margin-bottom:8px;min-height:68px;box-sizing:border-box"><div style="font-size:13px;font-weight:800;line-height:1.35">'+String(c.name||'').replace(/[&<>]/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[x]})+'</div><div style="display:flex;justify-content:space-between;color:#cbd5e1;font-size:10px;margin-top:8px"><span>'+String(c.code||'')+'</span><span>'+(Number(c.hrs)||0)+' س</span></div></div>';});cols+='<section style="background:#0f172a;border:1px solid #334155;border-radius:14px;padding:11px"><div style="display:flex;justify-content:space-between;border-bottom:1px solid #334155;padding-bottom:9px;margin-bottom:9px;font-weight:900"><span>المستوى '+(l.level||ix+1)+'</span><span style="color:#93c5fd;font-size:11px">'+hrs+' ساعة</span></div>'+cards+'</section>';});cols+='</div><div style="border-top:1px solid #334155;margin-top:20px;padding-top:12px;color:#64748b;font-size:12px;display:flex;justify-content:space-between"><span>طيبة أكاديمي • TU Academic</span><span>صورة كاملة بدون قص</span></div>';root.innerHTML=head+cols;document.body.appendChild(root);if(document.fonts&&document.fonts.ready)await document.fonts.ready;await new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r);});});var canvas=await html2canvas(root,{scale:2,backgroundColor:'#08111f',useCORS:true,logging:false,width:root.scrollWidth,height:root.scrollHeight,windowWidth:root.scrollWidth,windowHeight:root.scrollHeight});await new Promise(function(resolve,reject){canvas.toBlob(function(blob){if(!blob)return reject(new Error('فشل إنشاء الصورة'));var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='خطة-'+title.replace(/\s+/g,'-')+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},1200);resolve();},'image/png',1);});root.remove();toast('تم تصدير صورة الخطة كاملة ✅');}catch(e){console.error(e);var x=document.querySelector('body>div[dir="rtl"][style*="-20000px"]');if(x)x.remove();toast('تعذّر تصدير الصورة: '+(e.message||e));}};
