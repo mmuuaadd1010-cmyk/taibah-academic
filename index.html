@@ -4138,72 +4138,13 @@ function schPrintDoc(){
     '<div class="pmeta">'+chips+'</div>';
   var foot='<div class="pfoot"><span>طيبة أكاديمي · TU Academic</span><span>'+m.date+'</span></div>';
   return '<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>الجدول الدراسي</title>'+
-    schPrintCSS()+'
-<style id="imam-plan-builder-style">
-#imamPlanBuilder{position:fixed;inset:20px;z-index:99999;background:var(--bg,#0b1117);color:var(--t,#eef2f5);border:1px solid var(--bor,#263241);border-radius:18px;box-shadow:0 20px 80px rgba(0,0,0,.45);display:none;overflow:auto;direction:rtl;padding:18px;font-family:inherit}
-#imamPlanBuilder input,#imamPlanBuilder textarea,#imamPlanBuilder select{width:100%;box-sizing:border-box;border:1px solid var(--bor,#263241);border-radius:10px;background:var(--s2,#111a24);color:var(--t,#eef2f5);padding:10px;margin:5px 0 10px;font-family:inherit}
-#imamPlanBuilder textarea{min-height:86px;white-space:pre;direction:rtl}
-#imamPlanBuilder button,.imamBuilderBtn{border:0;border-radius:10px;padding:9px 12px;background:#4f8cff;color:#fff;font-weight:800;cursor:pointer;margin:4px}
-#imamPlanBuilder .danger{background:#e45757}.imamLevelBox{border:1px solid var(--bor,#263241);border-radius:14px;padding:12px;margin:10px 0;background:var(--s,#101820)}
-#imamPlanBuilder .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.imamHelp{color:var(--t3,#9aa6b0);font-size:.82rem;line-height:1.7}.imamFab{position:fixed;left:18px;bottom:18px;z-index:99998;background:#7c5cff;color:#fff;border:0;border-radius:999px;padding:12px 16px;font-weight:900;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-</style>
-</head><body>'+
+    schPrintCSS()+
+    '</head><body>'+
     '<div id="tu-global-paid-banner" class="premium-notice" style="margin:10px 12px">'+
     '<h3><span class="tu-inline-logo tu-logo-img" aria-hidden="true"></span> TU Academic Premium — ابتداءً من 25 أغسطس</h3>'+
     '<p>معظم المزايا المتقدمة ستكون مدفوعة للمساهمة في تكاليف قاعدة البيانات والذكاء الاصطناعي. <b>الترم 15 ريال • السنة 30 ريال</b> ☕</p>'+
     '</div>'+
-    head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n
-<button class="imamFab" onclick="imamBuilderOpen()">➕ خطط الإمام</button>
-<div id="imamPlanBuilder">
-  <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap">
-    <h2 style="margin:0">لوحة إضافة خطط جامعة الإمام</h2>
-    <div><button onclick="imamBuilderSave()">💾 حفظ الخطة</button><button onclick="imamBuilderDownloadBackup()">⬇️ تحميل نسخة الخطط</button><button onclick="document.getElementById('ibImportFile').click()">⬆️ استيراد الخطط</button><button onclick="imamBuilderExport()">📋 نسخ JSON</button><button class="danger" onclick="imamBuilderClose()">إغلاق</button><input id="ibImportFile" type="file" accept="application/json,.json" style="display:none" onchange="imamBuilderImportFile(this)"></div>
-  </div>
-  <p class="imamHelp">أضف كلية جديدة أو اختر كلية موجودة، ثم أدخل التخصص والمستويات. المواد الاختيارية لا تُحسب في الخطة إلا إذا وضعت لها قريد/درجة لاحقًا في صفحة الخطة.</p>
-  <div class="grid">
-    <label>الكلية<select id="ibCollegeSelect" onchange="imamBuilderCollegeChanged()"></select></label>
-    <label>أو اسم كلية جديدة<input id="ibCollegeNew" placeholder="مثال: كلية الهندسة"></label>
-    <label>إيموجي التخصص<input id="ibIcon" placeholder="🎓" value="🎓"></label>
-    <label>اسم التخصص<input id="ibSpecName" placeholder="مثال: علوم الحاسب"></label>
-    <label>كود/معرّف اختياري<input id="ibSpecCode" placeholder="مثال: بكا-عال حاسب"></label>
-  </div>
-  <div style="margin:8px 0"><button onclick="imamBuilderAddLevel()">➕ إضافة مستوى</button><button onclick="imamBuilderClearForm()">تفريغ النموذج</button></div>
-  
-<div id="uquOfficialImporter" style="border:1px solid var(--bor,#263241);border-radius:14px;padding:12px;margin:12px 0;background:var(--s,#101820)">
-  <h3 style="margin:0 0 8px">استيراد خطة أم القرى من الرابط الرسمي</h3>
-  <div class="imamHelp">الصق رابط صفحة برنامج من جامعة أم القرى مثل: https://uqu.edu.sa/App/Degrees/1962 ثم اضغط استيراد. يتم سحب المستويات والمواد والساعات من الصفحة الرسمية داخل المتصفح.</div>
-  <div class="grid"><label>رابط الخطة الرسمي<input id="uquPlanUrl" placeholder="https://uqu.edu.sa/App/Degrees/1962"></label><label>إيموجي<input id="uquPlanIcon" value="🕋"></label></div>
-  <button onclick="uquImportOfficialPlan()">⬇️ استيراد خطة أم القرى</button>
-  <textarea id="uquBulkUrls" placeholder="الصق روابط كثيرة هنا، كل رابط في سطر" style="min-height:110px;margin-top:10px"></textarea>
-  <button onclick="uquImportOfficialPlansBulk()">⬇️ استيراد كل الروابط</button>
-  <span id="uquImportStatus" class="imamHelp"></span>
-</div>
-<div id="ibLevels"></div>
-  <div class="imamHelp">صيغة المواد داخل كل مستوى: كل سطر = الرمز | اسم المادة | الساعات | اختياري؟ | القريد<br>مثال: عال1111 | أساسيات الحوسبة والأخلاقيات | 3<br>مثال اختياري: عال14XX | مقرر اختياري تخصص | 3 | اختياري</div>
-</div>
-
-<script id="imam-plan-builder-script">
-(function(){
-function qs(id){return document.getElementById(id)}
-function uid(s){return String(s||'x').trim().replace(/\s+/g,'_').replace(/[^00-FF\w-]/g,'').slice(0,70)||('id_'+Date.now())}
-function getImam(){try{var x=localStorage.getItem('imam_custom_specs'); if(x)return JSON.parse(x)}catch(e){} return (typeof IMAM_SPECS!=='undefined'?JSON.parse(JSON.stringify(IMAM_SPECS)):[])}
-function setImam(data){localStorage.setItem('imam_custom_specs',JSON.stringify(data)); try{ if(window.student){student.university='imam'; saveSt&&saveSt()} }catch(e){} try{window.IMAM_SPECS=data}catch(e){} try{applyUniversitySpecs(); renderSpecs&&renderSpecs()}catch(e){} }
-window.imamBuilderOpen=function(){var p=qs('imamPlanBuilder'); if(p){p.style.display='block'; imamBuilderFillColleges(); if(!qs('ibLevels').children.length) imamBuilderAddLevel();}}
-window.imamBuilderClose=function(){var p=qs('imamPlanBuilder'); if(p)p.style.display='none'}
-window.imamBuilderFillColleges=function(){var sel=qs('ibCollegeSelect'); if(!sel)return; var data=getImam(); sel.innerHTML='<option value="">-- اختر أو اكتب كلية جديدة --</option>'+data.map(function(c){return '<option>'+String(c.college||'')+'</option>'}).join('')}
-window.imamBuilderCollegeChanged=function(){var v=qs('ibCollegeSelect').value; if(v)qs('ibCollegeNew').value=v}
-window.imamBuilderAddLevel=function(){var box=qs('ibLevels'), n=box.children.length+1, d=document.createElement('div'); d.className='imamLevelBox'; d.innerHTML='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>المستوى '+n+'</b><button class="danger" onclick="this.closest(\'.imamLevelBox\').remove();imamBuilderRenumber()">حذف المستوى</button></div><input class="ibLevelNo" type="number" min="1" value="'+n+'" placeholder="رقم المستوى"><textarea class="ibCourses" placeholder="الرمز | اسم المادة | الساعات | اختياري؟ | القريد"></textarea>'; box.appendChild(d)}
-window.imamBuilderRenumber=function(){[].forEach.call(document.querySelectorAll('#ibLevels .imamLevelBox'),function(el,i){var b=el.querySelector('b'); if(b)b.textContent='المستوى '+(i+1); var inp=el.querySelector('.ibLevelNo'); if(inp&&!inp.value)inp.value=i+1})}
-window.imamBuilderClearForm=function(){['ibCollegeNew','ibSpecName','ibSpecCode'].forEach(function(id){qs(id).value=''}); qs('ibIcon').value='🎓'; qs('ibLevels').innerHTML=''; imamBuilderAddLevel()}
-function parseCourse(line,i){var a=line.split('|').map(function(x){return x.trim()}); if(a.length<3)return null; var hrs=parseFloat((a[2]||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}))||0; var elective=/اختياري|optional/i.test(a[3]||''); var grade=(a[4]||'').trim(); return {id:uid((a[0]||'c')+'_'+(a[1]||'')+'_'+i),code:a[0]||'',name:a[1]||'',hrs:hrs,elective:elective,optional:elective,grade:grade,countInPlan:(!elective||!!grade)} }
-window.imamBuilderSave=function(){var college=(qs('ibCollegeNew').value||qs('ibCollegeSelect').value||'').trim(), name=qs('ibSpecName').value.trim(); if(!college||!name){alert('اكتب اسم الكلية واسم التخصص');return} var code=qs('ibSpecCode').value.trim(), icon=qs('ibIcon').value.trim()||'🎓'; var levels=[]; [].forEach.call(document.querySelectorAll('#ibLevels .imamLevelBox'),function(el){var no=parseInt(el.querySelector('.ibLevelNo').value||levels.length+1,10); var courses=(el.querySelector('.ibCourses').value||'').split(/\n+/).map(parseCourse).filter(Boolean); if(courses.length)levels.push({level:no,courses:courses})}); if(!levels.length){alert('أضف مواد مستوى واحد على الأقل');return} levels.sort(function(a,b){return a.level-b.level}); var sp={id:'imam_custom_'+uid(college+'_'+name+'_'+code),name:name,code:code,icon:icon,university:'imam',degree:'bachelor',college:college,source:'مدخل يدويًا من لوحة المطور',audit:'خطة مضافة يدويًا بواسطة لوحة المطور',levels:levels,verifiedCatalog:true}; sp.planHours=levels.reduce(function(t,l){return t+l.courses.reduce(function(s,c){return s+(c.countInPlan?Number(c.hrs||0):0)},0)},0); var data=getImam(); var col=data.find(function(c){return c.college===college}); if(!col){col={college:college,entries:[]}; data.push(col)} var ex=col.entries.findIndex(function(x){return x.id===sp.id || (x.name===name && (x.code||'')===code)}); if(ex>=0)col.entries[ex]=sp; else col.entries.push(sp); setImam(data); alert('تم حفظ الخطة في جامعة الإمام ✅'); imamBuilderFillColleges(); }
-window.imamBuilderExport=function(){var txt=JSON.stringify(getImam(),null,2); navigator.clipboard&&navigator.clipboard.writeText(txt); alert('تم نسخ نسخة احتياطية من خطط الإمام')}
-var old=window.applyUniversitySpecs; window.applyUniversitySpecs=function(){try{var custom=localStorage.getItem('imam_custom_specs'); if(custom&&typeof IMAM_SPECS!=='undefined')window.IMAM_SPECS=JSON.parse(custom)}catch(e){} if(old)return old.apply(this,arguments)}
-})();
-</script>
-<script id="uqu-quick-add">
-(function(){document.addEventListener('DOMContentLoaded',function(){try{var area=document.querySelector('#s-university .uni-grid')||document.querySelector('.uni-grid');if(area&&!document.getElementById('uni-card-uqu')){var d=document.createElement('div');d.id='uni-card-uqu';d.className='uni-card';d.onclick=function(){selectUniversity('uqu')};d.innerHTML='<div style="font-size:34px">🕋</div><h3>جامعة أم القرى</h3><p>خطط قابلة للإكمال من لوحة المطور</p><div class="uni-current" style="display:none">محددة الآن</div>';area.appendChild(d)}}catch(e){}})} )();
-</script></body></html>';
+    head+schCalMarkup(true)+foot+'</body></html>';
 }
 </script>
 <div id="tu-payment-note" onclick="if(event.target===this)tuClosePayment()">
@@ -7936,7 +7877,7 @@ window.savePlanImage=window.exportPlanPoster=async function(){try{if(typeof curr
 <script id="imam-plan-builder-script">
 (function(){
 function qs(id){return document.getElementById(id)}
-function uid(s){return String(s||'x').trim().replace(/\s+/g,'_').replace(/[^00-FF\w-]/g,'').slice(0,70)||('id_'+Date.now())}
+function uid(s){return String(s||'x').trim().replace(/\s+/g,'_').replace(/[^\u0600-\u06FF\w-]/g,'').slice(0,70)||('id_'+Date.now())}
 function getImam(){try{var x=localStorage.getItem('imam_custom_specs'); if(x)return JSON.parse(x)}catch(e){} return (typeof IMAM_SPECS!=='undefined'?JSON.parse(JSON.stringify(IMAM_SPECS)):[])}
 function setImam(data){localStorage.setItem('imam_custom_specs',JSON.stringify(data)); try{ if(window.student){student.university='imam'; saveSt&&saveSt()} }catch(e){} try{window.IMAM_SPECS=data}catch(e){} try{applyUniversitySpecs(); renderSpecs&&renderSpecs()}catch(e){} }
 window.imamBuilderOpen=function(){var p=qs('imamPlanBuilder'); if(p){p.style.display='block'; imamBuilderFillColleges(); if(!qs('ibLevels').children.length) imamBuilderAddLevel();}}
