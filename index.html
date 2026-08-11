@@ -2245,7 +2245,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <p style="color:var(--t2);font-size:.82rem;line-height:1.8;margin:10px 0 16px">
           نفس المزايا الموجودة بالأعلى، والفرق فقط أن مدة الاشتراك <b style="color:var(--a2)">5 أشهر</b>.
         </p>
-        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 5 أشهر — 15 ريال')">اشترك الآن</button>
+        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 5 أشهر — 15 ريال','term')">اشترك الآن</button>
       </div>
 
       <div class="premium-plan best">
@@ -2255,7 +2255,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <p style="color:var(--t2);font-size:.82rem;line-height:1.8;margin:10px 0 16px">
           نفس المزايا الموجودة بالأعلى، والفرق فقط أن مدة الاشتراك <b style="color:var(--a2)">12 شهر</b>.
         </p>
-        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 12 شهر — 30 ريال')">اشترك الآن</button>
+        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 12 شهر — 30 ريال','year')">اشترك الآن</button>
       </div>
     </div>
   </section>
@@ -2967,7 +2967,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
             <li>🆕 كل التحديثات والمزايا الجديدة أول بأول</li>
             <li>🚫 بدون إعلانات نهائيًا</li>
           </ul>
-          <button class="premium-pay" onclick="tuOpenPayment('الترم — 15 ريال')">انتقل إلى صفحة الدفع</button>
+          <button class="premium-pay" onclick="tuOpenPayment('الترم — 15 ريال','term')">انتقل إلى صفحة الدفع</button>
         </div>
 
         <div class="premium-plan best">
@@ -2985,7 +2985,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
             <li>🔒 راحة بال كاملة طول العام الدراسي بدون تجديد متكرر</li>
             <li>🥇 أولوية بالدعم والمزايا التجريبية الجديدة</li>
           </ul>
-          <button class="premium-pay" onclick="tuOpenPayment('السنة — 30 ريال')">انتقل إلى صفحة الدفع</button>
+          <button class="premium-pay" onclick="tuOpenPayment('السنة — 30 ريال','year')">انتقل إلى صفحة الدفع</button>
         </div>
       </div>
 
@@ -4138,24 +4138,58 @@ function schPrintDoc(){
 <div id="tu-payment-note" onclick="if(event.target===this)tuClosePayment()">
   <div class="tu-payment-box">
     <div style="font-size:2rem">💳</div>
-    <h3>صفحة الدفع</h3>
+    <h3>إتمام الاشتراك</h3>
     <p id="tu-payment-plan"></p>
-    <p style="padding:10px;border-radius:10px;background:rgba(245,197,66,.08);color:var(--y)">
-      ⏳ لسى ما حطّينا طرق الدفع — انتظر، بنوفرها قريبًا.
-    </p>
-    <button onclick="tuClosePayment()">حسنًا</button>
+    <label for="tu-discount-input" style="display:block;text-align:right;color:var(--t2);font-size:.76rem;margin:10px 0 6px">كود خصم (اختياري)</label>
+    <input id="tu-discount-input" dir="ltr" autocomplete="off" placeholder="DISCOUNT-CODE" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:11px;color:var(--t);padding:12px;font:700 .88rem Tajawal,sans-serif;outline:none;margin-bottom:12px">
+    <div id="tu-payment-msg" style="display:none;margin-bottom:10px;border-radius:10px;padding:10px 12px;font-size:.78rem"></div>
+    <button onclick="tuStartTamaraPay()" id="tu-pay-btn">الدفع عبر تمارا 🛡️</button>
+    <button onclick="tuClosePayment()" style="background:transparent;color:var(--t2);margin-top:8px">إلغاء</button>
   </div>
 </div>
 <script>
-function tuOpenPayment(plan){
+var TU_CURRENT_PLAN_TYPE=null;
+var TAMARA_FN_URL=SB_URL+'/functions/v1/tamara-checkout';
+function tuOpenPayment(plan,planType){
   var m=document.getElementById('tu-payment-note');
   var p=document.getElementById('tu-payment-plan');
+  TU_CURRENT_PLAN_TYPE=planType;
   if(p)p.textContent='الاشتراك المحدد: '+plan;
+  var di=document.getElementById('tu-discount-input'); if(di)di.value='';
+  var msg=document.getElementById('tu-payment-msg'); if(msg){msg.style.display='none';msg.textContent='';}
+  var btn=document.getElementById('tu-pay-btn'); if(btn){btn.disabled=false;btn.textContent='الدفع عبر تمارا 🛡️';}
   if(m)m.classList.add('open');
 }
 function tuClosePayment(){
   var m=document.getElementById('tu-payment-note');
   if(m)m.classList.remove('open');
+}
+function tuPayMsg(t,ok){
+  var m=document.getElementById('tu-payment-msg');
+  if(!m)return;
+  m.style.display='block';
+  m.style.color=ok?'var(--g)':'var(--r)';
+  m.style.background=ok?'rgba(62,207,142,.1)':'rgba(240,100,92,.1)';
+  m.textContent=t;
+}
+async function tuStartTamaraPay(){
+  if(!TU_CURRENT_PLAN_TYPE)return;
+  if(typeof CURRENT_USER==='undefined'||!CURRENT_USER||!sbClient)return tuPayMsg('سجّل الدخول أولًا لإتمام الاشتراك.',false);
+  var btn=document.getElementById('tu-pay-btn');
+  var code=((document.getElementById('tu-discount-input')||{}).value||'').trim();
+  btn.disabled=true;btn.textContent='جاري التحويل لتمارا...';
+  try{
+    var sess=await sbClient.auth.getSession();
+    var token=sess&&sess.data&&sess.data.session&&sess.data.session.access_token;
+    if(!token)throw new Error('انتهت الجلسة، سجّل الدخول من جديد');
+    var res=await fetch(TAMARA_FN_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:TU_CURRENT_PLAN_TYPE,discount_code:code})});
+    var data=await res.json();
+    if(!res.ok)throw new Error(data.error||'تعذّر بدء الدفع');
+    location.href=data.checkout_url;
+  }catch(e){
+    tuPayMsg(e.message||'صار خطأ، حاول مرة ثانية',false);
+    btn.disabled=false;btn.textContent='الدفع عبر تمارا 🛡️';
+  }
 }
 </script>
 <script>
