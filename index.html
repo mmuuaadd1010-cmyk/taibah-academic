@@ -4189,7 +4189,7 @@ async function tuStartTamaraPay(){
     var fnUrl=SB_URL+'/functions/v1/tamara-checkout';
     var res=await fetch(fnUrl,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:TU_CURRENT_PLAN_TYPE,discount_code:code,phone_number:phone})});
     var data=await res.json();
-    if(!res.ok)throw new Error(data.error||'تعذّر بدء الدفع');
+    if(!res.ok)throw new Error(data.error||data.message||JSON.stringify(data)||'تعذّر بدء الدفع');
     location.href=data.checkout_url;
   }catch(e){
     tuPayMsg(e.message||'صار خطأ، حاول مرة ثانية',false);
