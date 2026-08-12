@@ -6441,6 +6441,72 @@ function scfgAiToggleNew(v){var e=document.getElementById('scfg-ai-newcol');if(e
 function scfgAiStatus(msg,color){var e=document.getElementById('scfg-ai-status');if(e){e.style.color=color||'var(--t2)';e.innerHTML=msg;}}
 function scfgAiProviderChange(){var pel=document.getElementById('scfg-ai-provider');var p=pel?pel.value:'openrouter';var ms=document.getElementById('scfg-ai-model');var k=document.getElementById('scfg-ai-key');var hint=document.getElementById('scfg-ai-hint');if(ms){if(p==='openrouter'){ms.innerHTML='<option value="openrouter/free">تلقائي (نموذج مجاني يقرأ الصور)</option>';}else if(p==='groq'){ms.innerHTML='<option value="llama-3.3-70b-versatile">Llama 3.3 70B</option><option value="meta-llama/llama-4-scout-17b-16e-instruct">Llama 4 Scout (صور)</option><option value="llama-3.1-8b-instant">Llama 3.1 8B</option>';}else{ms.innerHTML='<option value="gemini-2.5-flash">Gemini 2.5 Flash</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option><option value="gemini-2.5-pro">Gemini 2.5 Pro</option>';}}if(k){try{k.value=localStorage.getItem('tu_aikey_'+p)||'';}catch(e){}k.placeholder=(p==='openrouter')?'sk-or-...':(p==='groq'?'gsk_...':'AQ.... / AIza...');}if(hint){hint.innerHTML=(p==='openrouter')?'🔑 مفتاح OpenRouter مجاني بدون بطاقة — سوّه من openrouter.ai/keys':(p==='groq'?'🔑 مفتاح GroqCloud مجاني وسريع — سوّه من console.groq.com/keys':'🔑 مفتاح Gemini — سوّه من aistudio.google.com/apikey');}}
 function scfgFileToDataUrl(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(''+r.result);};r.onerror=rej;r.readAsDataURL(file);});}
+async function scfgAiImport(){
+ var provider=((document.getElementById('scfg-ai-provider')||{}).value)||'openrouter';
+ var key=((document.getElementById('scfg-ai-key')||{}).value||'').trim();
+ var collegeSel=((document.getElementById('scfg-ai-college')||{}).value)||'';
+ var newColEl=document.getElementById('scfg-ai-newcol');
+ var college=(collegeSel==='__new__')?(((newColEl&&newColEl.value)||'').trim()):collegeSel;
+ var name=((document.getElementById('scfg-ai-name')||{}).value||'').trim();
+ var emoji=(((document.getElementById('scfg-ai-emoji')||{}).value)||'').trim()||'📘';
+ var modelEl=document.getElementById('scfg-ai-model');
+ var model=(modelEl&&modelEl.value)||(aiIsOA(provider)?aiOAModel(provider,false):'gemini-2.5-flash');
+ var files=(document.getElementById('scfg-ai-imgs')||{}).files;
+ var planText=((document.getElementById('scfg-ai-text')||{}).value||'').trim();
+ if(!name){scfgAiStatus('⚠️ اكتب اسم التخصص أولاً','#f5a05a');return;}
+ if(!college){scfgAiStatus('⚠️ اختر الكلية أو اكتب اسم كلية جديدة','#f5a05a');return;}
+ if(!key){scfgAiStatus('⚠️ الصق المفتاح أولاً','#f5a05a');return;}
+ if(!planText&&(!files||!files.length)){scfgAiStatus('⚠️ الصق نص الخطة أو ارفع صورة على الأقل','#f5a05a');return;}
+ try{localStorage.setItem('tu_aikey_'+provider,key);}catch(e){}
+ scfgAiStatus('⏳ يقرأ الخطة ويحللها... (قد تأخذ دقيقة)');
+ try{
+  var urls=[];if(files){for(var i=0;i<files.length;i++){urls.push(await scfgFileToDataUrl(files[i]));}}
+  var prompt='استخرج الخطة الدراسية كاملةً وأرجع JSON فقط بدون أي شرح، بهذا الشكل بالضبط: {"levels":[{"level":1,"courses":[{"code":"CS 101","name":"اسم المادة","hrs":3}]}]} . القواعد: level رقم المستوى/الفصل. code رمز المقرر كما هو. name اسم المادة بالعربي. hrs عدد الساعات المعتمدة كرقم صحيح. رتّب المستويات تصاعديًا من 1. مهم جداً: استخرج كل المستويات وكل المواد بدون اختصار أو حذف، ولا تكتفِ بمستوى واحد. أرجع JSON صالح فقط.';
+  var txt='';
+  if(aiIsOA(provider)){
+   var content=[{type:'text',text:prompt+(planText?('\n\nنص الخطة:\n'+planText):'')}];
+   for(var u=0;u<urls.length;u++){content.push({type:'image_url',image_url:{url:urls[u]}});}
+   var body={model:model,messages:[{role:'user',content:content}]};
+   var orurl=aiOAUrl(provider);
+   var resp=await fetch(orurl,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
+   var data=await resp.json();
+   if(!resp.ok){scfgAiStatus('❌ خطأ: '+((data.error&&data.error.message)||resp.status),'#f77');return;}
+   try{var mc=data.choices[0].message.content;txt=(typeof mc==='string')?mc:mc.map(function(x){return x.text||'';}).join('');}catch(e){}
+  }else{
+   var parts=[];for(var u=0;u<urls.length;u++){var uu=urls[u];var mime=uu.substring(5,uu.indexOf(';'));var b64=uu.substring(uu.indexOf(',')+1);parts.push({inlineData:{mimeType:mime,data:b64}});}
+   var gbody={contents:[{parts:[{text:prompt+(planText?('\n\nنص الخطة:\n'+planText):'')}].concat(parts)}],generationConfig:{temperature:0.1}};
+   var gurl='https://'+'generativelanguage.googleapis.com'+'/v1beta/models/'+model+':generateContent?key='+encodeURIComponent(key);
+   var gresp=await fetch(gurl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(gbody)});
+   var gdata=await gresp.json();
+   if(!gresp.ok){scfgAiStatus('❌ خطأ: '+((gdata.error&&gdata.error.message)||gresp.status),'#f77');return;}
+   try{txt=gdata.candidates[0].content.parts.map(function(p){return p.text||'';}).join('');}catch(e){}
+  }
+  txt=(''+txt).replace(/```json/gi,'').replace(/```/g,'').trim();
+  var mm=txt.match(/\{[\s\S]*\}/);if(mm)txt=mm[0];
+  var parsed=JSON.parse(txt);
+  var levels=parsed.levels||parsed;
+  if(!levels||!levels.length){scfgAiStatus('❌ ما قدرت أقرأ خطة واضحة، جرّب تلصق النص أو صورة أوضح','#f77');return;}
+  var sid='aim'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  for(var a=0;a<levels.length;a++){
+   levels[a].level=levels[a].level||(a+1);
+   levels[a].courses=levels[a].courses||[];
+   for(var b=0;b<levels[a].courses.length;b++){
+    var cc2=levels[a].courses[b];
+    cc2.hrs=+cc2.hrs||0;
+    cc2.code=cc2.code||'';
+    cc2.name=cc2.name||'';
+    cc2.id=sid+'_l'+levels[a].level+'_'+(b+1);
+   }
+  }
+  var sp={id:sid,name:name,icon:emoji,levels:levels};
+  scfgCardPersist(college,sp);
+  try{scfgMergeSpecs();}catch(e){}
+  try{scfgAiFillColleges();}catch(e){}
+  try{scfgDelFill();}catch(e){}
+  var tot=0,cn=0;for(var a=0;a<levels.length;a++){for(var b=0;b<levels[a].courses.length;b++){tot+=levels[a].courses[b].hrs;cn++;}}
+  scfgAiStatus('✅ تمت إضافة «'+name+'» بنجاح: '+levels.length+' مستوى · '+cn+' مادة · '+tot+' ساعة. اضغط 🌍 نشر للجميع بالأسفل عشان يظهر لكل الزوار.','#5ccb8a');
+ }catch(e){scfgAiStatus('❌ فشل التحليل: '+((e&&e.message)||e)+' — تأكد من صحة المفتاح والنص/الصور','#f77');}
+}
 function scfgMergeSpecs(){
  try{
   // Start from the selected university, then merge developer-added majors on top.
