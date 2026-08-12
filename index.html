@@ -625,41 +625,25 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .sub-icon.tu-logo-img{font-size:0;background-color:#080a0d!important;background-size:78% 78%!important;background-position:center!important;background-repeat:no-repeat!important}
 </style>
 
-<style id="tu-auth-gate-fix">
-/* إظهار زر ابدأ الآن بدل فتح شاشة تسجيل الدخول مباشرة */
-#lp-auth:not(.tu-auth-open) .auth-card{display:none!important}
-#lp-auth.tu-auth-open .tu-auth-gate{display:none!important}
-.tu-auth-gate{max-width:460px;width:100%;margin:0 auto;text-align:center;background:linear-gradient(165deg,var(--s2),var(--s1));border:1px solid var(--bor);border-radius:28px;padding:34px 22px;box-shadow:0 30px 80px -24px rgba(0,0,0,.6)}
-.tu-auth-gate .tag{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(91,157,253,.28);background:rgba(91,157,253,.12);color:var(--a3);border-radius:999px;padding:7px 13px;font-size:.76rem;font-weight:900;margin-bottom:14px}
-.tu-auth-gate h2{font-size:1.65rem;line-height:1.35;margin:0 0 10px;color:var(--t);font-weight:950}
-.tu-auth-gate p{font-size:.9rem;line-height:1.85;color:var(--t2);margin:0 0 20px}
-.tu-auth-gate button{width:100%;border:0;border-radius:18px;padding:17px 18px;background:var(--grad);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:950;cursor:pointer;box-shadow:0 18px 38px -14px var(--a1)}
-.tu-auth-gate button:hover{filter:brightness(1.08);transform:translateY(-2px)}
-.tu-auth-gate small{display:block;margin-top:12px;color:var(--t3);font-size:.76rem;line-height:1.6}
-</style>
-
-<style id="tu-auth-gate-click-fix">
-#lp-auth .tu-auth-gate{position:relative;z-index:5;pointer-events:auto!important}
-#lp-auth .tu-auth-gate button{pointer-events:auto!important;position:relative;z-index:6}
-#lp-auth.tu-auth-open .auth-card{display:block!important;max-width:460px!important;width:100%!important;margin:0 auto!important}
-#lp-auth.tu-auth-open .auth-panel{display:block!important;max-width:460px!important;width:100%!important;margin:0 auto!important}
-@media(max-width:560px){#lp-auth.tu-auth-open .auth-card{padding:0!important}.tu-auth-gate{padding:28px 18px!important}}
+<style id="tu-login-page-route-style">
+#lp-auth .auth-card{display:none!important}
+.tu-start-card{max-width:460px;width:100%;margin:0 auto;text-align:center;background:linear-gradient(165deg,var(--s2),var(--s1));border:1px solid var(--bor);border-radius:28px;padding:34px 22px;box-shadow:0 30px 80px -24px rgba(0,0,0,.6)}
+.tu-start-card .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(91,157,253,.28);background:rgba(91,157,253,.12);color:var(--a3);border-radius:999px;padding:7px 13px;font-size:.78rem;font-weight:900;margin-bottom:14px}
+.tu-start-card h2{font-size:1.75rem;line-height:1.25;margin:0 0 10px;color:var(--t);font-weight:950}.tu-start-card p{font-size:.92rem;line-height:1.85;color:var(--t2);margin:0 0 20px}.tu-start-card a{display:block;text-decoration:none;width:100%;box-sizing:border-box;border:0;border-radius:18px;padding:17px 18px;background:var(--grad);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:950;box-shadow:0 18px 38px -14px var(--a1)}
+@media(max-width:560px){.tu-start-card{padding:30px 18px}}
 </style>
 </head>
 <body style="background: rgb(5, 6, 8) !important;">
 <style id="tu-subscription-banner-style">
-#tu-subscription-banner{position:sticky;top:0;z-index:85;width:100%;box-sizing:border-box;padding:12px 54px 12px 14px;background:linear-gradient(100deg,#160013 0%,#5b0035 18%,#c2185b 38%,#ff7a18 58%,#ffd166 72%,#8a003d 100%);background-size:260% 100%;animation:tuOfferMove 6s linear infinite;color:#fff;border-bottom:1px solid rgba(255,220,130,.55);font-family:Tajawal,system-ui,sans-serif;font-size:.86rem;font-weight:950;line-height:1.75;text-align:center;box-shadow:0 10px 34px rgba(255,122,24,.32),0 0 24px rgba(194,24,91,.20),inset 0 -1px 0 rgba(255,255,255,.18)}
+#tu-subscription-banner{position:sticky;top:0;z-index:85;width:100%;box-sizing:border-box;padding:12px 54px 12px 14px;background:linear-gradient(100deg,#160013 0%,#8a0048 23%,#e11d48 45%,#ff7a18 66%,#ffd166 82%,#8a003d 100%);background-size:260% 100%;animation:tuOfferMove 6s linear infinite;color:#fff;border-bottom:1px solid rgba(255,220,130,.55);font-family:Tajawal,system-ui,sans-serif;font-size:.86rem;font-weight:950;line-height:1.75;text-align:center;box-shadow:0 10px 34px rgba(255,122,24,.32),0 0 24px rgba(194,24,91,.20),inset 0 -1px 0 rgba(255,255,255,.18)}
 @keyframes tuOfferMove{0%{background-position:0% 50%}100%{background-position:260% 50%}}
-#tu-subscription-banner .hot{display:inline-flex;align-items:center;gap:4px;color:#fff;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:2px 9px;margin-inline:3px;white-space:nowrap;box-shadow:0 0 16px rgba(255,255,255,.12)}
+#tu-subscription-banner .hot{display:inline-flex;align-items:center;gap:4px;color:#fff;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:2px 9px;margin-inline:3px;white-space:nowrap}
 #tu-subscription-banner b{color:#2b1200;background:linear-gradient(135deg,#fff7b7,#ffd166,#ffb703);border:1px solid rgba(255,255,255,.65);border-radius:999px;padding:3px 10px;white-space:nowrap;box-shadow:0 0 18px rgba(255,209,102,.55)}
-#tu-subscription-banner .code{font-family:Arial,Tajawal,sans-serif;letter-spacing:.8px;font-weight:1000;color:#190014;background:linear-gradient(135deg,#ffffff,#ffe66d);border:1px dashed rgba(0,0,0,.35);border-radius:12px;padding:3px 12px;white-space:nowrap;box-shadow:0 0 18px rgba(255,230,109,.55)}
+#tu-subscription-banner .code{font-family:Arial,Tajawal,sans-serif;letter-spacing:.8px;font-weight:1000;color:#190014;background:linear-gradient(135deg,#ffffff,#ffe66d);border:1px dashed rgba(0,0,0,.35);border-radius:12px;padding:3px 12px;white-space:nowrap}
 #tu-subscription-banner .tu-banner-close{position:absolute;inset-inline-start:10px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:999px;border:1px solid rgba(255,255,255,.32);background:rgba(0,0,0,.26);color:#fff;font-weight:1000;cursor:pointer;font-size:1rem}
-@media(max-width:640px){#tu-subscription-banner{font-size:.74rem;padding:9px 44px 9px 10px;line-height:1.7}#tu-subscription-banner .hot{padding:1px 7px}#tu-subscription-banner b,#tu-subscription-banner .code{padding:2px 8px}}
+@media(max-width:640px){#tu-subscription-banner{font-size:.74rem;padding:9px 44px 9px 10px;line-height:1.7}#tu-subscription-banner b,#tu-subscription-banner .code{padding:2px 8px}}
 </style>
-<div id="tu-subscription-banner">
-  <button class="tu-banner-close" onclick="document.getElementById('tu-subscription-banner').style.display='none'" aria-label="إغلاق">×</button>
-  <span class="hot">🔥 عرض محدود</span> بدءًا من <b>25 أغسطس 2026</b> سيصبح الاشتراك مدفوعًا — خصم إطلاق <b>45%</b> لفترة قصيرة فقط! استخدم كود <span class="code">TU45</span> قبل انتهاء العرض
-</div>
+<div id="tu-subscription-banner"><button class="tu-banner-close" onclick="document.getElementById('tu-subscription-banner').style.display='none'" aria-label="إغلاق">×</button><span class="hot">🔥 عرض محدود</span> بدءًا من <b>25 أغسطس 2026</b> سيصبح الاشتراك مدفوعًا — خصم إطلاق <b>45%</b> لفترة قصيرة فقط! استخدم كود <span class="code">TU45</span> قبل انتهاء العرض</div>
 
 
 <!-- Telegram gate removed -->
@@ -688,7 +672,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         <button class="lp-nav-link" onclick="lpGo('lp-shots')">الواجهات</button>
         <button class="lp-nav-link" onclick="lpGo('lp-how')">كيف يعمل؟</button>
         <button class="lp-nav-link" onclick="lpGo('lp-pricing')">الأسعار</button>
-        <button class="lp-nav-cta" onclick="lpScrollAuth()">ابدأ الآن</button>
+        <button class="lp-nav-cta" onclick="location.href='login.html'">ابدأ الآن</button>
       </div>
     </div>
   </nav>
@@ -701,7 +685,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         <h1 class="reveal d1 in" data-otext="كل حياتك الأكاديميةفي مكان واحد ذكي" data-ohtml="كل حياتك الأكاديمية&lt;br&gt;&lt;span class=&quot;grad-txt&quot;&gt;في مكان واحد ذكي&lt;/span&gt;">كل حياتك الأكاديمية<br><span class="grad-txt">في مكان واحد ذكي</span></h1>
         <p class="reveal d2 in" data-otext="تتبّع معدلك لحظياً، تولّد جدولك الدراسي تلقائياً، تخطّط خطتك كاملة، وتحقّق أهدافك — بواجهة عربية أنيقة وسريعة." data-ohtml="تتبّع معدلك لحظياً، تولّد جدولك الدراسي تلقائياً، تخطّط خطتك كاملة، وتحقّق أهدافك — بواجهة عربية أنيقة وسريعة.">تتبّع معدلك لحظياً، تولّد جدولك الدراسي تلقائياً، تخطّط خطتك كاملة، وتحقّق أهدافك — بواجهة عربية أنيقة وسريعة.</p>
         <div class="lp-hero-cta reveal d3 in">
-          <button class="lp-btn-primary" onclick="lpScrollAuth('signup')">🚀 أنشئ حسابك مجاناً</button>
+          <button class="lp-btn-primary" onclick="location.href='login.html'">🚀 أنشئ حسابك مجاناً</button>
           <button class="lp-btn-ghost" onclick="lpGo('lp-shots')">👀 شاهد الواجهات</button>
         </div>
         <div class="lp-hero-stats reveal d4 in">
@@ -715,13 +699,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
       <!-- AUTH CARD -->
       <div class="lp-auth reveal d2 in" id="lp-auth">
-        <div class="tu-auth-gate">
-          <span class="tag">🔐 حسابك يحفظ كل شيء</span>
+        <div class="tu-start-card">
+          <div class="badge">🔐 دخول سريع وآمن</div>
           <h2>ابدأ الآن</h2>
-          <p>اضغط الزر ثم اختر تسجيل الدخول أو إنشاء حساب جديد لحفظ معدلك وخطتك وجدولك.</p>
-          <button onclick="(function(){var b=document.getElementById('lp-auth');if(b)b.classList.add('tu-auth-open');try{if(typeof authTab==='function')authTab('signup');}catch(e){}setTimeout(function(){try{document.getElementById('lp-auth').scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}},50);})()">ابدأ الآن 🚀</button>
-          <small>تقدر تدخل أو تنشئ حساب من الشاشة التالية.</small>
+          <p>اضغط الزر وبتنتقل لصفحة تسجيل الدخول أو إنشاء حساب.</p>
+          <a href="login.html">ابدأ الآن 🚀</a>
         </div>
+        
         <div class="auth-card">
          <div class="auth-panel">
           <div class="logo-wrap">
@@ -889,7 +873,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     <div class="lp-cta-in reveal">
       <h2 data-otext="جاهز تبدأ رحلتك الأكاديمية؟" data-ohtml="جاهز تبدأ رحلتك الأكاديمية؟">جاهز تبدأ رحلتك الأكاديمية؟</h2>
       <p data-otext="انضم لطلاب الجامعات وخلّ كل شيء أكاديمي منظّمًا وواضحًا." data-ohtml="انضم لطلاب الجامعات وخلّ كل شيء أكاديمي منظّمًا وواضحًا.">انضم لطلاب الجامعات وخلّ كل شيء أكاديمي منظّمًا وواضحًا.</p>
-      <button class="lp-btn-primary" onclick="lpScrollAuth('signup')">🚀 أنشئ حسابك الآن</button>
+      <button class="lp-btn-primary" onclick="location.href='login.html'">🚀 أنشئ حسابك الآن</button>
     </div>
   </section>
 
@@ -1795,13 +1779,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       </div>
       <div class="set-card">
         <h3>ℹ️ عن البرنامج</h3>
-        <div style="font-size:.78rem;color:var(--t2);line-height:1.85">
-          <strong style="color:var(--t)">TU Academic</strong><br>
-          منصة أكاديمية متكاملة لطلاب جامعة طيبة وجامعة الإمام.<br><br>
-          <strong style="color:var(--t)">الرؤية:</strong> تمكين طلاب الجامعات من إدارة مسيرتهم الأكاديمية بكفاءة وذكاء.<br><br>
-          صنع بـ ❤️ بواسطة <strong style="color:var(--y)">CHAMBER</strong><br>
-          تابعنا: <a href="https://x.com/chamber_tu" target="_blank" style="color:var(--a1);text-decoration:none;font-weight:700">𝕏 تويتر</a> · <a href="https://t.me/taibahiacademic" target="_blank" style="color:var(--a1);text-decoration:none;font-weight:700">✈️ قناتنا على تلجرام</a>
-        </div>
+        
+<!-- Telegram promo removed -->
+
       </div>
       <div class="set-card">
         <h3>💬 اقتراح أو استفسار</h3>
@@ -2894,8 +2874,7 @@ function schPrintDoc(){
     '<h3><span class="tu-inline-logo tu-logo-img" aria-hidden="true"></span> TU Academic Premium — ابتداءً من 25 أغسطس</h3>'+
     '<p>معظم المزايا المتقدمة ستكون مدفوعة للمساهمة في تكاليف قاعدة البيانات والذكاء الاصطناعي. <b>الترم 15 ريال • السنة 30 ريال</b> ☕</p>'+
     '</div>'+
-    head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n
-</body></html>';
+    head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n</body></html>';
 }
 </script>
 <div id="tu-payment-note" onclick="if(event.target===this)tuClosePayment()">
@@ -6489,16 +6468,6 @@ window.savePlanImage=window.exportPlanPoster=async function(){try{if(typeof curr
 })();
 </script>
 
-<div id="tu-cmdk"><div class="cmdk-box"><input class="cmdk-inp" placeholder="ابحث عن تبويب أو تخصص... (Esc للإغلاق)"><div class="cmdk-list"></div></div></div><div class="cmdk-hint">⌘K بحث سريع</div><!-- Telegram top strip removed --><a id="site-support" target="_blank" rel="noopener" href="https://creators.sa/81chamber" title="إذا تشوف الموقع يستحق، تقدر تدعمه بأي مبلغ تحبه. كل مساهمة تساعد على استمرار تطويره. الله يحفظك 🙏🏻" style="position: fixed; bottom: 22px; left: 22px; z-index: 8500; display: inline-flex; align-items: center; gap: 6px; padding: 11px 17px; border-radius: 30px; background: linear-gradient(135deg, rgb(255, 158, 194), rgb(255, 61, 127)); color: rgb(255, 255, 255); font-weight: 800; font-size: 0.86rem; text-decoration: none; box-shadow: rgba(255, 61, 127, 0.45) 0px 6px 20px; transition: transform 0.15s;">💛 ادعم المطور</a><div id="tu-install-bar" style="position:fixed;left:12px;right:12px;bottom:14px;z-index:99999;background:linear-gradient(135deg,#0e1330,#161b3d);border:1px solid #2a3170;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);color:#fff;max-width:560px;margin:0 auto;direction:rtl"><span style="font-size:1.6rem">📲</span><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:.95rem">ثبّت طيبة أكاديمي على الآيفون</div><div style="font-size:.75rem;color:var(--t2)">اضغط زر المشاركة ⬆ ثم «إضافة إلى الشاشة الرئيسية»</div></div><button onclick="tuPwaDismiss()" aria-label="إغلاق" style="background:transparent;color:var(--t2);border:0;font-size:1.2rem;cursor:pointer;padding:4px">✕</button></div>
-<script id="tu-auth-gate-js">
-(function(){
-  window.tuOpenAuthGate=function(mode){
-    var box=document.getElementById('lp-auth');
-    if(box) box.classList.add('tu-auth-open');
-    try{ if(typeof authTab==='function') authTab(mode==='login'?'login':'signup'); }catch(e){}
-    setTimeout(function(){ try{ var el=document.getElementById('lp-auth'); if(el)el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} },50);
-  };
-  window.lpScrollAuth=function(mode){ window.tuOpenAuthGate(mode||'signup'); };
-})();
-</script>
-</body></html>
+<div id="tu-cmdk"><div class="cmdk-box"><input class="cmdk-inp" placeholder="ابحث عن تبويب أو تخصص... (Esc للإغلاق)"><div class="cmdk-list"></div></div></div><div class="cmdk-hint">⌘K بحث سريع</div>
+<!-- Telegram promo removed -->
+<a id="site-support" target="_blank" rel="noopener" href="https://creators.sa/81chamber" title="إذا تشوف الموقع يستحق، تقدر تدعمه بأي مبلغ تحبه. كل مساهمة تساعد على استمرار تطويره. الله يحفظك 🙏🏻" style="position: fixed; bottom: 22px; left: 22px; z-index: 8500; display: inline-flex; align-items: center; gap: 6px; padding: 11px 17px; border-radius: 30px; background: linear-gradient(135deg, rgb(255, 158, 194), rgb(255, 61, 127)); color: rgb(255, 255, 255); font-weight: 800; font-size: 0.86rem; text-decoration: none; box-shadow: rgba(255, 61, 127, 0.45) 0px 6px 20px; transition: transform 0.15s;">💛 ادعم المطور</a><div id="tu-install-bar" style="position:fixed;left:12px;right:12px;bottom:14px;z-index:99999;background:linear-gradient(135deg,#0e1330,#161b3d);border:1px solid #2a3170;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);color:#fff;max-width:560px;margin:0 auto;direction:rtl"><span style="font-size:1.6rem">📲</span><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:.95rem">ثبّت طيبة أكاديمي على الآيفون</div><div style="font-size:.75rem;color:var(--t2)">اضغط زر المشاركة ⬆ ثم «إضافة إلى الشاشة الرئيسية»</div></div><button onclick="tuPwaDismiss()" aria-label="إغلاق" style="background:transparent;color:var(--t2);border:0;font-size:1.2rem;cursor:pointer;padding:4px">✕</button></div></body></html>
