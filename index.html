@@ -1883,6 +1883,17 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 </head>
 <body style="background: rgb(5, 6, 8) !important;">
+<style id="tu-subscription-banner-style">
+#tu-subscription-banner{position:sticky;top:0;z-index:85;width:100%;box-sizing:border-box;padding:9px 52px 9px 14px;background:linear-gradient(90deg,#0b1220,#123b7a,#0b1220);color:#fff;border-bottom:1px solid rgba(255,255,255,.12);font-family:Tajawal,system-ui,sans-serif;font-size:.82rem;font-weight:900;line-height:1.7;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+#tu-subscription-banner b{color:#ffe68a;background:rgba(255,230,138,.12);border:1px solid rgba(255,230,138,.35);border-radius:999px;padding:2px 8px;white-space:nowrap}
+#tu-subscription-banner .tu-banner-close{position:absolute;inset-inline-start:10px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font-weight:900;cursor:pointer}
+@media(max-width:640px){#tu-subscription-banner{font-size:.72rem;padding:8px 42px 8px 10px;line-height:1.65}}
+</style>
+<div id="tu-subscription-banner">
+  <button class="tu-banner-close" onclick="document.getElementById('tu-subscription-banner').style.display='none'" aria-label="إغلاق">×</button>
+  بدءًا من <b>25 أغسطس 2026</b> سيصبح الاشتراك بمبلغ مادي بسيط، والآن يوجد خصم بقيمة <b>45%</b> — اغتنم الفرصة لفترة محدودة واستخدم كود الخصم <b>TU45</b>
+</div>
+
 <style>
 #tg-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(3,5,13,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-family:'Tajawal',system-ui,sans-serif}
 #tg-gate.tg-hidden{display:none}
@@ -3079,7 +3090,8 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 <div id="tu-vis-uniq" style="font-size:1.75rem;font-weight:800;background:var(--grad3);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">45</div>
 <div style="font-size:.74rem;color:var(--t2);margin-top:5px">👤 زوّار مختلفون اليوم</div>
 </div>
-<button onclick="tuLoadVisits()" title="تحديث" style="flex:0 0 auto;padding:10px 15px;border-radius:12px;border:1px solid var(--bor);background:var(--s3);color:var(--t);cursor:pointer;font-weight:700;font-size:1.1rem">🔄</button>
+<button onclick="tuLoadVisits();tuLoadPurchases()" title="تحديث" style="flex:0 0 auto;padding:10px 15px;border-radius:12px;border:1px solid var(--bor);background:var(--s3);color:var(--t);cursor:pointer;font-weight:700;font-size:1.1rem">🔄</button>
+<div style="flex:1;min-width:130px;background:var(--s2);border:1px solid var(--bor);border-radius:14px;padding:15px 12px;text-align:center"><div id="tu-purchases-total" style="font-size:1.75rem;font-weight:800;color:var(--g)">–</div><div style="font-size:.74rem;color:var(--t2);margin-top:5px">🛒 عمليات الشراء</div></div>
 <div style="flex:1;min-width:130px;background:var(--s2);border:1px solid var(--bor);border-radius:14px;padding:15px 12px;text-align:center"><div id="tu-logins-today" style="font-size:1.75rem;font-weight:800;color:var(--a2)">0</div><div style="font-size:.74rem;color:var(--t2);margin-top:5px">حسابات دخلت اليوم</div></div>
 </div>
 <div id="adm-att-card">
@@ -3097,6 +3109,13 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 <div style="padding-top:10px">
 <div id="tu-spec-total" style="font-size:.82rem;color:var(--t2);margin-bottom:10px">اضغط «تحديث» لعرض الأرقام.</div>
 <div id="tu-spec-counts" style="display:flex;flex-direction:column;gap:6px"></div>
+</div>
+</details>
+<details class="scfg-sec" ontoggle="if(this.open)tuLoadPurchases()" style="border:1px solid var(--bor);border-radius:12px;padding:8px 14px;margin-bottom:12px">
+<summary style="font-weight:800;cursor:pointer;padding:6px 0">🛒 عمليات الشراء <button onclick="event.stopPropagation();event.preventDefault();tuLoadPurchases()" style="float:left;padding:5px 10px;border-radius:9px;border:1px solid var(--bor);background:var(--s3);color:var(--t);cursor:pointer;font-weight:700;font-size:.8rem">🔄 تحديث</button></summary>
+<div style="padding-top:10px">
+<div id="tu-purchases-meta" style="font-size:.82rem;color:var(--t2);margin-bottom:10px">اضغط «تحديث» لعرض عدد عمليات الشراء.</div>
+<div id="tu-purchases-list" style="display:flex;flex-direction:column;gap:6px"></div>
 </div>
 </details>
 <div style="position:sticky;top:0;z-index:6;background:var(--s2,#161b22);padding:10px 0;margin:-4px 0 12px;border-bottom:1px solid var(--bor)"><button onclick="scfgPublish()" style="width:100%;padding:14px;border-radius:11px;border:none;background:var(--grad);color:var(--bg);font-weight:800;cursor:pointer;font-size:1rem">🌍 نشر للجميع (احفظ للكل)</button><div style="font-size:.72rem;color:var(--t3);text-align:center;margin-top:6px;line-height:1.6">احفظ هنا بعد أي تعديل. بدون النشر يبقى التغيير على جهازك فقط ويرجع كما كان بعد التحديث.</div></div>
@@ -4132,7 +4151,45 @@ function schPrintDoc(){
     '<h3><span class="tu-inline-logo tu-logo-img" aria-hidden="true"></span> TU Academic Premium — ابتداءً من 25 أغسطس</h3>'+
     '<p>معظم المزايا المتقدمة ستكون مدفوعة للمساهمة في تكاليف قاعدة البيانات والذكاء الاصطناعي. <b>الترم 15 ريال • السنة 30 ريال</b> ☕</p>'+
     '</div>'+
-    head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n</body></html>';
+    head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n
+<script id="tu-admin-purchases-js">
+async function tuLoadPurchases(){
+  var totalEl=document.getElementById('tu-purchases-total');
+  var meta=document.getElementById('tu-purchases-meta');
+  var list=document.getElementById('tu-purchases-list');
+  if(totalEl)totalEl.textContent='...';
+  if(meta)meta.textContent='جاري تحميل عمليات الشراء...';
+  try{
+    if(!window.sbClient && typeof ensureAuthClient==='function') await ensureAuthClient();
+    if(!window.sbClient) throw new Error('Supabase غير جاهز');
+    var q=sbClient.from('tamara_orders').select('id,plan_type,final_amount,status,created_at,payment_method',{count:'exact'}).order('created_at',{ascending:false}).limit(8);
+    var r=await q;
+    if(r.error) throw r.error;
+    var rows=r.data||[];
+    var total=(typeof r.count==='number')?r.count:rows.length;
+    if(totalEl)totalEl.textContent=total;
+    if(meta)meta.textContent='إجمالي عمليات الشراء: '+total;
+    if(list){
+      if(!rows.length){list.innerHTML='<div style="font-size:.8rem;color:var(--t3);padding:10px;text-align:center">لا توجد عمليات شراء مسجلة بعد.</div>';}
+      else{
+        list.innerHTML=rows.map(function(o){
+          var st=o.status||'pending';
+          var amt=(o.final_amount!=null?o.final_amount:'-')+' ريال';
+          var plan=o.plan_type==='year'?'سنوي':(o.plan_type==='term'?'5 أشهر':(o.plan_type||'-'));
+          var dt=o.created_at?new Date(o.created_at).toLocaleString('ar-SA'):'-';
+          return '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--s2);border:1px solid var(--bor);border-radius:11px;padding:10px 12px;font-size:.78rem"><div><b style="color:var(--t)">'+plan+'</b><div style="color:var(--t3);font-size:.68rem">'+dt+'</div></div><div style="text-align:left"><b style="color:var(--a2)">'+amt+'</b><div style="color:var(--t2);font-size:.68rem">'+st+'</div></div></div>';
+        }).join('');
+      }
+    }
+  }catch(e){
+    if(totalEl)totalEl.textContent='!';
+    if(meta)meta.textContent='تعذر تحميل عمليات الشراء. تأكد من وجود جدول tamara_orders وصلاحيات القراءة للمطور.';
+    if(list)list.innerHTML='<div style="font-size:.78rem;color:var(--r);padding:10px;text-align:center">'+(e.message||e)+'</div>';
+  }
+}
+try{document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){if(document.getElementById('tu-purchases-total'))tuLoadPurchases();},1200);});}catch(e){}
+</script>
+</body></html>';
 }
 </script>
 <div id="tu-payment-note" onclick="if(event.target===this)tuClosePayment()">
@@ -4147,14 +4204,15 @@ function schPrintDoc(){
 
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,rgba(91,157,253,.12),rgba(255,255,255,.04));border:1px solid var(--bor);border-radius:16px;padding:13px;margin-bottom:12px">
       <div><b id="tu-payment-plan" style="display:block;color:var(--t);font-size:.95rem">اشتراك</b><span style="font-size:.72rem;color:var(--t2)">تفعيل فوري بعد نجاح العملية</span></div>
-      <b id="tu-payment-price" style="font-size:1.3rem;color:var(--a2);white-space:nowrap">—</b>
+      <div style="text-align:left;white-space:nowrap"><b id="tu-payment-price" style="display:block;font-size:1.3rem;color:var(--a2)">—</b><small id="tu-payment-before" style="display:none;color:var(--t3);text-decoration:line-through;font-weight:800"></small></div>
     </div>
 
     <label for="tu-phone-input" style="display:block;color:var(--t2);font-size:.76rem;margin:10px 0 6px;font-weight:800">رقم الجوال</label>
     <input id="tu-phone-input" dir="ltr" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="05XXXXXXXX" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:13px;color:var(--t);padding:13px;font:800 .94rem Tajawal,sans-serif;outline:none;margin-bottom:10px">
 
     <label for="tu-discount-input" style="display:block;color:var(--t2);font-size:.76rem;margin:10px 0 6px;font-weight:800">كود خصم لديك</label>
-    <input id="tu-discount-input" dir="ltr" autocomplete="off" placeholder="كود خصم لديك" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:13px;color:var(--t);padding:13px;font:800 .88rem Tajawal,sans-serif;outline:none;margin-bottom:12px;text-transform:uppercase">
+    <input id="tu-discount-input" dir="ltr" autocomplete="off" placeholder="كود خصم لديك" oninput="tuPreviewDiscount()" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:13px;color:var(--t);padding:13px;font:800 .88rem Tajawal,sans-serif;outline:none;margin-bottom:8px;text-transform:uppercase">
+    <div id="tu-discount-status" style="display:none;margin-bottom:12px;border-radius:12px;padding:10px 12px;font-size:.78rem;font-weight:900;text-align:center"></div>
 
     <div id="tu-payment-msg" style="display:none;margin-bottom:10px;border-radius:12px;padding:10px 12px;font-size:.78rem;font-weight:900;text-align:center"></div>
 
@@ -4186,11 +4244,37 @@ function tuOpenPayment(plan,planType){
   var pi=document.getElementById('tu-phone-input'); if(pi)pi.value='';
   var msg=document.getElementById('tu-payment-msg'); if(msg){msg.style.display='none';msg.textContent='';}
   ['tu-pay-apple','tu-pay-card','tu-pay-tamara'].forEach(function(id){var b=document.getElementById(id); if(b){b.disabled=false;}});
+  tuPreviewDiscount();
   if(m)m.classList.add('open');
   setTimeout(function(){var ph=document.getElementById('tu-phone-input'); if(ph)ph.focus();},80);
 }
 function tuClosePayment(){var m=document.getElementById('tu-payment-note'); if(m)m.classList.remove('open');}
 function tuPayMsg(t,ok){var m=document.getElementById('tu-payment-msg'); if(!m)return alert(t); m.style.display='block'; m.style.color=ok?'var(--g)':'var(--r)'; m.style.background=ok?'rgba(62,207,142,.1)':'rgba(240,100,92,.1)'; m.textContent=t;}
+
+function tuSetDiscountStatus(msg,ok){
+  var box=document.getElementById('tu-discount-status'); if(!box)return;
+  if(!msg){box.style.display='none';box.textContent='';return;}
+  box.style.display='block'; box.textContent=msg;
+  box.style.color=ok?'var(--g)':'var(--r)';
+  box.style.background=ok?'rgba(62,207,142,.12)':'rgba(240,100,92,.12)';
+}
+function tuPreviewDiscount(){
+  var code=((document.getElementById('tu-discount-input')||{}).value||'').trim().toUpperCase();
+  var priceEl=document.getElementById('tu-payment-price');
+  var beforeEl=document.getElementById('tu-payment-before');
+  var base=TU_CURRENT_PLAN_TYPE==='year'?30:15;
+  if(beforeEl){beforeEl.style.display='none';beforeEl.textContent='';}
+  if(priceEl)priceEl.textContent=base+' ريال';
+  if(!code){tuSetDiscountStatus('',true);return;}
+  if(code==='TU45'){
+    var after=(base*0.55).toFixed(2).replace(/\.00$/,'');
+    if(priceEl)priceEl.textContent=after+' ريال';
+    if(beforeEl){beforeEl.style.display='block';beforeEl.textContent=base+' ريال';}
+    tuSetDiscountStatus('✅ تم تطبيق الخصم 45% — سيتم تأكيده عند الدفع',true);
+  }else{
+    tuSetDiscountStatus('سيتم التحقق من كود الخصم عند الدفع',true);
+  }
+}
 async function tuStartTamaraPay(method){
   if(!TU_CURRENT_PLAN_TYPE)return;
   if(typeof sbClient==='undefined'||!sbClient)return tuPayMsg('خدمة تسجيل الدخول غير جاهزة. حدّث الصفحة وحاول مرة ثانية.',false);
