@@ -3088,6 +3088,20 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 <button onclick="tuLoadVisits()" title="تحديث" style="flex:0 0 auto;padding:10px 15px;border-radius:12px;border:1px solid var(--bor);background:var(--s3);color:var(--t);cursor:pointer;font-weight:700;font-size:1.1rem">🔄</button>
 <div style="flex:1;min-width:130px;background:var(--s2);border:1px solid var(--bor);border-radius:14px;padding:15px 12px;text-align:center"><div id="tu-logins-today" style="font-size:1.75rem;font-weight:800;color:var(--a2)">0</div><div style="font-size:.74rem;color:var(--t2);margin-top:5px">حسابات دخلت اليوم</div></div>
 </div>
+<div id="tu-visits-total-card" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:stretch">
+<div style="flex:1;min-width:150px;background:linear-gradient(135deg,rgba(110,160,255,.12),rgba(139,92,246,.12));border:1px solid var(--bor);border-radius:14px;padding:15px 12px;text-align:center">
+<div id="tu-vis-total" style="font-size:1.9rem;font-weight:800;background:var(--grad3);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">…</div>
+<div style="font-size:.74rem;color:var(--t2);margin-top:5px">📊 إجمالي الزيارات منذ البداية</div>
+</div>
+<div style="flex:1;min-width:150px;background:linear-gradient(135deg,rgba(110,160,255,.12),rgba(139,92,246,.12));border:1px solid var(--bor);border-radius:14px;padding:15px 12px;text-align:center">
+<div id="tu-vis-total-uniq" style="font-size:1.9rem;font-weight:800;background:var(--grad3);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">…</div>
+<div style="font-size:.74rem;color:var(--t2);margin-top:5px">🧍 إجمالي الزوّار منذ البداية</div>
+</div>
+<div style="flex:1;min-width:150px;background:var(--s2);border:1px solid var(--bor);border-radius:14px;padding:15px 12px;text-align:center">
+<div id="tu-vis-since" style="font-size:1rem;font-weight:800;color:var(--t)">…</div>
+<div style="font-size:.74rem;color:var(--t2);margin-top:5px">🗓️ متتبَّع منذ</div>
+</div>
+</div>
 <div id="adm-att-card">
   <div id="adm-att-head">
     <div><div class="aa-tt">📈 الحضور اليوم — رسم بياني</div><div class="aa-sub" id="adm-att-sub">توزيع الدخول على ساعات اليوم.</div></div>
@@ -6534,7 +6548,7 @@ function scfgMergeSpecs(){
   try{if(typeof scfgRefreshSpecUIs==='function')scfgRefreshSpecUIs();}catch(e){}
  }catch(e){try{console.error('custom_specs_merge',e);}catch(_){} }
 }
-function onAdminTab(){ loadAdminReviews(); loadAdminMaterials(); loadAdminUsers(); loadAdminSubCodes(); try{scfgInitPanel();}catch(_){} try{admLoadAttendance();}catch(_){} }
+function onAdminTab(){ loadAdminReviews(); loadAdminMaterials(); loadAdminUsers(); loadAdminSubCodes(); try{scfgInitPanel();}catch(_){} try{admLoadAttendance();}catch(_){} try{tuLoadVisits();}catch(_){} }
 /* ===== ADMIN: attendance chart ===== */
 var TU_ATT_MODE='hour', TU_ATT_CHART=null, TU_ATT_ROWS=null;
 function admAttMode(m){
@@ -7222,7 +7236,30 @@ function tuLoadVisits(){
       var b=document.getElementById("tu-vis-uniq"); if(b)b.textContent=(v.uniques||0);
       try{tuLoadLogins();}catch(e){}
     }, function(){});
+    try{tuLoadTotalVisits();}catch(e){}
   }catch(e){}
+}
+async function tuLoadTotalVisits(){
+  var totEl=document.getElementById("tu-vis-total");
+  var uniqEl=document.getElementById("tu-vis-total-uniq");
+  var sinceEl=document.getElementById("tu-vis-since");
+  if(typeof sbClient==="undefined"||!sbClient){ if(totEl)totEl.textContent="—"; if(uniqEl)uniqEl.textContent="—"; if(sinceEl)sinceEl.textContent="—"; return; }
+  try{
+    var totalVisits=0,totalUniques=0,minDay=null,from=0,page=1000,guard=0;
+    while(true){
+      var r=await sbClient.from("visit_stats").select("day,visits,uniques").order("day",{ascending:true}).range(from,from+page-1);
+      var data=(r&&r.data)?r.data:[];
+      data.forEach(function(x){ totalVisits+=Number(x.visits)||0; totalUniques+=Number(x.uniques)||0; if(!minDay||x.day<minDay) minDay=x.day; });
+      if(data.length<page) break;
+      from+=page; guard++;
+      if(guard>20) break;
+    }
+    if(totEl) totEl.textContent=totalVisits.toLocaleString("en-US");
+    if(uniqEl) uniqEl.textContent=totalUniques.toLocaleString("en-US");
+    if(sinceEl) sinceEl.textContent=minDay?minDay:"—";
+  }catch(e){
+    if(totEl) totEl.textContent="—"; if(uniqEl) uniqEl.textContent="—"; if(sinceEl) sinceEl.textContent="—";
+  }
 }
 (function(){
   function bump(){
