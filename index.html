@@ -2593,11 +2593,6 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <!-- GENERATOR -->
     <div class="tab-pane" id="p-gen">
       <div id="gen-paywall" style="display:none;text-align:center;padding:34px 18px 30px">
-<button id="gen-sub-check-btn" type="button" onclick="genVerifySubscription()" style="margin-top:14px;width:100%;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-weight:800;">
-  🔄 تحقق من الاشتراك
-</button>
-<div id="gen-sub-check-msg" style="margin-top:9px;text-align:center;font-size:13px;opacity:.85;"></div>
-
         <div style="font-size:2.6rem;margin-bottom:6px">🧠🔒</div>
         <h3 style="margin:0 0 8px;font-size:1.15rem">مولّد الجداول الذكي — للمشتركين فقط</h3>
         <p style="color:var(--t2);font-size:.85rem;line-height:1.9;max-width:420px;margin:0 auto 18px">
@@ -2606,6 +2601,8 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         </p>
         <a href="https://t.me/onlychamber" target="_blank" rel="noopener" style="display:inline-block;padding:12px 30px;border-radius:24px;background:var(--grad);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(91,157,253,.35);margin-bottom:12px">🚀 فعّل اشتراكك الآن</a>
         <div><button class="btn-ghost" onclick="genGoSub()" style="margin-top:6px">عرض تفاصيل الاشتراك بالموقع</button></div>
+        <button id="gen-sub-check-btn" type="button" onclick="genVerifySubscription()" style="margin-top:14px;width:100%;max-width:360px;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-weight:800;">🔄 تحقق من الاشتراك</button>
+        <div id="gen-sub-check-msg" style="margin-top:9px;text-align:center;font-size:13px;opacity:.85;"></div>
       </div>
       <div id="gen-body-wrap">
       <div class="card">
@@ -2626,7 +2623,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
           <div class="fmt-box">الصق سطراً لكل شعبة بالصيغة:<br><code>الرمز | الاسم | رقم الشعبة | الأيام | من | إلى</code><br>مثال:<br><code>CS 111 | أساسيات البرمجة | 1234 | الأحد,الثلاثاء | 08:00 | 09:50</code><br>الأيام: الأحد/الاثنين/الثلاثاء/الأربعاء/الخميس أو U/M/T/W/H</div>
           <textarea class="gen-paste" id="gc-paste" placeholder="CS 111 | أساسيات البرمجة | 1234 | الأحد,الثلاثاء | 08:00 | 09:50"></textarea>
           <button class="btn-prim" style="margin-top:10px" onclick="importPaste()">⬇️ استيراد الشعب</button><button id="btn-sample" class="btn-ghost" style="margin-top: 10px; margin-inline-start: 8px;">🧪 تعبئة مثال</button>
-        </div><div id="gen-file-box" style="display: block;"><div class="fmt-box">📥 ارفع ملف <b>«شعب المقررات»</b> الذي تنزّله من نظام الجامعة (HTML)، ثم اختر <b>رمز المادة</b> و<b>رقمها</b> و<b>الشعبة</b>. تُستبعد الشعب المقفلة (حجم 0) تلقائياً.</div><input type="file" id="ff-input" accept=".html,.htm,text/html" style="display:none"><label class="btn-prim" id="ff-upload" for="ff-input" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;">📂 ارفع ملف الشعب (HTML)</label><div id="ff-status" class="mini-lbl" style="margin:12px 0"></div><div id="ff-picker" style="display:none"><label class="ff-toggle"><input type="checkbox" id="ff-fulltgl" onchange="ffToggleFull()"> تضمين الشعب الممتلئة (المسجّل = السعة)</label><div class="ff-grid"><div class="ff-field"><label class="mini-lbl">رمز المادة</label><select class="mini-inp" id="ff-code" onchange="ffOnCode()"></select></div><div class="ff-field"><label class="mini-lbl">رقم المادة</label><select class="mini-inp" id="ff-num" onchange="ffOnNum()"></select></div><div class="ff-field"><label class="mini-lbl">الشعبة</label><select class="mini-inp" id="ff-sec" onchange="ffPreview()"></select></div><button class="btn-prim" id="ff-add" onclick="ffAdd()">➕ إضافة</button></div><div id="ff-name" class="ff-name"></div><div id="ff-preview" class="ff-preview"></div></div></div>
+        </div><div id="gen-file-box" style="display: block;"><div class="fmt-box">📥 ارفع ملف <b>«شعب المقررات»</b> الذي تنزّله من نظام الجامعة (HTML)، ثم اختر <b>رمز المادة</b> و<b>رقمها</b> و<b>الشعبة</b>. تُستبعد الشعب المقفلة (حجم 0) تلقائياً.</div><input type="file" id="ff-input" accept=".html,.htm,text/html" style="display:none"><button class="btn-prim" id="ff-upload">📂 ارفع ملف الشعب (HTML)</button><div id="ff-status" class="mini-lbl" style="margin:12px 0"></div><div id="ff-picker" style="display:none"><label class="ff-toggle"><input type="checkbox" id="ff-fulltgl" onchange="ffToggleFull()"> تضمين الشعب الممتلئة (المسجّل = السعة)</label><div class="ff-grid"><div class="ff-field"><label class="mini-lbl">رمز المادة</label><select class="mini-inp" id="ff-code" onchange="ffOnCode()"></select></div><div class="ff-field"><label class="mini-lbl">رقم المادة</label><select class="mini-inp" id="ff-num" onchange="ffOnNum()"></select></div><div class="ff-field"><label class="mini-lbl">الشعبة</label><select class="mini-inp" id="ff-sec" onchange="ffPreview()"></select></div><button class="btn-prim" id="ff-add" onclick="ffAdd()">➕ إضافة</button></div><div id="ff-name" class="ff-name"></div><div id="ff-preview" class="ff-preview"></div></div></div>
       </div>
       <div class="sec-title">مواد الترم</div>
       <div id="gen-courses"></div>
@@ -3758,36 +3755,31 @@ function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.ha
 function tuSubActive(v){
   try{
     if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN) return true;
-
-    if(!v && typeof subLocal==='function'){
-      v=subLocal();
-    }
-
-    return !!(
-      v &&
-      v.expires_at &&
-      new Date(v.expires_at) > new Date()
-    );
-  }catch(e){
-    return false;
-  }
+    if(!v && typeof subLocal==='function') v=subLocal();
+    return !!(v&&v.expires_at&&new Date(v.expires_at)>new Date());
+  }catch(e){ return false; }
 }
 
 async function genGetSubscription(){
   try{
-    if(typeof IS_ADMIN!=='undefined' && IS_ADMIN) return {admin:true};
+    if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN) return {admin:true};
 
     var uid='';
-    if(typeof CURRENT_USER!=='undefined' && CURRENT_USER && CURRENT_USER.id){
-      uid=CURRENT_USER.id;
+    try{
+      if(typeof CURRENT_USER!=='undefined' && CURRENT_USER && CURRENT_USER.id){
+        uid=CURRENT_USER.id;
+      }
+    }catch(e){}
+
+    // Fallback to the active Supabase session, without changing the login code.
+    if(!uid && typeof sbClient!=='undefined' && sbClient && sbClient.auth){
+      try{
+        var ar=await sbClient.auth.getUser();
+        uid=ar&&ar.data&&ar.data.user?ar.data.user.id:'';
+      }catch(e){}
     }
 
-    if(!uid && sbClient && sbClient.auth){
-      var ar=await sbClient.auth.getUser();
-      uid=ar && ar.data && ar.data.user ? ar.data.user.id : '';
-    }
-
-    if(!uid || !sbClient) return null;
+    if(!uid || typeof sbClient==='undefined' || !sbClient) return null;
 
     var q=await sbClient
       .from('user_subscriptions')
@@ -3798,7 +3790,7 @@ async function genGetSubscription(){
       .maybeSingle();
 
     if(q.error) throw q.error;
-    return q.data || null;
+    return q.data||null;
   }catch(e){
     console.error('genGetSubscription:',e);
     return null;
@@ -3811,54 +3803,53 @@ async function genVerifySubscription(){
   var gate=document.getElementById('gen-paywall');
   var body=document.getElementById('gen-body-wrap');
 
-  if(btn){
-    btn.disabled=true;
-    btn.textContent='⏳ جاري التحقق...';
-  }
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحقق...';}
   if(msg) msg.textContent='';
 
   try{
     var sub=await genGetSubscription();
 
-    if(sub && sub.expires_at && new Date(sub.expires_at)>new Date()){
-      try{ subSaveLocal(sub); }catch(e){}
-      try{ if(typeof subRender==='function') subRender(sub); }catch(e){}
-
-      if(gate) gate.style.display='none';
-      if(body) body.style.display='';
-      if(msg) msg.textContent='✅ اشتراكك فعال — تم فتح مولّد الجداول.';
+    if(tuSubActive(sub)){
+      try{if(typeof subSaveLocal==='function')subSaveLocal(sub);}catch(e){}
+      try{if(typeof subRender==='function')subRender(sub);}catch(e){}
+      if(gate)gate.style.display='none';
+      if(body){body.style.display='';body.style.pointerEvents='auto';body.style.position='relative';body.style.zIndex='2';}
+      if(msg)msg.textContent='✅ اشتراكك فعال — تم فتح مولّد الجداول.';
       return true;
     }
 
-    if(msg) msg.textContent='❌ لم يتم العثور على اشتراك فعال لهذا الحساب.';
+    if(msg)msg.textContent='❌ لم يتم العثور على اشتراك فعال لهذا الحساب.';
     return false;
   }catch(e){
-    if(msg) msg.textContent='⚠️ تعذر التحقق الآن، حاول مرة أخرى.';
+    console.error('genVerifySubscription:',e);
+    if(msg)msg.textContent='⚠️ تعذر التحقق، حاول مرة أخرى.';
     return false;
   }finally{
-    if(btn){
-      btn.disabled=false;
-      btn.textContent='🔄 تحقق من الاشتراك';
-    }
+    if(btn){btn.disabled=false;btn.textContent='🔄 تحقق من الاشتراك';}
   }
 }
 
 async function genGateCheck(){
   var gate=document.getElementById('gen-paywall');
   var body=document.getElementById('gen-body-wrap');
-  if(!gate || !body) return;
+  if(!gate||!body)return;
 
-  // لا نفترض أن الاشتراك موجود محليًا؛ نتحقق من قاعدة البيانات.
   var sub=await genGetSubscription();
   var active=tuSubActive(sub);
 
   if(active){
-    try{ subSaveLocal(sub); }catch(e){}
-    try{ if(typeof subRender==='function') subRender(sub); }catch(e){}
+    try{if(typeof subSaveLocal==='function')subSaveLocal(sub);}catch(e){}
+    try{if(typeof subRender==='function')subRender(sub);}catch(e){}
   }
 
   gate.style.display=active?'none':'block';
   body.style.display=active?'':'none';
+
+  if(active){
+    body.style.pointerEvents='auto';
+    body.style.position='relative';
+    body.style.zIndex='2';
+  }
 }
 function genGoSub(){
   var items=document.querySelectorAll('.tab-item');
@@ -4286,54 +4277,41 @@ function schPrintDoc(){
     '<p>معظم المزايا المتقدمة ستكون مدفوعة للمساهمة في تكاليف قاعدة البيانات والذكاء الاصطناعي. <b>الترم 15 ريال • السنة 30 ريال</b> ☕</p>'+
     '</div>'+
     head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n
-<script>
+<script id="tu-generator-controls-final">
 (function(){
-  function fixGeneratorControls(){
+  function fixGenUpload(){
     try{
+      var input=document.getElementById('ff-input');
+      var upload=document.getElementById('ff-upload');
       var body=document.getElementById('gen-body-wrap');
+
       if(body){
         body.style.pointerEvents='auto';
         body.style.position='relative';
         body.style.zIndex='2';
       }
 
-      var input=document.getElementById('ff-input');
-      var upload=document.getElementById('ff-upload');
-
       if(input && upload){
         upload.style.pointerEvents='auto';
         upload.style.cursor='pointer';
-
-        // Label click is the primary mechanism.
-        if(upload.tagName.toLowerCase()!=='label'){
-          upload.onclick=function(ev){
-            ev.preventDefault();
-            ev.stopPropagation();
-            input.click();
-          };
-        }else{
-          // Keep an explicit fallback too.
-          upload.onclick=function(){
-            try{ input.click(); }catch(e){}
-          };
-        }
-
-        input.onchange=window.ffFileChosen || input.onchange;
+        upload.onclick=function(ev){
+          try{if(ev){ev.preventDefault();ev.stopPropagation();}}catch(e){}
+          try{input.click();}catch(e){}
+        };
+        input.onchange=ffFileChosen;
       }
-    }catch(e){
-      console.error('Generator controls:',e);
-    }
+    }catch(e){}
   }
 
-  window.fixGeneratorControls=fixGeneratorControls;
+  window.fixGenUpload=fixGenUpload;
   if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',fixGeneratorControls);
+    document.addEventListener('DOMContentLoaded',fixGenUpload);
   }else{
-    fixGeneratorControls();
+    fixGenUpload();
   }
   window.addEventListener('load',function(){
-    setTimeout(fixGeneratorControls,100);
-    setTimeout(fixGeneratorControls,1000);
+    setTimeout(fixGenUpload,100);
+    setTimeout(fixGenUpload,800);
   });
 })();
 </script>
@@ -5489,7 +5467,7 @@ function buildFileImportUI(){
     const box=document.createElement('div');box.id='gen-file-box';box.style.display='none';
     box.innerHTML='<div class="fmt-box">\ud83d\udce5 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 <b>\u00ab\u0634\u0639\u0628 \u0627\u0644\u0645\u0642\u0631\u0631\u0627\u062a\u00bb</b> \u0627\u0644\u0630\u064a \u062a\u0646\u0632\u0651\u0644\u0647 \u0645\u0646 \u0646\u0638\u0627\u0645 \u0627\u0644\u062c\u0627\u0645\u0639\u0629 (\u0635\u064a\u063a\u0629 HTML)\u060c \u062b\u0645 \u0627\u062e\u062a\u0631 <b>\u0631\u0645\u0632 \u0627\u0644\u0645\u0627\u062f\u0629</b> \u0648<b>\u0631\u0642\u0645\u0647\u0627</b> \u0648<b>\u0627\u0644\u0634\u0639\u0628\u0629</b> \u0648\u0623\u0636\u0641\u0647\u0627. \u0628\u0639\u0636 \u0627\u0644\u0634\u0639\u0628 \u0642\u062f \u0644\u0627 \u062a\u0643\u0648\u0646 \u0636\u0645\u0646 \u0643\u0644\u064a\u062a\u0643\u060c \u0644\u0630\u0644\u0643 \u062a\u062e\u062a\u0627\u0631\u0647\u0627 \u0628\u0646\u0641\u0633\u0643.</div>'
       +'<input type="file" id="ff-input" accept=".html,.htm,text/html" style="display:none">'
-      +'<label class="btn-prim" id="ff-upload" for="ff-input" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;">\ud83d\udcc2 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 \u0627\u0644\u0634\u0639\u0628 (HTML)</label>'
+      +'<button class="btn-prim" id="ff-upload">\ud83d\udcc2 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 \u0627\u0644\u0634\u0639\u0628 (HTML)</button>'
       +'<div id="ff-status" class="mini-lbl" style="margin:12px 0"></div>'
       +'<div id="ff-picker" style="display:none">'
         +'<div class="ff-grid">'
@@ -5615,7 +5593,7 @@ function buildFileImportUI(){
     const box=document.createElement('div');box.id='gen-file-box';box.style.display='none';
     box.innerHTML='<div class="fmt-box">\ud83d\udce5 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 <b>\u00ab\u0634\u0639\u0628 \u0627\u0644\u0645\u0642\u0631\u0631\u0627\u062a\u00bb</b> \u0627\u0644\u0630\u064a \u062a\u0646\u0632\u0651\u0644\u0647 \u0645\u0646 \u0646\u0638\u0627\u0645 \u0627\u0644\u062c\u0627\u0645\u0639\u0629 (HTML)\u060c \u062b\u0645 \u0627\u062e\u062a\u0631 <b>\u0631\u0645\u0632 \u0627\u0644\u0645\u0627\u062f\u0629</b> \u0648<b>\u0631\u0642\u0645\u0647\u0627</b> \u0648<b>\u0627\u0644\u0634\u0639\u0628\u0629</b>. \u062a\u064f\u0633\u062a\u0628\u0639\u062f \u0627\u0644\u0634\u0639\u0628 \u0627\u0644\u0645\u0642\u0641\u0644\u0629 (\u062d\u062c\u0645 0) \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b.</div>'
       +'<input type="file" id="ff-input" accept=".html,.htm,text/html" style="display:none">'
-      +'<label class="btn-prim" id="ff-upload" for="ff-input" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;">\ud83d\udcc2 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 \u0627\u0644\u0634\u0639\u0628 (HTML)</label>'
+      +'<button class="btn-prim" id="ff-upload">\ud83d\udcc2 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 \u0627\u0644\u0634\u0639\u0628 (HTML)</button>'
       +'<div id="ff-status" class="mini-lbl" style="margin:12px 0"></div>'
       +'<div id="ff-picker" style="display:none">'
         +'<label class="ff-toggle"><input type="checkbox" id="ff-fulltgl" onchange="ffToggleFull()"> \u062a\u0636\u0645\u064a\u0646 \u0627\u0644\u0634\u0639\u0628 \u0627\u0644\u0645\u0645\u062a\u0644\u0626\u0629 (\u0627\u0644\u0645\u0633\u062c\u0651\u0644 = \u0627\u0644\u0633\u0639\u0629)</label>'
@@ -5715,7 +5693,7 @@ function buildFileImportUI(){
     var box=document.createElement('div');box.id='gen-file-box';
     box.innerHTML='<div class="fmt-box">\ud83d\udce5 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 <b>\u00ab\u0634\u0639\u0628 \u0627\u0644\u0645\u0642\u0631\u0631\u0627\u062a\u00bb</b> \u0627\u0644\u0630\u064a \u062a\u0646\u0632\u0651\u0644\u0647 \u0645\u0646 \u0646\u0638\u0627\u0645 \u0627\u0644\u062c\u0627\u0645\u0639\u0629 (HTML)\u060c \u062b\u0645 \u0627\u062e\u062a\u0631 <b>\u0631\u0645\u0632 \u0627\u0644\u0645\u0627\u062f\u0629</b> \u0648<b>\u0631\u0642\u0645\u0647\u0627</b> \u0648<b>\u0627\u0644\u0634\u0639\u0628\u0629</b>. \u062a\u064f\u0633\u062a\u0628\u0639\u062f \u0627\u0644\u0634\u0639\u0628 \u0627\u0644\u0645\u0642\u0641\u0644\u0629 (\u062d\u062c\u0645 0) \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b.</div>'
       +'<input type="file" id="ff-input" accept=".html,.htm,text/html" style="display:none">'
-      +'<label class="btn-prim" id="ff-upload" for="ff-input" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;">\ud83d\udcc2 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 \u0627\u0644\u0634\u0639\u0628 (HTML)</label>'
+      +'<button class="btn-prim" id="ff-upload">\ud83d\udcc2 \u0627\u0631\u0641\u0639 \u0645\u0644\u0641 \u0627\u0644\u0634\u0639\u0628 (HTML)</button>'
       +'<div id="ff-status" class="mini-lbl" style="margin:12px 0"></div>'
       +'<div id="ff-picker" style="display:none">'
         +'<label class="ff-toggle"><input type="checkbox" id="ff-fulltgl" onchange="ffToggleFull()"> \u062a\u0636\u0645\u064a\u0646 \u0627\u0644\u0634\u0639\u0628 \u0627\u0644\u0645\u0645\u062a\u0644\u0626\u0629 (\u0627\u0644\u0645\u0633\u062c\u0651\u0644 = \u0627\u0644\u0633\u0639\u0629)</label>'
@@ -5746,7 +5724,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 let sbClient=null, CURRENT_USER=null, PULLING=false, authMode='login';
 var USER_DATA_KEYS=['tu_pro_st','tu_pro_plan','tu_pro_plans','tu_pro_goals','tu_pro_sch','tu_pro_gen','tu_pro_pomo','tu_pro_profile','tu_pro_grad'];
 function clearLocalUserData(){ try{ USER_DATA_KEYS.forEach(function(k){ localStorage.removeItem(k); }); localStorage.removeItem('tu_pro_ts'); localStorage.removeItem('tu_pro_uid'); }catch(e){} try{ planStore={}; planData=null; }catch(e){} }
-function withTimeout(p, ms){ return Promise.race([ Promise.resolve(p), new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms||30000); }) ]); }
+function withTimeout(p, ms){ return Promise.race([ Promise.resolve(p), new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms||15000); }) ]); }
 const _origSet=localStorage.setItem.bind(localStorage);
 localStorage.setItem=function(k,v){ _origSet(k,v); try{ if(!PULLING && typeof k==='string' && k.indexOf('tu_pro_')===0 && k!=='tu_pro_ts' && k!=='tu_pro_uid'){ _origSet('tu_pro_ts', String(Date.now())); if(CURRENT_USER){ scheduleCloudPush(); } } }catch(e){} };
 
@@ -5807,7 +5785,6 @@ async function usernameAvailable(uname){
   return null;
 }
 async function resolveLoginEmail(identifier){
-  if(!sbClient) await ensureSupabaseClient();
   if(!identifier) return null;
   if(identifier.indexOf('@')>-1) return identifier;
   if(!sbClient) return null;
@@ -5818,158 +5795,33 @@ async function resolveLoginEmail(identifier){
 function getCaptchaToken(){ try{ if(window.turnstile) return turnstile.getResponse()||''; }catch(e){} return ''; }
 function resetCaptcha(){ try{ if(window.turnstile) turnstile.reset(); }catch(e){} }
 async function authSubmit(){
+  if(!sbClient){ authMsg('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0627\u0644\u062e\u0627\u062f\u0645\u060c \u062a\u062d\u0642\u0642 \u0645\u0646 \u0627\u0644\u0625\u0646\u062a\u0631\u0646\u062a.','err'); return; }
+  var email=(document.getElementById('au-email').value||'').trim(); if(email.indexOf('@')>-1)email=email.toLowerCase(); else email=email.replace(/^@/,'').toLowerCase();
+  var pass=(document.getElementById('au-pass').value||'');
+  if(!email||!pass){ authMsg('\u0623\u062f\u062e\u0644 \u0627\u0644\u0628\u0631\u064a\u062f \u0648\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631.','err'); return; }
+  authBusy(true);
+  var capToken=getCaptchaToken();
+  var _tw=document.querySelector('.cf-turnstile'); var _twReady=_tw&&_tw.querySelector('iframe'); if(_twReady && window.turnstile && !capToken){ authMsg('أكمل التحقق الأمني أولاً.','err'); authBusy(false); return; }
   try{
-    if(!sbClient){
-      var ready=await ensureSupabaseClient();
-      if(!ready){
-        authMsg('تعذّر تحميل خدمة تسجيل الدخول. تأكد من الإنترنت ثم أعد المحاولة.','err');
-        return;
-      }
-    }
-
-    var email=(document.getElementById('au-email').value||'').trim();
-    if(email.indexOf('@')>-1) email=email.toLowerCase();
-    else email=email.replace(/^@/,'').toLowerCase();
-
-    var pass=(document.getElementById('au-pass').value||'');
-    if(!email||!pass){
-      authMsg('أدخل البريد وكلمة المرور.','err');
-      return;
-    }
-
-    authBusy(true);
-
-    var capToken='';
-    try{ capToken=getCaptchaToken()||''; }catch(e){}
-
-    var tw=document.querySelector('.cf-turnstile');
-    var twReady=tw && tw.querySelector('iframe');
-    if(twReady && window.turnstile && !capToken){
-      authMsg('أكمل التحقق الأمني أولاً.','err');
-      authBusy(false);
-      return;
-    }
-
     if(authMode==='signup'){
       var name=(document.getElementById('au-name').value||'').trim();
       var uname=(((document.getElementById('au-user')||{}).value)||'').trim().replace(/^@/,'').toLowerCase();
-
-      if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){
-        authMsg('اسم المستخدم: ٣-٢٠ خانة (حروف إنجليزية وأرقام و _ فقط).','err');
-        authBusy(false);
-        return;
-      }
-
+      if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){ authMsg('اسم المستخدم: ٣-٢٠ خانة (حروف إنجليزية وأرقام و _ فقط).','err'); authBusy(false); return; }
       var avail=await usernameAvailable(uname);
-      if(avail===false){
-        authMsg('اسم المستخدم محجوز، اختر غيره.','err');
-        authBusy(false);
-        return;
-      }
-
-      var sr=await withTimeout(
-        sbClient.auth.signUp({
-          email:email,
-          password:pass,
-          options:{
-            captchaToken:capToken,
-            data:{full_name:name,username:uname},
-            emailRedirectTo:window.location.origin
-          }
-        }),30000
-      );
-
-      try{resetCaptcha();}catch(e){}
-
-      if(sr.error){
-        authMsg(trAuthErr(sr.error),'err');
-        authBusy(false);
-        return;
-      }
-
-      if(sr.data && sr.data.session && sr.data.user){
-        CURRENT_USER=sr.data.user;
-        await afterLogin();
-        try{
-          var pp=getProfileLocal();
-          pp.username=uname;
-          if(pp.visible===undefined)pp.visible=true;
-          saveProfileLocal(pp);
-          await syncProfile();
-          renderProfileForm();
-        }catch(e){}
-        return;
-      }
-
-      authMsg('✅ تم إنشاء حسابك! أرسلنا رابط تحقق إلى '+email+'. افتح الرسالة ثم سجّل الدخول.','ok');
+      if(avail===false){ authMsg('اسم المستخدم محجوز، اختر غيره.','err'); authBusy(false); return; }
+      var r=await withTimeout(sbClient.auth.signUp({ email:email, password:pass, options:{ captchaToken: capToken, data:{ full_name:name, username:uname }, emailRedirectTo: window.location.origin } }), 15000); resetCaptcha();
+      if(r.error){ authMsg(trAuthErr(r.error),'err'); authBusy(false); return; }
+      if(r.data && r.data.session && r.data.user){ CURRENT_USER=r.data.user; await afterLogin(); try{ var pp=getProfileLocal(); pp.username=uname; if(pp.visible===undefined)pp.visible=true; saveProfileLocal(pp); await syncProfile(); renderProfileForm(); }catch(e){} return; }
+      authMsg('\u2705 \u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628\u0643! \u0623\u0631\u0633\u0644\u0646\u0627 \u0631\u0627\u0628\u0637 \u062a\u062d\u0642\u0651\u0642 \u0625\u0644\u0649 '+email+'. \u0627\u0641\u062a\u062d \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0648\u0627\u0636\u063a\u0637 \u0627\u0644\u0631\u0627\u0628\u0637\u060c \u062b\u0645 \u0627\u0631\u062c\u0639 \u0648\u0633\u062c\u0651\u0644 \u0627\u0644\u062f\u062e\u0648\u0644.','ok');
       authBusy(false);
-      return;
+    } else {
+      var loginEmail=await resolveLoginEmail(email);
+      if(!loginEmail){ authMsg('ما لقينا حساباً بهذا اليوزرنيم أو البريد.','err'); authBusy(false); return; }
+      var r2=await withTimeout(sbClient.auth.signInWithPassword({ email:loginEmail, password:pass, options:{ captchaToken: capToken } }), 15000); resetCaptcha();
+      if(r2.error){ authMsg(trAuthErr(r2.error),'err'); authBusy(false); return; }
+      CURRENT_USER=r2.data.user; await afterLogin();
     }
-
-    // Login: email is already an email, so do NOT call RPC/profiles first.
-    var lr;
-    try{
-      lr=await withTimeout(
-        sbClient.auth.signInWithPassword({
-          email:email,
-          password:pass,
-          options:{captchaToken:capToken}
-        }),30000
-      );
-    }catch(firstErr){
-      // Recreate the client once; this handles stale clients / mobile connection changes.
-      sbClient=null;
-      var retryClient=await ensureSupabaseClient();
-      if(!retryClient) throw firstErr;
-
-      var freshCap='';
-      try{freshCap=getCaptchaToken()||'';}catch(e){}
-      lr=await withTimeout(
-        retryClient.auth.signInWithPassword({
-          email:email,
-          password:pass,
-          options:{captchaToken:freshCap}
-        }),30000
-      );
-    }
-
-    try{resetCaptcha();}catch(e){}
-
-    if(lr && lr.error){
-      authMsg(trAuthErr(lr.error) || ('خطأ من الخادم: '+lr.error.message),'err');
-      authBusy(false);
-      return;
-    }
-
-    if(!lr || !lr.data || !lr.data.user){
-      authMsg('لم يرجع خادم تسجيل الدخول بيانات الحساب. حاول مرة أخرى.','err');
-      authBusy(false);
-      return;
-    }
-
-    CURRENT_USER=lr.data.user;
-
-    try{
-      await afterLogin();
-    }catch(afterErr){
-      console.error('afterLogin error:',afterErr);
-      // Authentication succeeded; do not tell the user that login failed.
-      goAuthScreen('forms');
-      authBusy(false);
-      authMsg('تم تسجيل الدخول، لكن تحميل بيانات الموقع تأخر. حدّث الصفحة مرة واحدة.','ok');
-      return;
-    }
-
-  }catch(e){
-    console.error('authSubmit error:',e);
-    var detail=(e&&e.message)?e.message:String(e);
-    if(/timeout/i.test(detail)){
-      authMsg('الاتصال بـ Supabase تأخر. تأكد من الشبكة وحاول مرة أخرى.','err');
-    }else{
-      authMsg('خطأ تسجيل الدخول: '+detail,'err');
-    }
-    authBusy(false);
-  }
+  }catch(e){ authMsg('\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639\u060c \u062d\u0627\u0648\u0644 \u0645\u062c\u062f\u062f\u0627\u064b.','err'); authBusy(false); }
 }
 async function authResend(){
   if(!sbClient)return;
@@ -6051,61 +5903,15 @@ async function cloudPush(){
   try{ blob['tu_pro_ts']=localStorage.getItem('tu_pro_ts')||String(Date.now()); }catch(e){}
   try{ await sbClient.from('user_data').upsert({ user_id:CURRENT_USER.id, data:blob, updated_at:new Date().toISOString() }, { onConflict:'user_id' }); }catch(e){}
 }
-
-async function ensureSupabaseClient(){
-  if(sbClient) return sbClient;
-
-  if(typeof supabase!=='undefined' && supabase && supabase.createClient){
-    try{
-      sbClient=supabase.createClient(SB_URL,SB_KEY);
-      return sbClient;
-    }catch(e){}
-  }
-
-  var urls=[
-    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
-    'https://unpkg.com/@supabase/supabase-js@2'
-  ];
-
-  for(var i=0;i<urls.length;i++){
-    try{
-      await new Promise(function(resolve,reject){
-        var s=document.createElement('script');
-        s.src=urls[i];
-        s.async=true;
-        s.onload=resolve;
-        s.onerror=reject;
-        document.head.appendChild(s);
-      });
-
-      if(typeof supabase!=='undefined' && supabase && supabase.createClient){
-        sbClient=supabase.createClient(SB_URL,SB_KEY);
-        return sbClient;
-      }
-    }catch(e){}
-  }
-
-  return null;
-}
-
-async function authBootEntry(){
+function authBootEntry(){
   goAuthScreen('loading');
-
-  var client=await ensureSupabaseClient();
-
-  if(!client){
-    goAuthScreen('forms');
-    authMsg('تعذّر الاتصال بخدمة تسجيل الدخول. أعد تحميل الصفحة وحاول مرة أخرى.','err');
-    return;
+  if(typeof supabase==='undefined' || !supabase || !supabase.createClient){
+    goAuthScreen('forms'); authMsg('جاري إعادة الاتصال بخدمة تسجيل الدخول...','');
+    var sc=document.createElement('script');sc.src='https://unpkg.com/@supabase/supabase-js@2';sc.onload=function(){setTimeout(authBootEntry,50);};sc.onerror=function(){authMsg('تعذّر تحميل خدمة تسجيل الدخول. تحقق من الإنترنت ثم حدّث الصفحة.','err');};document.head.appendChild(sc);return;
   }
-
+  try{ sbClient=supabase.createClient(SB_URL, SB_KEY); }catch(e){ routeLocal(); return; }
   try{ scfgLoad(); }catch(e){}
-  try{
-    client.auth.onAuthStateChange(function(ev,sess){
-      if(ev==='PASSWORD_RECOVERY') promptNewPassword();
-    });
-  }catch(e){}
-
+  try{ sbClient.auth.onAuthStateChange(function(ev,sess){ if(ev==='PASSWORD_RECOVERY'){ promptNewPassword(); } }); }catch(e){}
   authBoot();
 }
 async function promptNewPassword(){
