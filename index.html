@@ -3851,9 +3851,15 @@ async function genGateCheck(){
   var gate=document.getElementById('gen-paywall'), body=document.getElementById('gen-body-wrap');
   if(!gate||!body)return;
   try{if(typeof subInit==='function')await subInit();}catch(e){}
+  // تحقق أولي سريع من النسخة المحلية/المخزّنة.
   var active=tuSubActive();
   gate.style.display=active?'none':'block';
   body.style.display=active?'':'none';
+  if(active)return;
+  // إن لم يظهر الاشتراك مفعّلاً محليًا، نفّذ نفس الفحص الكامل الذي يستخدمه
+  // زر "تحقق من الاشتراك" (بما في ذلك استرجاع الأكواد القديمة من
+  // subscription_codes) حتى يُفتح القسم تلقائيًا لأي مشترك فعلي.
+  try{ await genVerifySubscription(); }catch(e){}
 }
 function genGoSub(){
   var items=document.querySelectorAll('.tab-item');
