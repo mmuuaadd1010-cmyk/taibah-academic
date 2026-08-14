@@ -2593,6 +2593,11 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <!-- GENERATOR -->
     <div class="tab-pane" id="p-gen">
       <div id="gen-paywall" style="display:none;text-align:center;padding:34px 18px 30px">
+<button id="gen-sub-check-btn" type="button" onclick="genVerifySubscription()" style="margin-top:14px;width:100%;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-weight:800;">
+  🔄 تحقق من الاشتراك
+</button>
+<div id="gen-sub-check-msg" style="margin-top:9px;text-align:center;font-size:13px;opacity:.85;"></div>
+
         <div style="font-size:2.6rem;margin-bottom:6px">🧠🔒</div>
         <h3 style="margin:0 0 8px;font-size:1.15rem">مولّد الجداول الذكي — للمشتركين فقط</h3>
         <p style="color:var(--t2);font-size:.85rem;line-height:1.9;max-width:420px;margin:0 auto 18px">
@@ -3768,72 +3773,92 @@ function tuSubActive(v){
   }
 }
 
-async function genGateCheck(){
+async function genGetSubscription(){
+  try{
+    if(typeof IS_ADMIN!=='undefined' && IS_ADMIN) return {admin:true};
+
+    var uid='';
+    if(typeof CURRENT_USER!=='undefined' && CURRENT_USER && CURRENT_USER.id){
+      uid=CURRENT_USER.id;
+    }
+
+    if(!uid && sbClient && sbClient.auth){
+      var ar=await sbClient.auth.getUser();
+      uid=ar && ar.data && ar.data.user ? ar.data.user.id : '';
+    }
+
+    if(!uid || !sbClient) return null;
+
+    var q=await sbClient
+      .from('user_subscriptions')
+      .select('plan_type,starts_at,expires_at,code')
+      .eq('user_id',uid)
+      .order('expires_at',{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(q.error) throw q.error;
+    return q.data || null;
+  }catch(e){
+    console.error('genGetSubscription:',e);
+    return null;
+  }
+}
+
+async function genVerifySubscription(){
+  var btn=document.getElementById('gen-sub-check-btn');
+  var msg=document.getElementById('gen-sub-check-msg');
   var gate=document.getElementById('gen-paywall');
   var body=document.getElementById('gen-body-wrap');
 
-  if(!gate || !body) return;
+  if(btn){
+    btn.disabled=true;
+    btn.textContent='⏳ جاري التحقق...';
+  }
+  if(msg) msg.textContent='';
 
   try{
-    // لا تستخدم subUserId() هنا لأنها معرفة داخل IIFE الاشتراكات وليست global.
-    // نأخذ المستخدم الحالي مباشرة من Supabase Auth.
-    var uid='';
-    try{
-      if(sbClient && sbClient.auth){
-        var authRes=await sbClient.auth.getUser();
-        uid=authRes && authRes.data && authRes.data.user
-          ? authRes.data.user.id
-          : '';
-      }
-    }catch(e){}
+    var sub=await genGetSubscription();
 
-    // fallback للحساب الحالي إذا كان موجودًا في المتغير العام
-    if(!uid){
-      try{
-        uid=(typeof CURRENT_USER!=='undefined' && CURRENT_USER && CURRENT_USER.id)
-          ? CURRENT_USER.id
-          : '';
-      }catch(e){}
+    if(sub && sub.expires_at && new Date(sub.expires_at)>new Date()){
+      try{ subSaveLocal(sub); }catch(e){}
+      try{ if(typeof subRender==='function') subRender(sub); }catch(e){}
+
+      if(gate) gate.style.display='none';
+      if(body) body.style.display='';
+      if(msg) msg.textContent='✅ اشتراكك فعال — تم فتح مولّد الجداول.';
+      return true;
     }
 
-    if(uid && sbClient){
-      var q=await sbClient
-        .from('user_subscriptions')
-        .select('plan_type,starts_at,expires_at,code')
-        .eq('user_id',uid)
-        .order('expires_at',{ascending:false})
-        .limit(1)
-        .maybeSingle();
-
-      if(q.error) throw q.error;
-
-      if(q.data){
-        subSaveLocal(q.data);
-        if(typeof subRender==='function') subRender(q.data);
-      }
-
-      var active=tuSubActive(q.data);
-
-      gate.style.display=active?'none':'block';
-      body.style.display=active?'':'none';
-      return;
-    }
-
-    var local=typeof subLocal==='function' ? subLocal() : null;
-    var active=tuSubActive(local);
-
-    gate.style.display=active?'none':'block';
-    body.style.display=active?'':'none';
-
+    if(msg) msg.textContent='❌ لم يتم العثور على اشتراك فعال لهذا الحساب.';
+    return false;
   }catch(e){
-    console.error('Subscription gate error:',e);
-
-    var local=typeof subLocal==='function' ? subLocal() : null;
-    var active=tuSubActive(local);
-
-    gate.style.display=active?'none':'block';
-    body.style.display=active?'':'none';
+    if(msg) msg.textContent='⚠️ تعذر التحقق الآن، حاول مرة أخرى.';
+    return false;
+  }finally{
+    if(btn){
+      btn.disabled=false;
+      btn.textContent='🔄 تحقق من الاشتراك';
+    }
   }
+}
+
+async function genGateCheck(){
+  var gate=document.getElementById('gen-paywall');
+  var body=document.getElementById('gen-body-wrap');
+  if(!gate || !body) return;
+
+  // لا نفترض أن الاشتراك موجود محليًا؛ نتحقق من قاعدة البيانات.
+  var sub=await genGetSubscription();
+  var active=tuSubActive(sub);
+
+  if(active){
+    try{ subSaveLocal(sub); }catch(e){}
+    try{ if(typeof subRender==='function') subRender(sub); }catch(e){}
+  }
+
+  gate.style.display=active?'none':'block';
+  body.style.display=active?'':'none';
 }
 function genGoSub(){
   var items=document.querySelectorAll('.tab-item');
