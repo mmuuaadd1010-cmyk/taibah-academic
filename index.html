@@ -5807,6 +5807,7 @@ async function usernameAvailable(uname){
   return null;
 }
 async function resolveLoginEmail(identifier){
+  if(!sbClient) await ensureSupabaseClient();
   if(!identifier) return null;
   if(identifier.indexOf('@')>-1) return identifier;
   if(!sbClient) return null;
@@ -5817,7 +5818,13 @@ async function resolveLoginEmail(identifier){
 function getCaptchaToken(){ try{ if(window.turnstile) return turnstile.getResponse()||''; }catch(e){} return ''; }
 function resetCaptcha(){ try{ if(window.turnstile) turnstile.reset(); }catch(e){} }
 async function authSubmit(){
-  if(!sbClient){ authMsg('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0627\u0644\u062e\u0627\u062f\u0645\u060c \u062a\u062d\u0642\u0642 \u0645\u0646 \u0627\u0644\u0625\u0646\u062a\u0631\u0646\u062a.','err'); return; }
+  if(!sbClient){
+    var ready=await ensureSupabaseClient();
+    if(!ready){
+      authMsg('تعذّر الاتصال بالخادم، حاول تحديث الصفحة ثم تسجيل الدخول مرة أخرى.','err');
+      return;
+    }
+  }
   var email=(document.getElementById('au-email').value||'').trim(); if(email.indexOf('@')>-1)email=email.toLowerCase(); else email=email.replace(/^@/,'').toLowerCase();
   var pass=(document.getElementById('au-pass').value||'');
   if(!email||!pass){ authMsg('\u0623\u062f\u062e\u0644 \u0627\u0644\u0628\u0631\u064a\u062f \u0648\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631.','err'); return; }
@@ -5925,15 +5932,61 @@ async function cloudPush(){
   try{ blob['tu_pro_ts']=localStorage.getItem('tu_pro_ts')||String(Date.now()); }catch(e){}
   try{ await sbClient.from('user_data').upsert({ user_id:CURRENT_USER.id, data:blob, updated_at:new Date().toISOString() }, { onConflict:'user_id' }); }catch(e){}
 }
-function authBootEntry(){
-  goAuthScreen('loading');
-  if(typeof supabase==='undefined' || !supabase || !supabase.createClient){
-    goAuthScreen('forms'); authMsg('جاري إعادة الاتصال بخدمة تسجيل الدخول...','');
-    var sc=document.createElement('script');sc.src='https://unpkg.com/@supabase/supabase-js@2';sc.onload=function(){setTimeout(authBootEntry,50);};sc.onerror=function(){authMsg('تعذّر تحميل خدمة تسجيل الدخول. تحقق من الإنترنت ثم حدّث الصفحة.','err');};document.head.appendChild(sc);return;
+
+async function ensureSupabaseClient(){
+  if(sbClient) return sbClient;
+
+  if(typeof supabase!=='undefined' && supabase && supabase.createClient){
+    try{
+      sbClient=supabase.createClient(SB_URL,SB_KEY);
+      return sbClient;
+    }catch(e){}
   }
-  try{ sbClient=supabase.createClient(SB_URL, SB_KEY); }catch(e){ routeLocal(); return; }
+
+  var urls=[
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    'https://unpkg.com/@supabase/supabase-js@2'
+  ];
+
+  for(var i=0;i<urls.length;i++){
+    try{
+      await new Promise(function(resolve,reject){
+        var s=document.createElement('script');
+        s.src=urls[i];
+        s.async=true;
+        s.onload=resolve;
+        s.onerror=reject;
+        document.head.appendChild(s);
+      });
+
+      if(typeof supabase!=='undefined' && supabase && supabase.createClient){
+        sbClient=supabase.createClient(SB_URL,SB_KEY);
+        return sbClient;
+      }
+    }catch(e){}
+  }
+
+  return null;
+}
+
+async function authBootEntry(){
+  goAuthScreen('loading');
+
+  var client=await ensureSupabaseClient();
+
+  if(!client){
+    goAuthScreen('forms');
+    authMsg('تعذّر الاتصال بخدمة تسجيل الدخول. أعد تحميل الصفحة وحاول مرة أخرى.','err');
+    return;
+  }
+
   try{ scfgLoad(); }catch(e){}
-  try{ sbClient.auth.onAuthStateChange(function(ev,sess){ if(ev==='PASSWORD_RECOVERY'){ promptNewPassword(); } }); }catch(e){}
+  try{
+    client.auth.onAuthStateChange(function(ev,sess){
+      if(ev==='PASSWORD_RECOVERY') promptNewPassword();
+    });
+  }catch(e){}
+
   authBoot();
 }
 async function promptNewPassword(){
