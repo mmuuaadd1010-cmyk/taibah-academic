@@ -2592,6 +2592,17 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 
     <!-- GENERATOR -->
     <div class="tab-pane" id="p-gen">
+      <div id="gen-paywall" style="display:none;text-align:center;padding:34px 18px 30px">
+        <div style="font-size:2.6rem;margin-bottom:6px">🧠🔒</div>
+        <h3 style="margin:0 0 8px;font-size:1.15rem">مولّد الجداول الذكي — للمشتركين فقط</h3>
+        <p style="color:var(--t2);font-size:.85rem;line-height:1.9;max-width:420px;margin:0 auto 18px">
+          ولّد جدولك الدراسي بضغطة زر بدل ما تعبيه يدويًا! فعّل اشتراكك الآن واستفد من العرض الحالي:
+          <br><b style="color:var(--y)">الترم 9 ريال فقط</b> · <b style="color:var(--y)">السنة 23 ريال فقط</b> — لعدد محدود من المشتركين، قبل ما يبدأ السعر الرسمي (15 ريال / 30 ريال) بتاريخ 25 أغسطس.
+        </p>
+        <a href="https://t.me/onlychamber" target="_blank" rel="noopener" style="display:inline-block;padding:12px 30px;border-radius:24px;background:var(--grad);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(91,157,253,.35);margin-bottom:12px">🚀 فعّل اشتراكك الآن</a>
+        <div><button class="btn-ghost" onclick="genGoSub()" style="margin-top:6px">عرض تفاصيل الاشتراك بالموقع</button></div>
+      </div>
+      <div id="gen-body-wrap">
       <div class="card">
         <div class="card-h">🧠 مولّد الجداول الذكي</div>
         <div class="gen-intro">ارفع ملف <b>«شعب المقررات»</b> (HTML) من نظام الجامعة، اختر موادك وشعبها، ثم ولّد أفضل جدول مع أيام الـ Off.</div>
@@ -2627,6 +2638,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <button class="btn-prim" style="margin-top:14px" onclick="generateSchedules()">⚡ ولّد الجداول</button><button id="btn-jumpoff" class="btn-ghost" style="margin-top: 10px; width: 100%;">🟢 انتقل لأفضل جدول فيه يوم Off</button>
       </div>
       <div id="gen-results"></div>
+      </div>
     </div>
 
     <!-- CHART -->
@@ -3737,7 +3749,30 @@ function tuBuildDrawer(){
 }
 function tuOpenDrawer(){ tuBuildDrawer(); var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.add('open'); if(o)o.classList.add('open'); }
 function tuCloseDrawer(){ var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.remove('open'); if(o)o.classList.remove('open'); }
-function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}var _app=document.getElementById('s-app');if(_app)_app.dataset.currentTab=id;document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}if(id==='planner'){plnrRender();}if(id==='subscription'){subInit();}}
+function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}var _app=document.getElementById('s-app');if(_app)_app.dataset.currentTab=id;document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}if(id==='planner'){plnrRender();}if(id==='subscription'){subInit();}if(id==='gen'){genGateCheck();}}
+function tuSubActive(){
+  try{
+    if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN) return true;
+    var v=(typeof subLocal==='function')?subLocal():null;
+    return !!(v&&v.expires_at&&new Date(v.expires_at)>new Date());
+  }catch(e){ return false; }
+}
+async function genGateCheck(){
+  var gate=document.getElementById('gen-paywall'), body=document.getElementById('gen-body-wrap');
+  if(!gate||!body) return;
+  try{ if(typeof subInit==='function') await subInit(); }catch(e){}
+  var active=tuSubActive();
+  gate.style.display=active?'none':'block';
+  body.style.display=active?'':'none';
+}
+function genGoSub(){
+  var items=document.querySelectorAll('.tab-item');
+  for(var i=0;i<items.length;i++){
+    var oc=items[i].getAttribute('onclick')||'';
+    if(oc.indexOf("goTab('subscription'")>=0){ items[i].click(); return; }
+  }
+  try{ goTab('subscription'); }catch(e){}
+}
 
 /* ===== GRADES / PLAN ===== */
 const GRADES=[['A+',5],['A',4.75],['B+',4.5],['B',4],['C+',3.5],['C',3],['D+',2.5],['D',2],['F',1]];
