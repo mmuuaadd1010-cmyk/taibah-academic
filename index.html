@@ -3759,16 +3759,30 @@ function tuSubActive(v){
     return !!(x&&x.expires_at&&new Date(x.expires_at)>new Date());
   }catch(e){ return false; }
 }
+
 async function genVerifySubscription(){
   var gate=document.getElementById('gen-paywall');
   var body=document.getElementById('gen-body-wrap');
   var btn=document.getElementById('gen-sub-check-btn');
   var msg=document.getElementById('gen-sub-check-msg');
+
   try{
     if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحقق...';}
-    var uid=(typeof subUserId==='function')?subUserId():'';
-    if(!uid) throw new Error('login');
-    if(!sbClient) throw new Error('client');
+    if(msg)msg.textContent='';
+
+    // IMPORTANT: subUserId() is private inside the subscription IIFE.
+    // Use the global authenticated user directly.
+    var uid='';
+    try{uid=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.id)||'';}catch(e){}
+
+    if(!uid){
+      if(msg)msg.textContent='⚠️ لم يتم التعرف على جلسة الدخول. أعد تحميل الصفحة بعد تسجيل الدخول.';
+      return false;
+    }
+    if(!sbClient){
+      if(msg)msg.textContent='⚠️ الاتصال بالخادم غير جاهز. أعد تحميل الصفحة وحاول مرة أخرى.';
+      return false;
+    }
 
     var q=await sbClient.from('user_subscriptions')
       .select('plan_type,starts_at,expires_at,code')
@@ -3777,32 +3791,38 @@ async function genVerifySubscription(){
       .limit(1)
       .maybeSingle();
 
-    if(q.error) throw q.error;
+    if(q.error)throw q.error;
 
     if(q.data && tuSubActive(q.data)){
-      try{subSaveLocal(q.data);subRender(q.data);}catch(e){}
+      try{if(typeof subSaveLocal==='function')subSaveLocal(q.data);}catch(e){}
+      try{if(typeof subRender==='function')subRender(q.data);}catch(e){}
       gate.style.display='none';
       body.style.display='';
       if(msg)msg.textContent='✅ اشتراكك فعال وتم فتح مولّد الجداول.';
-      return;
+      return true;
     }
 
     gate.style.display='block';
     body.style.display='none';
     if(msg)msg.textContent='❌ لا يوجد اشتراك فعال لهذا الحساب.';
+    return false;
   }catch(e){
-    console.error('genVerifySubscription',e);
-    if(msg)msg.textContent=e.message==='login'
-      ? '⚠️ سجّل الدخول أولًا.'
-      : '⚠️ تعذر التحقق من الاشتراك.';
+    console.error('genVerifySubscription:',e);
+    if(msg)msg.textContent='⚠️ تعذر التحقق من الاشتراك: '+(e.message||'خطأ غير معروف');
+    return false;
   }finally{
     if(btn){btn.disabled=false;btn.textContent='🔄 تحقق من الاشتراك';}
   }
 }
+
 async function genGateCheck(){
   var gate=document.getElementById('gen-paywall'), body=document.getElementById('gen-body-wrap');
-  if(!gate||!body) return;
-  try{ if(typeof subInit==='function') await subInit(); }catch(e){}
+  if(!gate||!body)return;
+
+  // Keep the original subscription initialization intact.
+  try{if(typeof subInit==='function')await subInit();}catch(e){}
+
+  // Read the refreshed local subscription written by subInit().
   var active=tuSubActive();
   gate.style.display=active?'none':'block';
   body.style.display=active?'':'none';
