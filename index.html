@@ -3770,20 +3770,15 @@ async function genVerifySubscription(){
     if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحقق...';}
     if(msg)msg.textContent='';
 
-    // IMPORTANT: subUserId() is private inside the subscription IIFE.
-    // Use the global authenticated user directly.
     var uid='';
     try{uid=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.id)||'';}catch(e){}
-
     if(!uid){
-      if(msg)msg.textContent='⚠️ لم يتم التعرف على جلسة الدخول. أعد تحميل الصفحة بعد تسجيل الدخول.';
+      if(msg)msg.textContent='⚠️ لم يتم التعرف على جلسة الدخول. حدّث الصفحة بعد تسجيل الدخول.';
       return false;
     }
-    if(!sbClient){
-      if(msg)msg.textContent='⚠️ الاتصال بالخادم غير جاهز. أعد تحميل الصفحة وحاول مرة أخرى.';
-      return false;
-    }
+    if(!sbClient)throw new Error('الاتصال بالخادم غير جاهز');
 
+    // أولًا: الاشتراك الطبيعي في user_subscriptions.
     var q=await sbClient.from('user_subscriptions')
       .select('plan_type,starts_at,expires_at,code')
       .eq('user_id',uid)
@@ -3794,18 +3789,55 @@ async function genVerifySubscription(){
     if(q.error)throw q.error;
 
     if(q.data && tuSubActive(q.data)){
-      try{if(typeof subSaveLocal==='function')subSaveLocal(q.data);}catch(e){}
-      try{if(typeof subRender==='function')subRender(q.data);}catch(e){}
-      gate.style.display='none';
-      body.style.display='';
+      try{subSaveLocal(q.data);subRender(q.data);}catch(e){}
+      gate.style.display='none'; body.style.display='';
       if(msg)msg.textContent='✅ اشتراكك فعال وتم فتح مولّد الجداول.';
       return true;
     }
 
-    gate.style.display='block';
-    body.style.display='none';
+    // استرجاع آمن للاشتراكات القديمة:
+    // بعض الأكواد القديمة قد تكون redeemed_by مرتبطة بالحساب
+    // لكن لم يُنشأ لها سجل في user_subscriptions.
+    var old=await sbClient.from('subscription_codes')
+      .select('code,plan_type,redeemed_at,disabled')
+      .eq('redeemed_by',uid)
+      .eq('disabled',false)
+      .order('redeemed_at',{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(old.error)throw old.error;
+
+    if(old.data && old.data.redeemed_at){
+      var start=new Date(old.data.redeemed_at);
+      var end=new Date(start);
+      end.setMonth(end.getMonth()+(old.data.plan_type==='year'?12:5));
+
+      var recovered={
+        user_id:uid,
+        code:old.data.code,
+        plan_type:old.data.plan_type,
+        starts_at:start.toISOString(),
+        expires_at:end.toISOString()
+      };
+
+      if(tuSubActive(recovered)){
+        // إعادة بناء السجل المفقود حتى لا تتكرر المشكلة.
+        try{
+          var fix=await sbClient.from('user_subscriptions').upsert(recovered,{onConflict:'user_id'});
+          if(fix.error)console.warn('subscription recovery upsert:',fix.error);
+        }catch(e){}
+        try{subSaveLocal(recovered);subRender(recovered);}catch(e){}
+        gate.style.display='none'; body.style.display='';
+        if(msg)msg.textContent='✅ تم استرجاع اشتراكك السابق وفتح مولّد الجداول.';
+        return true;
+      }
+    }
+
+    gate.style.display='block'; body.style.display='none';
     if(msg)msg.textContent='❌ لا يوجد اشتراك فعال لهذا الحساب.';
     return false;
+
   }catch(e){
     console.error('genVerifySubscription:',e);
     if(msg)msg.textContent='⚠️ تعذر التحقق من الاشتراك: '+(e.message||'خطأ غير معروف');
@@ -3818,11 +3850,7 @@ async function genVerifySubscription(){
 async function genGateCheck(){
   var gate=document.getElementById('gen-paywall'), body=document.getElementById('gen-body-wrap');
   if(!gate||!body)return;
-
-  // Keep the original subscription initialization intact.
   try{if(typeof subInit==='function')await subInit();}catch(e){}
-
-  // Read the refreshed local subscription written by subInit().
   var active=tuSubActive();
   gate.style.display=active?'none':'block';
   body.style.display=active?'':'none';
