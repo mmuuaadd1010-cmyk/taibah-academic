@@ -5746,7 +5746,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 let sbClient=null, CURRENT_USER=null, PULLING=false, authMode='login';
 var USER_DATA_KEYS=['tu_pro_st','tu_pro_plan','tu_pro_plans','tu_pro_goals','tu_pro_sch','tu_pro_gen','tu_pro_pomo','tu_pro_profile','tu_pro_grad'];
 function clearLocalUserData(){ try{ USER_DATA_KEYS.forEach(function(k){ localStorage.removeItem(k); }); localStorage.removeItem('tu_pro_ts'); localStorage.removeItem('tu_pro_uid'); }catch(e){} try{ planStore={}; planData=null; }catch(e){} }
-function withTimeout(p, ms){ return Promise.race([ Promise.resolve(p), new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms||15000); }) ]); }
+function withTimeout(p, ms){ return Promise.race([ Promise.resolve(p), new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms||30000); }) ]); }
 const _origSet=localStorage.setItem.bind(localStorage);
 localStorage.setItem=function(k,v){ _origSet(k,v); try{ if(!PULLING && typeof k==='string' && k.indexOf('tu_pro_')===0 && k!=='tu_pro_ts' && k!=='tu_pro_uid'){ _origSet('tu_pro_ts', String(Date.now())); if(CURRENT_USER){ scheduleCloudPush(); } } }catch(e){} };
 
@@ -5818,39 +5818,158 @@ async function resolveLoginEmail(identifier){
 function getCaptchaToken(){ try{ if(window.turnstile) return turnstile.getResponse()||''; }catch(e){} return ''; }
 function resetCaptcha(){ try{ if(window.turnstile) turnstile.reset(); }catch(e){} }
 async function authSubmit(){
-  if(!sbClient){
-    var ready=await ensureSupabaseClient();
-    if(!ready){
-      authMsg('تعذّر الاتصال بالخادم، حاول تحديث الصفحة ثم تسجيل الدخول مرة أخرى.','err');
+  try{
+    if(!sbClient){
+      var ready=await ensureSupabaseClient();
+      if(!ready){
+        authMsg('تعذّر تحميل خدمة تسجيل الدخول. تأكد من الإنترنت ثم أعد المحاولة.','err');
+        return;
+      }
+    }
+
+    var email=(document.getElementById('au-email').value||'').trim();
+    if(email.indexOf('@')>-1) email=email.toLowerCase();
+    else email=email.replace(/^@/,'').toLowerCase();
+
+    var pass=(document.getElementById('au-pass').value||'');
+    if(!email||!pass){
+      authMsg('أدخل البريد وكلمة المرور.','err');
       return;
     }
-  }
-  var email=(document.getElementById('au-email').value||'').trim(); if(email.indexOf('@')>-1)email=email.toLowerCase(); else email=email.replace(/^@/,'').toLowerCase();
-  var pass=(document.getElementById('au-pass').value||'');
-  if(!email||!pass){ authMsg('\u0623\u062f\u062e\u0644 \u0627\u0644\u0628\u0631\u064a\u062f \u0648\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631.','err'); return; }
-  authBusy(true);
-  var capToken=getCaptchaToken();
-  var _tw=document.querySelector('.cf-turnstile'); var _twReady=_tw&&_tw.querySelector('iframe'); if(_twReady && window.turnstile && !capToken){ authMsg('أكمل التحقق الأمني أولاً.','err'); authBusy(false); return; }
-  try{
+
+    authBusy(true);
+
+    var capToken='';
+    try{ capToken=getCaptchaToken()||''; }catch(e){}
+
+    var tw=document.querySelector('.cf-turnstile');
+    var twReady=tw && tw.querySelector('iframe');
+    if(twReady && window.turnstile && !capToken){
+      authMsg('أكمل التحقق الأمني أولاً.','err');
+      authBusy(false);
+      return;
+    }
+
     if(authMode==='signup'){
       var name=(document.getElementById('au-name').value||'').trim();
       var uname=(((document.getElementById('au-user')||{}).value)||'').trim().replace(/^@/,'').toLowerCase();
-      if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){ authMsg('اسم المستخدم: ٣-٢٠ خانة (حروف إنجليزية وأرقام و _ فقط).','err'); authBusy(false); return; }
+
+      if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){
+        authMsg('اسم المستخدم: ٣-٢٠ خانة (حروف إنجليزية وأرقام و _ فقط).','err');
+        authBusy(false);
+        return;
+      }
+
       var avail=await usernameAvailable(uname);
-      if(avail===false){ authMsg('اسم المستخدم محجوز، اختر غيره.','err'); authBusy(false); return; }
-      var r=await withTimeout(sbClient.auth.signUp({ email:email, password:pass, options:{ captchaToken: capToken, data:{ full_name:name, username:uname }, emailRedirectTo: window.location.origin } }), 15000); resetCaptcha();
-      if(r.error){ authMsg(trAuthErr(r.error),'err'); authBusy(false); return; }
-      if(r.data && r.data.session && r.data.user){ CURRENT_USER=r.data.user; await afterLogin(); try{ var pp=getProfileLocal(); pp.username=uname; if(pp.visible===undefined)pp.visible=true; saveProfileLocal(pp); await syncProfile(); renderProfileForm(); }catch(e){} return; }
-      authMsg('\u2705 \u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628\u0643! \u0623\u0631\u0633\u0644\u0646\u0627 \u0631\u0627\u0628\u0637 \u062a\u062d\u0642\u0651\u0642 \u0625\u0644\u0649 '+email+'. \u0627\u0641\u062a\u062d \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0648\u0627\u0636\u063a\u0637 \u0627\u0644\u0631\u0627\u0628\u0637\u060c \u062b\u0645 \u0627\u0631\u062c\u0639 \u0648\u0633\u062c\u0651\u0644 \u0627\u0644\u062f\u062e\u0648\u0644.','ok');
+      if(avail===false){
+        authMsg('اسم المستخدم محجوز، اختر غيره.','err');
+        authBusy(false);
+        return;
+      }
+
+      var sr=await withTimeout(
+        sbClient.auth.signUp({
+          email:email,
+          password:pass,
+          options:{
+            captchaToken:capToken,
+            data:{full_name:name,username:uname},
+            emailRedirectTo:window.location.origin
+          }
+        }),30000
+      );
+
+      try{resetCaptcha();}catch(e){}
+
+      if(sr.error){
+        authMsg(trAuthErr(sr.error),'err');
+        authBusy(false);
+        return;
+      }
+
+      if(sr.data && sr.data.session && sr.data.user){
+        CURRENT_USER=sr.data.user;
+        await afterLogin();
+        try{
+          var pp=getProfileLocal();
+          pp.username=uname;
+          if(pp.visible===undefined)pp.visible=true;
+          saveProfileLocal(pp);
+          await syncProfile();
+          renderProfileForm();
+        }catch(e){}
+        return;
+      }
+
+      authMsg('✅ تم إنشاء حسابك! أرسلنا رابط تحقق إلى '+email+'. افتح الرسالة ثم سجّل الدخول.','ok');
       authBusy(false);
-    } else {
-      var loginEmail=await resolveLoginEmail(email);
-      if(!loginEmail){ authMsg('ما لقينا حساباً بهذا اليوزرنيم أو البريد.','err'); authBusy(false); return; }
-      var r2=await withTimeout(sbClient.auth.signInWithPassword({ email:loginEmail, password:pass, options:{ captchaToken: capToken } }), 15000); resetCaptcha();
-      if(r2.error){ authMsg(trAuthErr(r2.error),'err'); authBusy(false); return; }
-      CURRENT_USER=r2.data.user; await afterLogin();
+      return;
     }
-  }catch(e){ authMsg('\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639\u060c \u062d\u0627\u0648\u0644 \u0645\u062c\u062f\u062f\u0627\u064b.','err'); authBusy(false); }
+
+    // Login: email is already an email, so do NOT call RPC/profiles first.
+    var lr;
+    try{
+      lr=await withTimeout(
+        sbClient.auth.signInWithPassword({
+          email:email,
+          password:pass,
+          options:{captchaToken:capToken}
+        }),30000
+      );
+    }catch(firstErr){
+      // Recreate the client once; this handles stale clients / mobile connection changes.
+      sbClient=null;
+      var retryClient=await ensureSupabaseClient();
+      if(!retryClient) throw firstErr;
+
+      var freshCap='';
+      try{freshCap=getCaptchaToken()||'';}catch(e){}
+      lr=await withTimeout(
+        retryClient.auth.signInWithPassword({
+          email:email,
+          password:pass,
+          options:{captchaToken:freshCap}
+        }),30000
+      );
+    }
+
+    try{resetCaptcha();}catch(e){}
+
+    if(lr && lr.error){
+      authMsg(trAuthErr(lr.error) || ('خطأ من الخادم: '+lr.error.message),'err');
+      authBusy(false);
+      return;
+    }
+
+    if(!lr || !lr.data || !lr.data.user){
+      authMsg('لم يرجع خادم تسجيل الدخول بيانات الحساب. حاول مرة أخرى.','err');
+      authBusy(false);
+      return;
+    }
+
+    CURRENT_USER=lr.data.user;
+
+    try{
+      await afterLogin();
+    }catch(afterErr){
+      console.error('afterLogin error:',afterErr);
+      // Authentication succeeded; do not tell the user that login failed.
+      goAuthScreen('forms');
+      authBusy(false);
+      authMsg('تم تسجيل الدخول، لكن تحميل بيانات الموقع تأخر. حدّث الصفحة مرة واحدة.','ok');
+      return;
+    }
+
+  }catch(e){
+    console.error('authSubmit error:',e);
+    var detail=(e&&e.message)?e.message:String(e);
+    if(/timeout/i.test(detail)){
+      authMsg('الاتصال بـ Supabase تأخر. تأكد من الشبكة وحاول مرة أخرى.','err');
+    }else{
+      authMsg('خطأ تسجيل الدخول: '+detail,'err');
+    }
+    authBusy(false);
+  }
 }
 async function authResend(){
   if(!sbClient)return;
