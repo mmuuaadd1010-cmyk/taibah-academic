@@ -3775,7 +3775,26 @@ async function genGateCheck(){
   if(!gate || !body) return;
 
   try{
-    var uid=subUserId();
+    // لا تستخدم subUserId() هنا لأنها معرفة داخل IIFE الاشتراكات وليست global.
+    // نأخذ المستخدم الحالي مباشرة من Supabase Auth.
+    var uid='';
+    try{
+      if(sbClient && sbClient.auth){
+        var authRes=await sbClient.auth.getUser();
+        uid=authRes && authRes.data && authRes.data.user
+          ? authRes.data.user.id
+          : '';
+      }
+    }catch(e){}
+
+    // fallback للحساب الحالي إذا كان موجودًا في المتغير العام
+    if(!uid){
+      try{
+        uid=(typeof CURRENT_USER!=='undefined' && CURRENT_USER && CURRENT_USER.id)
+          ? CURRENT_USER.id
+          : '';
+      }catch(e){}
+    }
 
     if(uid && sbClient){
       var q=await sbClient
