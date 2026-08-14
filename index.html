@@ -2595,14 +2595,16 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
       <div id="gen-paywall" style="display:none;text-align:center;padding:34px 18px 30px">
         <div style="font-size:2.6rem;margin-bottom:6px">🧠🔒</div>
         <h3 style="margin:0 0 8px;font-size:1.15rem">مولّد الجداول الذكي — للمشتركين فقط</h3>
+        <button id="gen-sub-check-btn" type="button" onclick="genVerifySubscription()" style="margin:12px auto 8px;padding:12px 18px;border:0;border-radius:12px;cursor:pointer;font-weight:800">
+          🔄 تحقق من الاشتراك
+        </button>
+        <div id="gen-sub-check-msg" style="min-height:20px;font-size:.82rem;color:var(--t2);margin-bottom:8px"></div>
         <p style="color:var(--t2);font-size:.85rem;line-height:1.9;max-width:420px;margin:0 auto 18px">
           ولّد جدولك الدراسي بضغطة زر بدل ما تعبيه يدويًا! فعّل اشتراكك الآن واستفد من العرض الحالي:
           <br><b style="color:var(--y)">الترم 9 ريال فقط</b> · <b style="color:var(--y)">السنة 23 ريال فقط</b> — لعدد محدود من المشتركين، قبل ما يبدأ السعر الرسمي (15 ريال / 30 ريال) بتاريخ 25 أغسطس.
         </p>
         <a href="https://t.me/onlychamber" target="_blank" rel="noopener" style="display:inline-block;padding:12px 30px;border-radius:24px;background:var(--grad);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(91,157,253,.35);margin-bottom:12px">🚀 فعّل اشتراكك الآن</a>
         <div><button class="btn-ghost" onclick="genGoSub()" style="margin-top:6px">عرض تفاصيل الاشتراك بالموقع</button></div>
-        <button id="gen-sub-check-btn" type="button" onclick="genVerifySubscription()" style="margin-top:14px;width:100%;max-width:360px;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-weight:800;">🔄 تحقق من الاشتراك</button>
-        <div id="gen-sub-check-msg" style="margin-top:9px;text-align:center;font-size:13px;opacity:.85;"></div>
       </div>
       <div id="gen-body-wrap">
       <div class="card">
@@ -3760,26 +3762,27 @@ function tuSubActive(v){
   }catch(e){ return false; }
 }
 
-async function genGetSubscription(){
+async function genVerifySubscription(){
+  var msg=document.getElementById('gen-sub-check-msg');
+  var btn=document.getElementById('gen-sub-check-btn');
   try{
-    if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN) return {admin:true};
+    if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحقق...';}
+    if(msg) msg.textContent='';
 
-    var uid='';
-    try{
-      if(typeof CURRENT_USER!=='undefined' && CURRENT_USER && CURRENT_USER.id){
-        uid=CURRENT_USER.id;
-      }
-    }catch(e){}
-
-    // Fallback to the active Supabase session, without changing the login code.
-    if(!uid && typeof sbClient!=='undefined' && sbClient && sbClient.auth){
-      try{
-        var ar=await sbClient.auth.getUser();
-        uid=ar&&ar.data&&ar.data.user?ar.data.user.id:'';
-      }catch(e){}
+    if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN){
+      document.getElementById('gen-paywall').style.display='none';
+      document.getElementById('gen-body-wrap').style.display='';
+      if(msg) msg.textContent='✅ تم التحقق.';
+      return true;
     }
 
-    if(!uid || typeof sbClient==='undefined' || !sbClient) return null;
+    var uid='';
+    try{ uid=(CURRENT_USER&&CURRENT_USER.id)||''; }catch(e){}
+
+    if(!uid || !sbClient){
+      if(msg) msg.textContent='⚠️ سجّل الدخول أولًا ثم اضغط تحقق من الاشتراك.';
+      return false;
+    }
 
     var q=await sbClient
       .from('user_subscriptions')
@@ -3790,39 +3793,21 @@ async function genGetSubscription(){
       .maybeSingle();
 
     if(q.error) throw q.error;
-    return q.data||null;
-  }catch(e){
-    console.error('genGetSubscription:',e);
-    return null;
-  }
-}
 
-async function genVerifySubscription(){
-  var btn=document.getElementById('gen-sub-check-btn');
-  var msg=document.getElementById('gen-sub-check-msg');
-  var gate=document.getElementById('gen-paywall');
-  var body=document.getElementById('gen-body-wrap');
-
-  if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحقق...';}
-  if(msg) msg.textContent='';
-
-  try{
-    var sub=await genGetSubscription();
-
-    if(tuSubActive(sub)){
-      try{if(typeof subSaveLocal==='function')subSaveLocal(sub);}catch(e){}
-      try{if(typeof subRender==='function')subRender(sub);}catch(e){}
-      if(gate)gate.style.display='none';
-      if(body){body.style.display='';body.style.pointerEvents='auto';body.style.position='relative';body.style.zIndex='2';}
-      if(msg)msg.textContent='✅ اشتراكك فعال — تم فتح مولّد الجداول.';
+    if(q.data && q.data.expires_at && new Date(q.data.expires_at)>new Date()){
+      try{ if(typeof subSaveLocal==='function') subSaveLocal(q.data); }catch(e){}
+      try{ if(typeof subRender==='function') subRender(q.data); }catch(e){}
+      document.getElementById('gen-paywall').style.display='none';
+      document.getElementById('gen-body-wrap').style.display='';
+      if(msg) msg.textContent='✅ اشتراكك فعال وتم فتح المولد.';
       return true;
     }
 
-    if(msg)msg.textContent='❌ لم يتم العثور على اشتراك فعال لهذا الحساب.';
+    if(msg) msg.textContent='❌ لا يوجد اشتراك فعال لهذا الحساب.';
     return false;
   }catch(e){
     console.error('genVerifySubscription:',e);
-    if(msg)msg.textContent='⚠️ تعذر التحقق، حاول مرة أخرى.';
+    if(msg) msg.textContent='⚠️ تعذر التحقق من الاشتراك، حاول مرة أخرى.';
     return false;
   }finally{
     if(btn){btn.disabled=false;btn.textContent='🔄 تحقق من الاشتراك';}
@@ -3830,26 +3815,40 @@ async function genVerifySubscription(){
 }
 
 async function genGateCheck(){
-  var gate=document.getElementById('gen-paywall');
-  var body=document.getElementById('gen-body-wrap');
-  if(!gate||!body)return;
+  var gate=document.getElementById('gen-paywall'), body=document.getElementById('gen-body-wrap');
+  if(!gate||!body) return;
 
-  var sub=await genGetSubscription();
-  var active=tuSubActive(sub);
+  // أولًا نحاول مزامنة الاشتراك بالطريقة الأصلية الموجودة في الموقع.
+  try{ if(typeof subInit==='function') await subInit(); }catch(e){}
 
-  if(active){
-    try{if(typeof subSaveLocal==='function')subSaveLocal(sub);}catch(e){}
-    try{if(typeof subRender==='function')subRender(sub);}catch(e){}
-  }
+  // ثم نتحقق مباشرة من Supabase باستخدام CURRENT_USER.
+  try{
+    var uid='';
+    try{ uid=(CURRENT_USER&&CURRENT_USER.id)||''; }catch(e){}
 
+    if(uid && sbClient){
+      var q=await sbClient
+        .from('user_subscriptions')
+        .select('plan_type,starts_at,expires_at,code')
+        .eq('user_id',uid)
+        .order('expires_at',{ascending:false})
+        .limit(1)
+        .maybeSingle();
+
+      if(!q.error && q.data){
+        try{ if(typeof subSaveLocal==='function') subSaveLocal(q.data); }catch(e){}
+        try{ if(typeof subRender==='function') subRender(q.data); }catch(e){}
+        var active=tuSubActive(q.data);
+        gate.style.display=active?'none':'block';
+        body.style.display=active?'':'none';
+        return;
+      }
+    }
+  }catch(e){ console.error('genGateCheck:',e); }
+
+  var active=tuSubActive();
   gate.style.display=active?'none':'block';
   body.style.display=active?'':'none';
-
-  if(active){
-    body.style.pointerEvents='auto';
-    body.style.position='relative';
-    body.style.zIndex='2';
-  }
 }
 function genGoSub(){
   var items=document.querySelectorAll('.tab-item');
@@ -4276,47 +4275,7 @@ function schPrintDoc(){
     '<h3><span class="tu-inline-logo tu-logo-img" aria-hidden="true"></span> TU Academic Premium — ابتداءً من 25 أغسطس</h3>'+
     '<p>معظم المزايا المتقدمة ستكون مدفوعة للمساهمة في تكاليف قاعدة البيانات والذكاء الاصطناعي. <b>الترم 15 ريال • السنة 30 ريال</b> ☕</p>'+
     '</div>'+
-    head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n
-<script id="tu-generator-controls-final">
-(function(){
-  function fixGenUpload(){
-    try{
-      var input=document.getElementById('ff-input');
-      var upload=document.getElementById('ff-upload');
-      var body=document.getElementById('gen-body-wrap');
-
-      if(body){
-        body.style.pointerEvents='auto';
-        body.style.position='relative';
-        body.style.zIndex='2';
-      }
-
-      if(input && upload){
-        upload.style.pointerEvents='auto';
-        upload.style.cursor='pointer';
-        upload.onclick=function(ev){
-          try{if(ev){ev.preventDefault();ev.stopPropagation();}}catch(e){}
-          try{input.click();}catch(e){}
-        };
-        input.onchange=ffFileChosen;
-      }
-    }catch(e){}
-  }
-
-  window.fixGenUpload=fixGenUpload;
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',fixGenUpload);
-  }else{
-    fixGenUpload();
-  }
-  window.addEventListener('load',function(){
-    setTimeout(fixGenUpload,100);
-    setTimeout(fixGenUpload,800);
-  });
-})();
-</script>
-
-</body></html>';
+    head+schCalMarkup(true)+foot+'\n<script id="plan-poster-js">\nfunction ppEsc(s){return String(s==null?\'\':s).replace(/[&<>"\']/g,function(c){return {\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c];});}\nfunction ppSpecName(){try{return (currentSpec&&currentSpec.name)||document.querySelector(\'.spec-name\')?.textContent||\'الخطة الدراسية\';}catch(e){return \'الخطة الدراسية\';}}\nfunction ppCollege(){try{return (currentCollege&&currentCollege.college)||\'\';}catch(e){return \'\';}}\nfunction ppMeta(){var now=new Date();return now.toLocaleDateString(\'ar-SA\',{year:\'numeric\',month:\'long\',day:\'numeric\'});}\nasync function ppCapture(el,file){if(typeof html2canvas===\'undefined\'){toast(\'جاري تحميل أداة الصور... حاول بعد لحظة\');return;}document.body.appendChild(el);try{var canvas=await tuCanvas(el,{scale:2,backgroundColor:\'#080b12\'});await tuDownloadCanvas(canvas,file);}catch(e){console.error(e);toast(\'تعذر تصدير الصورة\');}finally{el.remove();}}\nfunction exportPlanPoster(){if(!currentPlan||!currentPlan.levels)return toast(\'اختر تخصصك أولاً\');var levels=currentPlan.levels.filter(function(l){return l&&l.courses&&l.courses.length;});if(!levels.length)return toast(\'الخطة فارغة\');var cols=Math.min(10,Math.max(4,levels.length));var total=0,cnt=0;levels.forEach(function(l){l.courses.forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var colors=[\'linear-gradient(135deg,#0f766e,#0891b2)\',\'linear-gradient(135deg,#1d4ed8,#7c3aed)\',\'linear-gradient(135deg,#15803d,#0f766e)\',\'linear-gradient(135deg,#be123c,#fb7185)\',\'linear-gradient(135deg,#0369a1,#38bdf8)\',\'linear-gradient(135deg,#991b1b,#ef4444)\',\'linear-gradient(135deg,#c2410c,#f97316)\',\'linear-gradient(135deg,#1e40af,#06b6d4)\',\'linear-gradient(135deg,#334155,#64748b)\',\'linear-gradient(135deg,#111827,#4b5563)\'];var grid=\'\';levels.forEach(function(l,idx){var hrs=0;var courses=\'\';l.courses.forEach(function(c){if(c.deleted)return;hrs+=Number(c.hrs)||0;courses+=\'<div class="pp-course" style="--pp-accent:\'+colors[idx%colors.length]+\'"><div class="pp-cname">\'+ppEsc(c.name)+\'</div><div class="pp-code">\'+ppEsc(c.code||\'\')+\'</div><div class="pp-hrs">\'+(Number(c.hrs)||0)+\' ساعات</div></div>\';});grid+=\'<section class="pp-level"><div class="pp-lh"><div class="pp-ltitle">المستوى \'+ppEsc(l.level)+\'</div><div class="pp-lhrs">\'+hrs+\' ساعة</div></div>\'+courses+\'</section>\';});var el=document.createElement(\'div\');el.className=\'plan-poster-card\';el.style.setProperty(\'--pp-cols\',cols);el.innerHTML=\'<div class="pp-head"><div><div class="pp-brand">خطتي الأكاديمية</div><div class="pp-title">\'+ppEsc(ppSpecName())+\'</div><div class="pp-sub">كل مستوى في الصورة يمثل ترم مستقل — تصميم خاص لموقعكم</div><div class="pp-chiprow"><span class="pp-chip">\'+ppEsc(ppCollege())+\'</span><span class="pp-chip">\'+cnt+\' مقرر</span><span class="pp-chip">\'+total+\' ساعة</span></div></div><div style="text-align:left"><div style="font-size:13px;color:#94a3b8">\'+ppMeta()+\'</div><div style="font-weight:900;color:#e2e8f0;margin-top:6px">KSU GPA</div></div></div><div class="pp-grid">\'+grid+\'</div><div class="pp-foot"><span>تصميم خاص للموقع</span><span>مستوى = ترم</span></div>\';ppCapture(el,\'plan-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\nfunction exportSpecPoster(){if(!currentPlan)return toast(\'اختر تخصصك أولاً\');var total=0,cnt=0,lv=(currentPlan.levels||[]).length;(currentPlan.levels||[]).forEach(function(l){(l.courses||[]).forEach(function(c){if(!c.deleted){total+=Number(c.hrs)||0;cnt++;}})});var el=document.createElement(\'div\');el.className=\'spec-poster-card\';el.innerHTML=\'<div class="spc-inner"><div class="spc-badge">🎓 بطاقة تخصص</div><div class="spc-title">\'+ppEsc(ppSpecName())+\'</div><div class="spc-meta"><div class="spc-box"><b>\'+lv+\'</b><span>مستويات / أترام</span></div><div class="spc-box"><b>\'+cnt+\'</b><span>مقرر في الخطة</span></div><div class="spc-box"><b>\'+total+\'</b><span>ساعة معتمدة</span></div></div></div><div class="spc-foot"><span>\'+ppEsc(ppCollege())+\'</span><span>KSU GPA • \'+ppMeta()+\'</span></div>\';ppCapture(el,\'spec-\'+ppSpecName().replace(/\\s+/g,\'-\')+\'.png\');}\n<\/script>\n</body></html>';
 }
 </script>
 <div id="tu-payment-note" onclick="if(event.target===this)tuClosePayment()">
