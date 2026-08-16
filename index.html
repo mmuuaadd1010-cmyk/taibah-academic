@@ -5429,8 +5429,8 @@ function parseCollegeFile(text){
     const meets=[];
     DAYC.forEach(function(pair){
       const v=tds[pair[1]]||'';
-      const m=v.match(/(\d{1,2}[:.]\d{2})\s*-\s*(\d{1,2}[:.]\d{2})/);
-      if(m){const f=parseTime(m[1]),t=parseTime(m[2]);if(f!=null&&t!=null&&t>f)meets.push({days:[pair[0]],from:f,to:t});}
+      const rgx=/(\d{1,2}[:.]\d{2})\s*-\s*(\d{1,2}[:.]\d{2})/g;let m;
+      while((m=rgx.exec(v))){const f=parseTime(m[1]),t=parseTime(m[2]);if(f!=null&&t!=null&&t>f)meets.push({days:[pair[0]],from:f,to:t});}
     });
     if(!meets.length)return;
     out.push({code:code.toUpperCase(),num:num,name:(tds[9]||'').trim(),sec:sec,instr:(tds[7]||'').trim(),meets:meets});
@@ -5550,7 +5550,7 @@ function parseCollegeFile(text){
     const reg=parseInt((tds[0]||'').replace(/[^0-9]/g,''),10);
     const cap=parseInt((tds[1]||'').replace(/[^0-9]/g,''),10);
     const meets=[];
-    DAYC.forEach(function(p){const v=tds[p[1]]||'';const m=v.match(/(\d{1,2}[:.]\d{2})\s*-\s*(\d{1,2}[:.]\d{2})/);if(m){const f=parseTime(m[1]),t=parseTime(m[2]);if(f!=null&&t!=null&&t>f)meets.push({days:[p[0]],from:f,to:t});}});
+    DAYC.forEach(function(p){const v=tds[p[1]]||'';const rgx=/(\d{1,2}[:.]\d{2})\s*-\s*(\d{1,2}[:.]\d{2})/g;let m;while((m=rgx.exec(v))){const f=parseTime(m[1]),t=parseTime(m[2]);if(f!=null&&t!=null&&t>f)meets.push({days:[p[0]],from:f,to:t});}});
     out.push({code:code.toUpperCase(),num:num,name:(tds[9]||'').trim(),sec:sec,instr:(tds[7]||'').trim(),meets:meets,reg:isNaN(reg)?null:reg,cap:isNaN(cap)?null:cap});
   });
   return out;
@@ -8216,6 +8216,26 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
   function pcNorm(s){ return pcNormStr(pcAr(s)); }
   function pcNormAll(s){ var out=[]; pcCands(s).forEach(function(c){ var n=pcNormStr(c); if(n&&out.indexOf(n)<0)out.push(n); }); return out; }
 
+  function pcLetters(s){ return String(s==null?'':s).replace(/[^\u0621-\u064a]/g,''); }
+  function pcSubseq(a,b){
+    var i=0,j=0;
+    while(i<a.length&&j<b.length){ if(a.charAt(i)===b.charAt(j))i++; j++; }
+    return i===a.length;
+  }
+  function pcFuzz(n,kn){
+    var a=pcLetters(n), k=pcLetters(kn);
+    if(k.length<4||a.length<3)return 0;
+    if(a.length>k.length||a.length<k.length-3)return 0;
+    if(!pcSubseq(a,k))return 0;
+    if(a.length/k.length<0.6)return 0;
+    return Math.max(1,Math.round(a.length*0.5));
+  }
+  function pcFixLig(t){
+    return String(t==null?'':t)
+      .replace(/([\u0621-\u064a])[0-9A-Za-z#$%&@!?*+=~^](?=[\u0621-\u064a])/g,'$1\u0644')
+      .replace(/\s{2,}/g,' ').trim();
+  }
+
   var DAYS_AR=[
     {d:0,k:['الأحد','الاحد','أحد','احد'],l:'ح'},
     {d:1,k:['الاثنين','الإثنين','الاثنين','اثنين','الأثنين'],l:'ن'},
@@ -8228,6 +8248,14 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
     for(var i=0;i<DAYS_AR.length;i++){
       for(var j=0;j<DAYS_AR[i].k.length;j++){ if(ns.indexOf(pcNormStr(DAYS_AR[i].k[j]))>-1) return {d:DAYS_AR[i].d,weak:false}; }
     }
+    var fb=null,fs=0;
+    for(var a=0;a<DAYS_AR.length;a++){
+      for(var b=0;b<DAYS_AR[a].k.length;b++){
+        var dk=pcNormStr(DAYS_AR[a].k[b]);
+        for(var c=0;c<ns.length;c++){ if(pcFuzz(ns[c],dk)>fs){ fs=pcFuzz(ns[c],dk); fb=DAYS_AR[a].d; } }
+      }
+    }
+    if(fb!=null)return {d:fb,weak:false,fuzzy:true};
     for(var i2=0;i2<DAYS_AR.length;i2++){ if(ns.indexOf(pcNormStr(DAYS_AR[i2].l))>-1) return {d:DAYS_AR[i2].d,weak:true}; }
     return null;
   }
@@ -8239,15 +8267,17 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
     {r:'code',k:['رمز المقرر','رمز المادة','الرمز','رمز']},
     {r:'num',k:['رقم المقرر','رقم المادة','الرقم','رقم']},
     {r:'name',k:['اسم المقرر','اسم المادة','المقرر','المادة','اسم']},
-    {r:'instr',k:['المدرس','المدرسة','استاذ المادة','أستاذ المادة','المحاضر','عضو هيئة التدريس','اسم المدرس','المعلم','المدرّس']},
+    {r:'instr',k:['استاذ','أستاذ','استاذ المقرر','أستاذ المقرر','المدرس','المدرسة','استاذ المادة','أستاذ المادة','المحاضر','عضو هيئة التدريس','اسم المدرس','المعلم','المدرّس']},
     {r:'crn',k:['الرقم المرجعي','الرقم المرجعى','crn','رقم مرجعي','المرجع']},
     {r:'dcol',k:['الأيام','الايام','أيام','ايام','اليوم','يوم','الأيام والأوقات','ايام المحاضرة']},
     {r:'tcol',k:['الوقت','التوقيت','وقت المحاضرة','الزمن','الموعد','الأوقات','الاوقات','وقت']},
     {r:'tfrom',k:['من','من الساعة','البداية','بداية']},
     {r:'tto',k:['إلى','الى','النهاية','نهاية','إلى الساعة']},
-    {r:'place',k:['القاعة','المكان','الموقع','المبنى','قاعة']}
+    {r:'place',k:['القاعة','المكان','الموقع','المبنى','قاعة']},
+    {r:'branch',k:['الفرع','الفروع','المقر','فرع']},
+    {r:'srl',k:['م','مسلسل','م.','تسلسل','الرقم المتسلسل']}
   ];
-  function pcRole(t){
+  function pcRoleScored(t){
     var ns=pcNormAll(t); if(!ns.length)return null;
     var best=null,bl=0;
     for(var i=0;i<ROLES.length;i++){
@@ -8257,11 +8287,13 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
           var n=ns[q]; if(!n||(n.length<2&&n!==kn))continue;
           if(n===kn){ if(kn.length+100>bl){best=ROLES[i].r;bl=kn.length+100;} }
           else if(kn.length>=3&&n.indexOf(kn)>-1){ if(kn.length>bl){best=ROLES[i].r;bl=kn.length;} }
+          else { var fz=pcFuzz(n,kn); if(fz>bl){best=ROLES[i].r;bl=fz;} }
         }
       }
     }
-    return best;
+    return best?{r:best,s:bl}:null;
   }
+  function pcRole(t){ var q=pcRoleScored(t); return q?q.r:null; }
 
   var T1=/(\d{1,2})\s*[:.]\s*(\d{2})\s*[-\u2013\u2014\u2212]\s*(\d{1,2})\s*[:.]\s*(\d{2})/;
   var T2=/\b(\d{4})\s*[-\u2013\u2014\u2212]\s*(\d{4})\b/;
@@ -8318,24 +8350,58 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
     });
     return lines;
   }
-  function pcHeaderCols(items){
-    var cols=[],strong=0,weak=0,roles=0;
+  function pcRoleItems(items){
+    var out=[];
     (items||[]).forEach(function(it){
       var dn=pcDayName(it.t);
-      if(dn){ cols.push({role:'day',day:dn.d,x:it.x,w:it.w}); if(dn.weak)weak++;else strong++; return; }
-      var r=pcRole(it.t);
-      if(r){ cols.push({role:r,x:it.x,w:it.w}); roles++; }
+      if(dn){ out.push({role:'day',day:dn.d,x:it.x,w:it.w,s:(dn.weak?40:(dn.fuzzy?95:120))}); return; }
+      var q=pcRoleScored(it.t);
+      if(q){ out.push({role:q.r,x:it.x,w:it.w,s:q.s}); }
     });
-    if(!(strong>=2||weak>=3||roles>=4))return null;
-    cols.sort(function(a,b){return a.x-b.x;});
-    var seen={},out=[];
-    cols.forEach(function(c){ var k=c.role==='day'?('day'+c.day):c.role; if(seen[k])return; seen[k]=1; out.push(c); });
-    return {cols:out,score:strong*2+weak+roles+out.length};
+    return out;
   }
-  function pcHeader(L){
-    var a=pcHeaderCols(L.raw||L.items), b=pcHeaderCols(L.items);
-    if(a&&b)return (b.score>a.score)?b.cols:a.cols;
-    return a?a.cols:(b?b.cols:null);
+  function pcColStat(list){
+    var strong=0,weak=0,roles=0,seen={};
+    (list||[]).forEach(function(c){
+      var k=(c.role==='day')?('day'+c.day):c.role;
+      if(seen[k])return; seen[k]=1;
+      if(c.role==='day'){ if(c.s>=90)strong++; else weak++; }
+      else roles++;
+    });
+    return {ok:(strong>=2||weak>=3||roles>=4),score:strong*2+weak+roles};
+  }
+  function pcCols(list){
+    var by={},out=[],k;
+    (list||[]).forEach(function(c){
+      var key=(c.role==='day')?('day'+c.day):c.role;
+      if(!by[key]||c.s>by[key].s)by[key]=c;
+    });
+    for(k in by){ if(Object.prototype.hasOwnProperty.call(by,k))out.push(by[k]); }
+    out.sort(function(a,b){return a.x-b.x;});
+    return out;
+  }
+  function pcLineRoles(L){
+    var a=pcRoleItems(L.raw||L.items), b=pcRoleItems(L.items);
+    var sa=pcColStat(a), sb=pcColStat(b);
+    return (sb.score>sa.score)?{list:b,st:sb}:{list:a,st:sa};
+  }
+  function pcHasTime(t){ return /\d{1,2}\s*[:.]\s*\d{2}/.test(pcDigits(t||'')); }
+  function pcHeader(L){ var r=pcLineRoles(L); return r.st.ok?pcCols(r.list):null; }
+  function pcHeaderAt(lines,i){
+    var me=pcLineRoles(lines[i]);
+    if(!me.st.ok)return null;
+    var all=me.list.slice(), used=[i];
+    var h=(lines[i].items[0]&&lines[i].items[0].h)||8;
+    for(var k=i-2;k<=i+2;k++){
+      if(k===i||k<0||k>=lines.length)continue;
+      var L=lines[k];
+      if(pcHasTime(L.text))continue;
+      if(Math.abs(L.y-lines[i].y)>Math.max(14,h*2.4))continue;
+      var rl=pcLineRoles(L);
+      if(!rl.list.length)continue;
+      all=all.concat(rl.list); used.push(k);
+    }
+    return {cols:pcCols(all),used:used};
   }
   function pcBounds(cols){
     var b=[];
@@ -8381,38 +8447,104 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
   }
 
   /* ---------------- rows ---------------- */
+  function pcSecTok(t){
+    var v=pcDigits(String(t==null?'':t)).replace(/[\u200e\u200f\u202a-\u202e]/g,'').trim();
+    var m=v.match(/[A-Za-z]{1,3}\s*\d{1,4}|\d{1,4}\s*[A-Za-z]{1,3}|\d{1,5}/);
+    if(!m)return '';
+    var tok=m[0].replace(/\s+/g,'');
+    var f=tok.match(/^(\d{1,4})([A-Za-z]{1,3})$/);
+    if(f)tok=f[2]+f[1];
+    return tok.toUpperCase();
+  }
+  function pcTimes(t){
+    var v=pcDigits(t||''), out=[], m, i;
+    var re=/(\d{1,2})\s*[:.]\s*(\d{2})\s*[-\u2013\u2014\u2212]\s*(\d{1,2})\s*[:.]\s*(\d{2})/g;
+    while((m=re.exec(v))&&out.length<6){
+      var f=(+m[1])*60+(+m[2]), o=(+m[3])*60+(+m[4]);
+      if(o>f&&o<=1440){
+        var dup=false;
+        for(i=0;i<out.length;i++){ if(out[i].f===f&&out[i].t===o)dup=true; }
+        if(!dup)out.push({f:f,t:o});
+      }
+    }
+    if(!out.length){ var one=pcTime(v); if(one)out.push(one); }
+    return out;
+  }
+  function pcCodeNum(B,lineText){
+    var joint=String((B.code||'')+' '+(B.num||'')).trim();
+    var code=(joint.match(/[A-Za-z]{2,6}/)||[''])[0];
+    if(!code){ var am=pcAr(joint).match(/[\u0621-\u064a]{2,6}/); if(am)code=am[0]; }
+    if(!code&&lineText){ var lm=String(lineText).match(/\b[A-Za-z]{2,6}\b/); if(lm&&!/^(am|pm|to)$/i.test(lm[0]))code=lm[0]; }
+    var dj=pcDigits(joint).replace(/[A-Za-z]+/g,' ');
+    var nm=dj.match(/\d{1,5}/);
+    return {code:code||'',num:nm?String(parseInt(nm[0],10)):''};
+  }
   function pcRows(pages){
-    var rows=[], cols=null, bounds=null;
-    pages.forEach(function(items){
-      var lines=pcLines(items);
-      lines.forEach(function(L){
-        var h=pcHeader(L);
-        if(h){ cols=h; bounds=pcBounds(h); return; }
-        if(!bounds)return;
-        var B=pcAssign(L,bounds);
-        var codeTxt=B.code||'', numTxt=B.num||'', secTxt=B.sec||'';
-        var code=(codeTxt.match(/[A-Za-z]{2,6}/)||[''])[0];
-        if(!code){ var am=pcAr(codeTxt).match(/[\u0621-\u064a]{2,6}/); if(am)code=am[0]; }
-        if(!code){ var lm=L.text.match(/\b[A-Za-z]{2,6}\b/); if(lm&&!/^(am|pm|to)$/i.test(lm[0]))code=lm[0]; }
-        var num=pcInt(numTxt); if(num!=null&&String(num).length<3){ var nm=pcDigits(numTxt).match(/\d{3,5}/); num=nm?parseInt(nm[0],10):num; }
-        var sec=pcInt(secTxt);
-        var cap=pcInt(B.cap), reg=pcInt(B.reg), rem=pcInt(B.rem);
-        if(cap!=null&&reg==null&&rem!=null)reg=Math.max(0,cap-rem);
-        var days={};
-        for(var d=0;d<5;d++){ var tt=pcTime(B['day'+d]||''); if(tt)days[d]=pcHHMM(tt.f)+' - '+pcHHMM(tt.t); }
+    var rows=[], bounds=null;
+    (pages||[]).forEach(function(items){
+      var lines=pcLines(items), skip={}, i, j;
+      for(i=0;i<lines.length;i++){
+        if(skip[i])continue;
+        var hd=pcHeaderAt(lines,i);
+        if(hd&&hd.cols&&hd.cols.length>=3){
+          bounds=pcBounds(hd.cols);
+          for(j=0;j<hd.used.length;j++){ skip[hd.used[j]]=1; }
+        }
+      }
+      if(!bounds)return;
+      var recs=[];
+      for(i=0;i<lines.length;i++){
+        if(skip[i])continue;
+        var L=lines[i], B=pcAssign(L,bounds);
+        var cn0=pcCodeNum(B,L.text), st0=pcSecTok(B.sec||'');
+        recs.push({y:L.y,h:(L.items[0]&&L.items[0].h)||8,B:B,text:L.text,
+          anchor:!!(cn0.code&&(cn0.num||st0))});
+      }
+      var groups=[];
+      recs.forEach(function(R){ if(R.anchor){ R.parts=[R]; groups.push(R); } });
+      recs.forEach(function(R){
+        if(R.anchor)return;
+        var timeish=pcHasTime(R.text);
+        var lim=timeish?Math.max(10,R.h*1.7):Math.max(6,R.h*1.05);
+        var best=null,bd=1e9;
+        groups.forEach(function(G){ var d=Math.abs(G.y-R.y); if(d<bd){bd=d;best=G;} });
+        if(best&&bd<=lim){ best.parts.push(R); return; }
+        if(timeish){
+          var prev=null;
+          groups.forEach(function(G){ if(G.y>R.y)prev=G; });
+          if(prev)prev.parts.push(R);
+        }
+      });
+      groups.forEach(function(G){
+        var parts=G.parts.slice().sort(function(a,b){return b.y-a.y;});
+        var cells={};
+        parts.forEach(function(P){
+          for(var k in P.B){
+            if(!Object.prototype.hasOwnProperty.call(P.B,k))continue;
+            cells[k]=(cells[k]?cells[k]+' ':'')+P.B[k];
+          }
+        });
+        var cn=pcCodeNum(cells,G.text), sec=pcSecTok(cells.sec||'');
+        var cap=pcInt(cells.cap), reg=pcInt(cells.reg), rem=pcInt(cells.rem);
+        if(cap==null&&reg!=null&&rem!=null)cap=reg+rem;
+        else if(cap!=null&&reg==null&&rem!=null)reg=Math.max(0,cap-rem);
+        var days={},d;
+        for(d=0;d<5;d++){
+          var arr=pcTimes(cells['day'+d]||'');
+          if(arr.length){
+            days[d]=arr.map(function(z){return pcHHMM(z.f)+' - '+pcHHMM(z.t);}).join(' , ');
+          }
+        }
         if(!Object.keys(days).length){
-          var dl=pcDaysFromText(B.dcol||''), rng=pcTime(B.tcol||'');
-          if(!rng&&(B.tfrom||B.tto)){ var f=pcOne(B.tfrom||''), t2=pcOne(B.tto||''); if(f!=null&&t2!=null&&t2>f)rng={f:f,t:t2}; }
+          var dl=pcDaysFromText(cells.dcol||''), rng=pcTime(cells.tcol||'');
+          if(!rng&&(cells.tfrom||cells.tto)){
+            var f0=pcOne(cells.tfrom||''), t0=pcOne(cells.tto||'');
+            if(f0!=null&&t0!=null&&t0>f0)rng={f:f0,t:t0};
+          }
           if(dl.length&&rng){ dl.forEach(function(d2){ days[d2]=pcHHMM(rng.f)+' - '+pcHHMM(rng.t); }); }
         }
-        var hasTime=!!Object.keys(days).length;
-        if(!code&&num==null&&sec==null){
-          if(hasTime&&rows.length){ var prev=rows[rows.length-1]; for(var k in days){ if(!prev.days[k])prev.days[k]=days[k]; } }
-          return;
-        }
-        if(!hasTime&&(code===''||sec==null))return;
-        rows.push({code:code?String(code).toUpperCase():'',num:num==null?'':String(num),sec:sec==null?'':String(sec),
-          name:pcAr(B.name||''),instr:pcAr(B.instr||''),cap:cap,reg:reg,days:days});
+        rows.push({code:cn.code?String(cn.code).toUpperCase():'',num:cn.num||'',sec:sec||'',
+          name:pcFixLig(pcAr(cells.name||'')),instr:pcFixLig(pcAr(cells.instr||'')),cap:cap,reg:reg,days:days});
       });
     });
     var merged=[],idx={};
@@ -8421,8 +8553,10 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
       if(idx[key]!=null){
         var m=merged[idx[key]];
         for(var k in r.days){ if(!m.days[k])m.days[k]=r.days[k]; }
-        if(m.cap==null)m.cap=r.cap; if(m.reg==null)m.reg=r.reg;
-        if(!m.name)m.name=r.name; if(!m.instr)m.instr=r.instr;
+        if(m.cap==null)m.cap=r.cap;
+        if(m.reg==null)m.reg=r.reg;
+        if(!m.name)m.name=r.name;
+        if(!m.instr)m.instr=r.instr;
         return;
       }
       idx[key]=merged.length; merged.push(r);
@@ -8447,8 +8581,12 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
   }
   function pcSelfSecs(rows){
     return rows.map(function(r){
-      var meets=[];
-      for(var d=0;d<5;d++){ var tt=pcTime(r.days[d]||''); if(tt)meets.push({days:[d],from:tt.f,to:tt.t}); }
+      var meets=[],d;
+      for(d=0;d<5;d++){
+        (function(dd){
+          pcTimes(r.days[dd]||'').forEach(function(tt){ meets.push({days:[dd],from:tt.f,to:tt.t}); });
+        })(d);
+      }
       return {code:String(r.code||'').toUpperCase(),num:String(r.num||''),name:r.name||'',sec:String(r.sec||''),
         instr:r.instr||'',meets:meets,reg:(r.reg==null?null:r.reg),cap:(r.cap==null?null:r.cap)};
     }).filter(function(s){return s.code&&s.num&&s.sec;});
@@ -8543,7 +8681,10 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
       PC_HTML=pcHtml(rows);
       var mine=pcSelfSecs(rows), std=[];
       try{ if(typeof parseCollegeFile==='function')std=parseCollegeFile(PC_HTML)||[]; }catch(e){}
-      PC_SECS=(std.length>=mine.length)?std:mine;
+      var mm=0,sm=0;
+      mine.forEach(function(s){ mm+=(s.meets||[]).length; });
+      std.forEach(function(s){ sm+=(s.meets||[]).length; });
+      PC_SECS=(mine.length>std.length||mm>sm)?mine:std;
       var withTime=PC_SECS.filter(function(s){return s.meets&&s.meets.length;}).length;
       if(!PC_SECS.length){
         pcStatus('\u26a0\ufe0f ما لقيت جدول شعب واضح في هذا الملف PDF.<br>لو الملف صورة (سكان) أو مضغوط، الأفضل تحفظ الصفحة من نظام الجامعة بصيغة <b>HTML</b>، أو أرسل الملف للمطوّر لأضبطه.');
