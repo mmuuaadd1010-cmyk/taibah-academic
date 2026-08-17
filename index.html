@@ -5653,7 +5653,7 @@ try{enhanceGenUI();}catch(e){}
 /* ======================================================
    COLLEGE FILE IMPORT v2 \u2014 seats, closed/full filter, Set fix
 ====================================================== */
-var FF_FULL=false; /* include full sections (\u0627\u0644\u0634\u0639\u0628 \u0627\u0644\u0645\u0645\u062a\u0644\u0626\u0629) */
+var FF_FULL=true; /* include full sections (\u0627\u0644\u0634\u0639\u0628 \u0627\u0644\u0645\u0645\u062a\u0644\u0626\u0629) */
 /* ================= v2 GENERIC SECTIONS FILE PARSER =================
    Reads EVERY section row from any college sections file (HTML/text),
    whatever the column order, header wording, encoding or time format. */
@@ -6197,11 +6197,11 @@ function pfDecode(buf){
 function ffIsClosed(s){return s.cap===0;}
 function ffIsFull(s){return s.cap!=null&&s.reg!=null&&s.cap>0&&s.reg>=s.cap;}
 function ffEligible(s){
-  if(!s.meets||!s.meets.length)return false; /* no time -> not schedulable */
-  /* closed (cap 0) sections are INCLUDED, warning only */            /* closed (size 0) -> always excluded */
-  if(!FF_FULL&&ffIsFull(s))return false;    /* full -> excluded unless toggle on */
-  return true;
+  /* Schedulable sections need meeting times; full sections are still read and
+     shown so a course never disappears silently from the imported file. */
+  return !!(s&&s.meets&&s.meets.length);
 }
+function ffVisible(s){return !!s;}
 function buildFileImportUI(){
   if(!document.getElementById('p-gen'))return;
   const tabs=document.querySelector('#p-gen .gen-tabs');
@@ -6260,7 +6260,7 @@ function ffFileChosen(e){
   };
   try{r.readAsArrayBuffer(f);}catch(e2){r.readAsText(f);}
 }
-function ffToggleFull(){var cb=document.getElementById('ff-fulltgl');FF_FULL=!!(cb&&cb.checked);if(FILESECS.length){var st=document.getElementById('ff-status');var elig=FILESECS.filter(ffEligible).length;var nc=new Set(FILESECS.filter(ffEligible).map(function(s){return s.code;})).size;var closed=FILESECS.filter(ffIsClosed).length;if(st)st.innerHTML='\u2705 \u0642\u0631\u0623\u062a <b>'+FILESECS.length+'</b> \u0634\u0639\u0628\u0629 \u00b7 \u0642\u0627\u0628\u0644\u0629 \u0644\u0644\u062c\u062f\u0648\u0644\u0629 \u0627\u0644\u0622\u0646 <b>'+elig+'</b> \u0644\u0640 <b>'+nc+'</b> \u0645\u0627\u062f\u0629 \u00b7 \u0645\u0646\u0647\u0627 <b>'+closed+'</b> \u0645\u0642\u0641\u0644\u0629 (\u0627\u0644\u0633\u0639\u0629 0) \u26d4';}ffFillCodes();}
+function ffToggleFull(){var cb=document.getElementById('ff-fulltgl');FF_FULL=!!(cb&&cb.checked);if(FILESECS.length){var st=document.getElementById('ff-status');var elig=FILESECS.filter(ffEligible).length;var nc=new Set(FILESECS.filter(ffVisible).map(function(s){return s.code;})).size;var closed=FILESECS.filter(ffIsClosed).length;if(st)st.innerHTML='\u2705 \u0642\u0631\u0623\u062a <b>'+FILESECS.length+'</b> \u0634\u0639\u0628\u0629 \u00b7 \u0642\u0627\u0628\u0644\u0629 \u0644\u0644\u062c\u062f\u0648\u0644\u0629 \u0627\u0644\u0622\u0646 <b>'+elig+'</b> \u0644\u0640 <b>'+nc+'</b> \u0645\u0627\u062f\u0629 \u00b7 \u0645\u0646\u0647\u0627 <b>'+closed+'</b> \u0645\u0642\u0641\u0644\u0629 (\u0627\u0644\u0633\u0639\u0629 0) \u26d4';}ffFillCodes();}
 function ffFillCodes(){
   const sel=document.getElementById('ff-code');if(!sel)return;
   const codes=Array.from(new Set(FILESECS.filter(ffEligible).map(function(s){return s.code;}))).sort();
@@ -6271,7 +6271,7 @@ function ffFillCodes(){
 }
 function ffOnCode(){
   const sel=document.getElementById('ff-code');if(!sel)return;const code=sel.value;
-  const list=FILESECS.filter(function(s){return s.code===code&&ffEligible(s);});
+  const list=FILESECS.filter(function(s){return s.code===code;});
   const seen={},opts=[];
   list.forEach(function(s){var k=String(s.num||'');if(seen[k])return;seen[k]=1;opts.push({num:k,name:s.name||''});});
   opts.sort(function(a,b){return (+a.num||0)-(+b.num||0);});
@@ -6298,7 +6298,7 @@ function ffOnNum(){
 function ffPreview(){
   const host=document.getElementById('ff-preview');if(!host)return;
   const code=document.getElementById('ff-code').value,num=document.getElementById('ff-num').value,secv=document.getElementById('ff-sec').value;
-  let pool=FILESECS.filter(function(s){return s.code===code&&s.num===num&&ffEligible(s);});
+  let pool=FILESECS.filter(function(s){return s.code===code&&s.num===num;});
   if(secv&&secv!=='__ALL__')pool=pool.filter(function(s){return s.sec===secv;});
   const nameEl=document.getElementById('ff-name');if(nameEl)nameEl.textContent=pool.length?pool[0].name:'';
   const DN=['\u0627\u0644\u0623\u062d\u062f','\u0627\u0644\u0627\u062b\u0646\u064a\u0646','\u0627\u0644\u062b\u0644\u0627\u062b\u0627\u0621','\u0627\u0644\u0623\u0631\u0628\u0639\u0627\u0621','\u0627\u0644\u062e\u0645\u064a\u0633'];
@@ -6566,6 +6566,8 @@ async function promptNewPassword(){
     else { alert('تم تحديث كلمة المرور ✅'); }
   }catch(e){ alert('حدث خطأ، حاول مجدداً.'); }
 }
+/* Developer panel reliability: retry the authoritative admin check after auth/profile data settles. */
+(function(){var tries=0;function retryAdmin(){tries++;try{if(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&typeof sbClient!=='undefined'&&sbClient&&typeof checkAdminStatus==='function')checkAdminStatus();}catch(e){}if(tries<5)setTimeout(retryAdmin,1200);}if(window.addEventListener)window.addEventListener('load',function(){setTimeout(retryAdmin,500);});setTimeout(retryAdmin,1800);})();
 async function authBoot(){
   try{
     var s=await withTimeout(sbClient.auth.getSession(), 8000);
@@ -6921,14 +6923,14 @@ function specCourseList(specId){
   return out;
 }
 async function checkAdminStatus(){
-  if(!CURRENT_USER||!sbClient){ IS_ADMIN=false; return; }
-  try{
-    var r=await sbClient.from('profiles').select('is_admin').eq('user_id',CURRENT_USER.id).maybeSingle();
-    IS_ADMIN=!!(r&&r.data&&r.data.is_admin);
-  }catch(e){ IS_ADMIN=false; }
-  var btn=document.getElementById('admin-tab-btn'); if(btn) btn.style.display=IS_ADMIN?'':'none';
-  if(IS_ADMIN) subscribeReviewAlerts(); try{scfgApply(SITE_CFG);}catch(e){}
-  if(IS_ADMIN&&window.TU_PENDING_VIEW==='admin'){window.TU_PENDING_VIEW=null;try{var ab=tuTabButton('admin');if(ab)goTab('admin',ab);}catch(e){}}
+  if(!CURRENT_USER||!sbClient){IS_ADMIN=false;var b0=document.getElementById('admin-tab-btn');if(b0)b0.style.display='none';return false;}
+  var ok=false;
+  try{var am=CURRENT_USER.app_metadata||{};ok=am.role==='admin'||am.is_admin===true;}catch(e){}
+  try{var r=await sbClient.from('profiles').select('is_admin').eq('user_id',CURRENT_USER.id).maybeSingle();if(r&&!r.error&&r.data&&r.data.is_admin===true)ok=true;}catch(e){}
+  IS_ADMIN=!!ok;
+  var btn=document.getElementById('admin-tab-btn');if(btn)btn.style.display=IS_ADMIN?'':'none';
+  if(IS_ADMIN){try{subscribeReviewAlerts();}catch(e){}try{scfgApply(SITE_CFG);}catch(e){}try{if(typeof scfgInitPanel==='function')scfgInitPanel();}catch(e){}if(window.TU_PENDING_VIEW==='admin'){window.TU_PENDING_VIEW=null;try{var ab=tuTabButton('admin');if(ab)goTab('admin',ab);}catch(e){}}}
+  return IS_ADMIN;
 }
 function onReviewsTab(){ loadMyReviews(); }
 function openMaterialsModal(lv,id){
@@ -7365,7 +7367,16 @@ function scfgMergeSpecs(){
   try{if(typeof scfgRefreshSpecUIs==='function')scfgRefreshSpecUIs();}catch(e){}
  }catch(e){try{console.error('custom_specs_merge',e);}catch(_){} }
 }
-function onAdminTab(){ loadAdminReviews(); loadAdminMaterials(); loadAdminUsers(); loadAdminSubCodes(); try{scfgInitPanel();}catch(_){} try{admLoadAttendance();}catch(_){} try{tuLoadVisits();}catch(_){} }
+function onAdminTab(){
+  try{loadAdminReviews();}catch(e){console.warn('admin reviews',e);}
+  try{loadAdminMaterials();}catch(e){console.warn('admin materials',e);}
+  try{loadAdminUsers();}catch(e){console.warn('admin users',e);}
+  try{loadAdminSubCodes();}catch(e){console.warn('admin subcodes',e);}
+  try{if(typeof scfgInitPanel==='function')scfgInitPanel();}catch(e){console.warn('admin settings',e);}
+  try{if(typeof admLoadAttendance==='function')admLoadAttendance();}catch(e){console.warn('admin attendance',e);}
+  try{if(typeof tuLoadVisits==='function')tuLoadVisits();}catch(e){console.warn('admin visits',e);}
+  try{if(typeof installTools==='function')installTools();}catch(e){}
+}
 /* ===== ADMIN: attendance chart ===== */
 var TU_ATT_MODE='hour', TU_ATT_CHART=null, TU_ATT_ROWS=null;
 function admAttMode(m){
@@ -9139,88 +9150,98 @@ function pnuOpenPlan(file,name){var box=document.getElementById('pnu-official-bo
     var nm=dj.match(/\d{1,5}/);
     return {code:code||'',num:nm?String(parseInt(nm[0],10)):''};
   }
+  /* Robust PDF row parser: keep bounds across pages and infer the stable
+     table geometry when a PDF page has no/garbled header. */
+  function pcInferBounds(lines){
+    try{
+      var xs=[];
+      (lines||[]).forEach(function(L){(L.items||[]).forEach(function(it){if(pcHasTime(it.t||''))xs.push(+it.x);});});
+      xs=xs.filter(function(x){return isFinite(x);}).sort(function(a,b){return a-b;});
+      var clusters=[];
+      xs.forEach(function(x){var last=clusters[clusters.length-1];if(last&&Math.abs(last.x-x)<=2.2){last.n++;last.sum+=x;last.x=last.sum/last.n;}else clusters.push({x:x,n:1,sum:x});});
+      clusters=clusters.filter(function(c){return c.n>=1;});
+      if(clusters.length>5)clusters=clusters.sort(function(a,b){return b.n-a.n;}).slice(0,5).sort(function(a,b){return a.x-b.x;});
+      if(clusters.length<5)clusters=[{x:81.6},{x:112.1},{x:140.6},{x:168.3},{x:195.4}];
+      var cols=[];
+      for(var d=0;d<5;d++)cols.push({role:'day',day:d,x:clusters[d].x,w:10});
+      var roleX={reg:37.3,cap:60.4,instr:250,name:375,sec:301,num:405.5,code:421.5,branch:470,crn:505};
+      (lines||[]).some(function(L){
+        var tx=L.text||'';
+        if(!/\b[A-Za-z]{2,6}\s*\d{2,5}\b/.test(tx))return false;
+        (L.items||[]).forEach(function(it){var t=String(it.t||'').trim();if(/^[A-Za-z]{2,6}$/.test(t)&&!/^(AM|PM|TO)$/i.test(t))roleX.code=it.x;else if(/^\d{3,5}$/.test(t))roleX.num=it.x;else if(/^(?:F|S)\d{1,4}$/i.test(t))roleX.sec=it.x;else if(/^\d+$/.test(t)&&it.x>480)roleX.crn=it.x;});
+        return true;
+      });
+      Object.keys(roleX).forEach(function(k){cols.push({role:k,x:roleX[k],w:12});});
+      cols.sort(function(a,b){return a.x-b.x;});
+      return pcBounds(cols);
+    }catch(e){return null;}
+  }
+
   function pcRows(pages){
-    var rows=[], bounds=null;
+    var rows=[],bounds=null;
     (pages||[]).forEach(function(items){
-      var lines=pcLines(items), skip={}, i, j;
+      var lines=pcLines(items),skip={},i,j;
       for(i=0;i<lines.length;i++){
         if(skip[i])continue;
         var hd=pcHeaderAt(lines,i);
-        if(hd&&hd.cols&&hd.cols.length>=3){
-          bounds=pcBounds(hd.cols);
-          for(j=0;j<hd.used.length;j++){ skip[hd.used[j]]=1; }
-        }
+        if(hd&&hd.cols&&hd.cols.length>=3){bounds=pcBounds(hd.cols);for(j=0;j<hd.used.length;j++)skip[hd.used[j]]=1;}
       }
+      /* Do not discard later pages just because their header is absent. */
+      if(!bounds)bounds=pcInferBounds(lines);
       if(!bounds)return;
       var recs=[];
       for(i=0;i<lines.length;i++){
         if(skip[i])continue;
-        var L=lines[i], B=pcAssign(L,bounds);
-        var cn0=pcCodeNum(B,L.text), st0=pcSecTok(B.sec||'');
-        recs.push({y:L.y,h:(L.items[0]&&L.items[0].h)||8,B:B,text:L.text,
-          anchor:!!(cn0.code&&(cn0.num||st0))});
+        var L=lines[i],B=pcAssign(L,bounds),cn0=pcCodeNum(B,L.text),st0=pcSecTok(B.sec||'');
+        if(!cn0.code){var jm=String(L.text||'').match(/(?:\b([A-Za-z]{2,6})\s*(\d{1,5})\b|\b(\d{1,5})\s*([A-Za-z]{2,6})\b)/);if(jm)cn0={code:(jm[1]||jm[4]).toUpperCase(),num:String(parseInt(jm[2]||jm[3],10))};}var stText=(String(L.text||'').match(/\b([FS])\s*(\d{1,4})\b/i)||[]);if(!st0&&stText)st0=(stText[1]+stText[2]).toUpperCase();
+        recs.push({y:L.y,h:(L.items[0]&&L.items[0].h)||8,B:B,text:L.text,anchor:!!(cn0.code&&(cn0.num||st0))});
       }
       var groups=[];
-      recs.forEach(function(R){ if(R.anchor){ R.parts=[R]; groups.push(R); } });
+      recs.forEach(function(R){if(R.anchor){R.parts=[R];groups.push(R);}});
       recs.forEach(function(R){
         if(R.anchor)return;
-        var timeish=pcHasTime(R.text);
-        var lim=timeish?Math.max(10,R.h*1.7):Math.max(6,R.h*1.05);
-        var best=null,bd=1e9;
-        groups.forEach(function(G){ var d=Math.abs(G.y-R.y); if(d<bd){bd=d;best=G;} });
-        if(best&&bd<=lim){ best.parts.push(R); return; }
-        if(timeish){
-          var prev=null;
-          groups.forEach(function(G){ if(G.y>R.y)prev=G; });
-          if(prev)prev.parts.push(R);
-        }
+        var timeish=pcHasTime(R.text),lim=timeish?Math.max(10,R.h*1.7):Math.max(6,R.h*1.05),best=null,bd=1e9;
+        groups.forEach(function(G){var d=Math.abs(G.y-R.y);if(d<bd){bd=d;best=G;}});
+        if(best&&bd<=lim){best.parts.push(R);return;}
+        if(timeish){var prev=null;groups.forEach(function(G){if(G.y>R.y)prev=G;});if(prev)prev.parts.push(R);}
       });
       groups.forEach(function(G){
-        var parts=G.parts.slice().sort(function(a,b){return b.y-a.y;});
-        var cells={};
-        parts.forEach(function(P){
-          for(var k in P.B){
-            if(!Object.prototype.hasOwnProperty.call(P.B,k))continue;
-            cells[k]=(cells[k]?cells[k]+' ':'')+P.B[k];
-          }
-        });
-        var cn=pcCodeNum(cells,G.text), sec=pcSecTok(cells.sec||'');
-        var cap=pcInt(cells.cap), reg=pcInt(cells.reg), rem=pcInt(cells.rem);
-        if(cap==null&&reg!=null&&rem!=null)cap=reg+rem;
-        else if(cap!=null&&reg==null&&rem!=null)reg=Math.max(0,cap-rem);
+        var parts=G.parts.slice().sort(function(a,b){return b.y-a.y;}),cells={};
+        parts.forEach(function(P){for(var k in P.B){if(!Object.prototype.hasOwnProperty.call(P.B,k))continue;cells[k]=(cells[k]?cells[k]+' ':'')+P.B[k];}});
+        var cn=pcCodeNum(cells,G.text),sec=pcSecTok(cells.sec||'');
+        if(!cn.code){var jm2=String(G.text||'').match(/(?:\b([A-Za-z]{2,6})\s*(\d{1,5})\b|\b(\d{1,5})\s*([A-Za-z]{2,6})\b)/);if(jm2)cn={code:(jm2[1]||jm2[4]).toUpperCase(),num:String(parseInt(jm2[2]||jm2[3],10))};}if(!sec){var stText2=(String(G.text||'').match(/\b([FS])\s*(\d{1,4})\b/i)||[]);if(stText2)sec=(stText2[1]+stText2[2]).toUpperCase();}
+        var cap=pcInt(cells.cap),reg=pcInt(cells.reg),rem=pcInt(cells.rem);
+        if(cap==null&&reg!=null&&rem!=null)cap=reg+rem;else if(cap!=null&&reg==null&&rem!=null)reg=Math.max(0,cap-rem);
         var days={},d;
-        for(d=0;d<5;d++){
-          var arr=pcTimes(cells['day'+d]||'');
-          if(arr.length){
-            days[d]=arr.map(function(z){return pcHHMM(z.f)+' - '+pcHHMM(z.t);}).join(' , ');
-          }
-        }
-        if(!Object.keys(days).length){
-          var dl=pcDaysFromText(cells.dcol||''), rng=pcTime(cells.tcol||'');
-          if(!rng&&(cells.tfrom||cells.tto)){
-            var f0=pcOne(cells.tfrom||''), t0=pcOne(cells.tto||'');
-            if(f0!=null&&t0!=null&&t0>f0)rng={f:f0,t:t0};
-          }
-          if(dl.length&&rng){ dl.forEach(function(d2){ days[d2]=pcHHMM(rng.f)+' - '+pcHHMM(rng.t); }); }
-        }
-        rows.push({code:cn.code?String(cn.code).toUpperCase():'',num:cn.num||'',sec:sec||'',
-          name:pcFixLig(pcAr(cells.name||'')),instr:pcFixLig(pcAr(cells.instr||'')),cap:cap,reg:reg,days:days});
+        for(d=0;d<5;d++){var arr=pcTimes(cells['day'+d]||'');if(arr.length)days[d]=arr.map(function(z){return pcHHMM(z.f)+' - '+pcHHMM(z.t);}).join(' , ');}
+        if(!Object.keys(days).length){var dl=pcDaysFromText(cells.dcol||''),rng=pcTime(cells.tcol||'');if(!rng&&(cells.tfrom||cells.tto)){var f0=pcOne(cells.tfrom||''),t0=pcOne(cells.tto||'');if(f0!=null&&t0!=null&&t0>f0)rng={f:f0,t:t0};}if(dl.length&&rng)dl.forEach(function(d2){days[d2]=pcHHMM(rng.f)+' - '+pcHHMM(rng.t);});}
+        rows.push({code:cn.code?String(cn.code).toUpperCase():'',num:cn.num||'',sec:sec||'',name:pcFixLig(pcAr(cells.name||'')),instr:pcFixLig(pcAr(cells.instr||'')),cap:cap,reg:reg,days:days});
       });
     });
-    var merged=[],idx={};
-    rows.forEach(function(r){
-      var key=r.code+'|'+r.num+'|'+r.sec;
-      if(idx[key]!=null){
-        var m=merged[idx[key]];
-        for(var k in r.days){ if(!m.days[k])m.days[k]=r.days[k]; }
-        if(m.cap==null)m.cap=r.cap;
-        if(m.reg==null)m.reg=r.reg;
-        if(!m.name)m.name=r.name;
-        if(!m.instr)m.instr=r.instr;
-        return;
-      }
-      idx[key]=merged.length; merged.push(r);
+    /* Last-resort PDF anchor scan: some university PDFs place the course number before
+       the code (e.g. "453 PHTE") and the section token (F1/F2) in the same line.
+       Keep those anchors even when a malformed/missing header made column inference weak. */
+    (pages||[]).forEach(function(items){
+      try{
+        var lines=pcLines(items), localBounds=null;
+        if(lines&&lines.length)localBounds=pcInferBounds(lines)||bounds;
+        if(!localBounds)return;
+        lines.forEach(function(L){
+          var tx=String(L.text||'');
+          var cm=tx.match(/(?:\b([A-Za-z]{2,6})\s*(\d{1,5})\b|\b(\d{1,5})\s*([A-Za-z]{2,6})\b)/);
+          var sm=tx.match(/\b([FS])\s*(\d{1,4})\b/i);
+          if(!cm||!sm)return;
+          var code=(cm[1]||cm[4]).toUpperCase(), num=String(parseInt(cm[2]||cm[3],10)), sec=(sm[1]+sm[2]).toUpperCase();
+          if(!code||!num||!sec)return;
+          var days={}, near=[];
+          lines.forEach(function(R){var dy=Math.abs(R.y-L.y);if(dy<=34&&pcHasTime(R.text))near.push(R);});
+          near.forEach(function(R){var B=pcAssign(R,localBounds);for(var d=0;d<5;d++){var a=pcTimes(B['day'+d]||'');if(a.length)days[d]=a.map(function(z){return pcHHMM(z.f)+' - '+pcHHMM(z.t);}).join(' , ');}});
+          rows.push({code:code,num:num,sec:sec,name:'',instr:'',cap:null,reg:null,days:days});
+        });
+      }catch(e){}
     });
+    var merged=[],idx={};
+    rows.forEach(function(r){var key=r.code+'|'+r.num+'|'+r.sec;if(idx[key]!=null){var m=merged[idx[key]];for(var k in r.days){if(!m.days[k])m.days[k]=r.days[k];}if(m.cap==null)m.cap=r.cap;if(m.reg==null)m.reg=r.reg;if(!m.name)m.name=r.name;if(!m.instr)m.instr=r.instr;return;}idx[key]=merged.length;merged.push(r);});
     return merged;
   }
 
