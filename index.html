@@ -6078,6 +6078,47 @@ function pfCollect(rowsList){
   PF_STATS.mode=Object.keys(modes).join('+')||'-';
   return out;
 }
+/* بعض أنظمة الجامعات (خصوصاً الملفات المحوّلة من PDF) تصدّر اسم المقرر
+   بترتيب كلمات معكوس بالكامل (مثال: "الحياء في مقدمة" بدل "مقدمة في الحياء").
+   الإصلاح القديم (pfFixOrder) كان يعتمد على قائمة كلمات محدودة ويتحقق فقط
+   من أول/آخر كلمة، فكان يفوّت أغلب الحالات. هنا نكتشف المشكلة على مستوى
+   الملف كامل عبر نمط شائع وموثوق ("X في مقدمة" الذي يجب أن يكون
+   "مقدمة في X")، ثم نعكس ترتيب الكلمات لكل أسماء الملف دفعة واحدة. */
+function pfDetectGlobalReverse(names){
+  var rev=0,fwd=0,i;
+  for(i=0;i<names.length;i++){
+    var toks=pfClean(names[i]).split(' ').filter(Boolean);
+    var fi=toks.indexOf('\u0641\u064a'); /* "في" */
+    if(fi>0&&fi<toks.length-1){
+      var nxt=pfKey(toks[fi+1]),prv=pfKey(toks[fi-1]);
+      if(nxt==='\u0645\u0642\u062f\u0645\u0647')rev++; /* ..X في مقدمة (معكوس) */
+      if(prv==='\u0645\u0642\u062f\u0645\u0647')fwd++; /* مقدمة في X.. (سليم) */
+    }
+  }
+  return rev>=2&&rev>fwd;
+}
+function pfApplyGlobalReverse(list){
+  for(var i=0;i<list.length;i++){
+    var nm=list[i].name;if(!nm)continue;
+    var toks=pfClean(nm).split(' ').filter(Boolean);
+    if(toks.length<2||toks.length>10)continue;
+    list[i].name=toks.reverse().join(' ');
+  }
+}
+/* شعب بدون اسم مقرر في صفها (شائع لما يكرر النظام نفس المقرر بشعب متعددة
+   ويترك خانة الاسم فارغة إلا بأول ظهور) — نستعير الاسم من أي شعبة أخرى
+   بنفس رمز+رقم المقرر بدل ما تظهر المادة "بلا اسم" وكأنها ناقصة. */
+function pfBackfillNames(list){
+  var byKey={},i;
+  for(i=0;i<list.length;i++){
+    var k=list[i].code+'|'+list[i].num;
+    if(list[i].name&&!byKey[k])byKey[k]=list[i].name;
+  }
+  for(i=0;i<list.length;i++){
+    var k2=list[i].code+'|'+list[i].num;
+    if(!list[i].name&&byKey[k2])list[i].name=byKey[k2];
+  }
+}
 function parseCollegeFile(text){
   PF_STATS={rows:0,kept:0,noTime:0,skipped:0,headers:0,merged:0,tables:0,mode:'-'};
   PF_AUTOSEC=1;
@@ -6119,6 +6160,8 @@ function parseCollegeFile(text){
     t.noTime=t.meets.length?0:1;
     PF_STATS.merged++;
   }
+  if(pfDetectGlobalReverse(out.map(function(s){return s.name;})))pfApplyGlobalReverse(out);
+  pfBackfillNames(out);
   PF_STATS.kept=out.length;
   PF_STATS.noTime=0;
   for(i=0;i<out.length;i++)if(!out[i].meets.length)PF_STATS.noTime++;
