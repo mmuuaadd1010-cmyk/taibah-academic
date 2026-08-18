@@ -1859,22 +1859,78 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <style id="site-custom-css"></style><style id="scfg-derived">.card{box-shadow:none !important}</style>
 <style id="tu-premium-marketing">
-.premium-notice{margin:12px;padding:16px 18px;border-radius:18px;background:linear-gradient(135deg,rgba(91,157,253,.14),rgba(62,207,142,.07));border:1px solid rgba(91,157,253,.28);color:var(--t)}
-.premium-notice h3{margin:0 0 5px;font-size:1rem}.premium-notice p{margin:0;color:var(--t2);font-size:.75rem;line-height:1.8}.premium-notice b{color:var(--a1)}
-.premium-pricing{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 12px}
-.premium-plan{position:relative;padding:20px;border-radius:20px;background:var(--s2);border:1px solid var(--bor);text-align:center}
-.premium-plan.best{border-color:rgba(91,157,253,.5);box-shadow:0 10px 35px rgba(91,157,253,.12)}
-.premium-plan .best-label{position:absolute;top:10px;right:10px;padding:4px 8px;border-radius:999px;background:rgba(245,197,66,.12);color:var(--y);font-size:.62rem;font-weight:800}
-.premium-plan h3{margin:4px 0 8px;color:var(--t)}.premium-price{font-size:2rem;font-weight:900;color:var(--t)}.premium-price small{font-size:.7rem;color:var(--t2)}
-.premium-plan ul{text-align:right;list-style:none;padding:0;margin:15px 0;color:var(--t2);font-size:.72rem;line-height:1.9}
-.premium-plan li::before{content:"✓ ";color:var(--g);font-weight:900}
-.premium-pay{width:100%;border:0;border-radius:11px;padding:11px;background:var(--grad);color:#fff;font-weight:900;cursor:pointer}
-.premium-pay:hover{filter:brightness(1.08)}
+.premium-notice{position:relative;margin:12px;padding:22px 24px;border-radius:22px;background:linear-gradient(150deg,rgba(91,157,253,.14),rgba(62,207,142,.05) 55%,rgba(91,157,253,.08));border:1px solid rgba(91,157,253,.22);color:var(--t);overflow:hidden}
+.premium-notice::before{content:"";position:absolute;inset:0;background:radial-gradient(560px 220px at 15% -10%,rgba(91,157,253,.16),transparent 60%),radial-gradient(480px 220px at 100% 120%,rgba(62,207,142,.12),transparent 60%);pointer-events:none}
+.premium-notice h3{margin:0 0 6px;font-size:1.12rem;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px}
+.premium-notice p{margin:0;color:var(--t2);font-size:.8rem;line-height:1.85;position:relative}
+.premium-notice b{color:var(--a2)}
+
+/* ===== Pricing — store-grade plan cards ===== */
+.premium-pricing{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin:22px 12px 8px;align-items:stretch}
+.premium-plan{
+  position:relative;display:flex;flex-direction:column;
+  padding:28px 24px 24px;border-radius:26px;text-align:center;
+  background:linear-gradient(180deg,var(--s2),var(--s1) 70%);
+  border:1px solid var(--bor2);
+  box-shadow:0 1px 0 rgba(255,255,255,.02) inset,0 18px 40px -26px rgba(0,0,0,.6);
+  transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease,border-color .28s ease;
+  isolation:isolate;overflow:hidden
+}
+.premium-plan::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,0) 35%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none
+}
+.premium-plan:hover{transform:translateY(-6px);border-color:rgba(91,157,253,.4);box-shadow:0 26px 60px -28px rgba(79,142,247,.35)}
+.premium-plan.best{
+  border-color:rgba(91,157,253,.55);
+  background:linear-gradient(180deg,rgba(79,142,247,.14),var(--s2) 42%,var(--s1) 100%);
+  box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 22px 55px -26px rgba(79,142,247,.45);
+  transform:translateY(-4px)
+}
+.premium-plan.best:hover{transform:translateY(-9px)}
+.premium-plan .best-label{
+  position:absolute;top:0;right:50%;transform:translate(50%,-50%);
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+  padding:6px 16px;border-radius:999px;
+  background:var(--grad3,var(--grad));color:#fff;
+  font-size:.68rem;font-weight:900;letter-spacing:.2px;
+  box-shadow:0 10px 22px -8px rgba(79,142,247,.55);z-index:2
+}
+.premium-plan .plan-badge{
+  width:46px;height:46px;margin:6px auto 4px;display:grid;place-items:center;
+  border-radius:14px;font-size:1.35rem;
+  background:linear-gradient(135deg,rgba(91,157,253,.18),rgba(159,208,255,.06));
+  border:1px solid rgba(91,157,253,.25)
+}
+.premium-plan h3{margin:2px 0 2px;color:var(--t);font-size:1.02rem;font-weight:800}
+.premium-plan .plan-sub{color:var(--t3);font-size:.7rem;font-weight:700;margin-bottom:14px}
+.premium-price{display:flex;align-items:flex-end;justify-content:center;gap:6px;font-size:2.4rem;font-weight:900;color:var(--t);line-height:1;letter-spacing:-.5px}
+.premium-price small{font-size:.72rem;color:var(--t2);font-weight:800;padding-bottom:6px}
+.premium-price .old-price{font-size:.85rem;color:var(--t3);text-decoration:line-through;font-weight:700;align-self:center;padding-bottom:2px}
+.premium-permo{margin-top:6px;color:var(--a2);font-size:.72rem;font-weight:800}
+.premium-save{display:inline-block;margin-top:8px;padding:4px 11px;border-radius:999px;background:rgba(62,207,142,.12);color:var(--g);font-size:.66rem;font-weight:900;border:1px solid rgba(62,207,142,.28)}
+.premium-plan hr{border:0;border-top:1px solid var(--bor2);margin:18px 0 14px;opacity:.7}
+.premium-plan ul{text-align:right;list-style:none;padding:0;margin:0 0 20px;color:var(--t2);font-size:.76rem;line-height:2;flex:1}
+.premium-plan li{display:flex;align-items:flex-start;gap:8px}
+.premium-plan li::before{content:"✓";flex:0 0 auto;display:grid;place-items:center;width:16px;height:16px;margin-top:3px;border-radius:5px;background:rgba(62,207,142,.16);color:var(--g);font-weight:900;font-size:.6rem}
+.premium-pay{
+  position:relative;width:100%;border:0;border-radius:14px;padding:14px;margin-top:auto;
+  background:var(--grad);color:#fff;font-weight:900;font-size:.9rem;cursor:pointer;
+  box-shadow:0 14px 30px -14px rgba(79,142,247,.55);
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease
+}
+.premium-pay:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 18px 36px -14px rgba(79,142,247,.65)}
+.premium-pay:active{transform:translateY(0)}
+.premium-plan.best .premium-pay{background:linear-gradient(135deg,#4f8ef7,#6aa9ff,#9fd0ff)}
+.premium-trust{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:20px 12px 4px;color:var(--t3);font-size:.72rem;font-weight:700}
+.premium-trust span{display:inline-flex;align-items:center;gap:6px}
 #tu-payment-note{display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px}
 #tu-payment-note.open{display:flex}.tu-payment-box{max-width:390px;width:100%;background:var(--s2);border:1px solid var(--bor2);border-radius:20px;padding:24px;text-align:center;color:var(--t)}
 .tu-payment-box h3{margin:8px 0}.tu-payment-box p{color:var(--t2);font-size:.8rem;line-height:1.8}
 .tu-payment-box button{border:0;border-radius:10px;padding:10px 20px;background:var(--grad);color:#fff;font-weight:800}
-@media(max-width:650px){.premium-pricing{grid-template-columns:1fr}}
+@media(max-width:650px){.premium-pricing{grid-template-columns:1fr;gap:20px}.premium-plan.best{transform:none}.premium-plan.best:hover{transform:translateY(-4px)}}
 </style>
 
 
@@ -2244,23 +2300,44 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 
     <div class="premium-pricing" style="max-width:980px;margin:0 auto">
       <div class="premium-plan">
-        <h3>اشتراك 5 أشهر</h3>
+        <div class="plan-badge">🗓️</div>
+        <h3>اشتراك ترم كامل</h3>
+        <div class="plan-sub">5 أشهر من الوصول الكامل</div>
         <div class="premium-price">15 <small>ريال</small></div>
-        <p style="color:var(--t2);font-size:.82rem;line-height:1.8;margin:10px 0 16px">
-          نفس المزايا الموجودة بالأعلى، والفرق فقط أن مدة الاشتراك <b style="color:var(--a2)">5 أشهر</b>.
-        </p>
-        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 5 أشهر — 15 ريال','term')">اشترك الآن</button>
+        <div class="premium-permo">يعادل ٣ ريال / شهر فقط</div>
+        <hr>
+        <ul>
+          <li>كل مزايا Premium بدون استثناء</li>
+          <li>مولّد الجداول الذكي + AI</li>
+          <li>تفعيل فوري بعد الدفع مباشرة</li>
+          <li>يكفي فصل دراسي كامل</li>
+        </ul>
+        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 5 أشهر — 15 ريال','term')">🛒 اشترك الآن — 15 ريال</button>
       </div>
 
       <div class="premium-plan best">
         <span class="best-label">🔥 الأكثر توفيرًا</span>
-        <h3>اشتراك 12 شهر</h3>
+        <div class="plan-badge">👑</div>
+        <h3>اشتراك سنوي</h3>
+        <div class="plan-sub">12 شهر من الوصول الكامل</div>
         <div class="premium-price">30 <small>ريال</small></div>
-        <p style="color:var(--t2);font-size:.82rem;line-height:1.8;margin:10px 0 16px">
-          نفس المزايا الموجودة بالأعلى، والفرق فقط أن مدة الاشتراك <b style="color:var(--a2)">12 شهر</b>.
-        </p>
-        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 12 شهر — 30 ريال','year')">اشترك الآن</button>
+        <div class="premium-permo">يعادل ٢.٥ ريال / شهر فقط</div>
+        <span class="premium-save">وفّر أكثر من 15% مقارنة بالباقة الفصلية</span>
+        <hr>
+        <ul>
+          <li>كل مزايا Premium بدون استثناء</li>
+          <li>مولّد الجداول الذكي + AI</li>
+          <li>تفعيل فوري بعد الدفع مباشرة</li>
+          <li>يغطي السنة الدراسية كاملة</li>
+        </ul>
+        <button class="premium-pay" onclick="tuOpenPayment('اشتراك 12 شهر — 30 ريال','year')">🛒 اشترك الآن — 30 ريال</button>
       </div>
+    </div>
+
+    <div class="premium-trust">
+      <span>🔒 دفع آمن عبر Tamara</span>
+      <span>⚡ تفعيل فوري</span>
+      <span>🎓 خاص بطلاب الجامعة</span>
     </div>
   </section>
 
@@ -6341,9 +6418,8 @@ function ffSeat(s){if(ffIsClosed(s))return ' \u26d4 \u0645\u0642\u0641\u0644\u06
 function ffOnNum(){
   const code=document.getElementById('ff-code').value,num=document.getElementById('ff-num').value;
   const all=FILESECS.filter(function(s){return s.code===code&&s.num===num;});
-  const ok=all.filter(function(s){return ffEligible(s);});
   const ss=document.getElementById('ff-sec');
-  ss.innerHTML='<option value="__ALL__">الكل ('+ok.length+' شعبة'+(all.length>ok.length?(' من '+all.length):'')+')</option>'+all.map(function(s){
+  ss.innerHTML='<option value="__ALL__">الكل ('+all.length+' شعبة)</option>'+all.map(function(s){
     var nt=(!s.meets||!s.meets.length);
     return '<option value="'+s.sec+'">'+s.sec+(s.instr?' — '+s.instr:'')+ffSeat(s)+(nt?' ⏱ بدون أوقات':'')+'</option>';
   }).join('');
@@ -6360,9 +6436,12 @@ function ffPreview(){
 }
 function ffAdd(){
   const code=document.getElementById('ff-code').value,num=document.getElementById('ff-num').value,secv=document.getElementById('ff-sec').value;
-  let pool=FILESECS.filter(function(s){return s.code===code&&s.num===num&&ffEligible(s);});
+  /* ملاحظة مهمة: ما نفلتر هنا على ffEligible إطلاقًا — كل شعبة موجودة بالملف
+     تنضاف بدون استثناء، سواء كانت مقفلة (السعة 0)، متاحة، أو حتى بدون
+     أوقات محاضرات مقروءة (تنضاف بدون مواعيد ويقدر الطالب يضيف وقتها يدويًا). */
+  let pool=FILESECS.filter(function(s){return s.code===code&&s.num===num;});
   if(secv&&secv!=='__ALL__')pool=pool.filter(function(s){return s.sec===secv;});
-  if(!pool.length)return toast('\u0644\u0627 \u062a\u0648\u062c\u062f \u0634\u0639\u0628 \u0644\u0647\u0627 \u0623\u0648\u0642\u0627\u062a \u0645\u062d\u0627\u0636\u0631\u0627\u062a \u0644\u0647\u0630\u0647 \u0627\u0644\u0645\u0627\u062f\u0629');
+  if(!pool.length)return toast('\u0644\u0627 \u062a\u0648\u062c\u062f \u0634\u0639\u0628 \u0644\u0647\u0630\u0647 \u0627\u0644\u0645\u0627\u062f\u0629 \u0641\u064a \u0627\u0644\u0645\u0644\u0641');
   const key=(num&&num!=='0')?(code+' '+num):(code+((pool[0]&&pool[0].name)?(' '+pool[0].name):''));
   let course=genData.courses.find(function(c){return c.code===key;});
   if(!course){course={code:key,name:pool[0].name||key,sections:[],on:true};genData.courses.push(course);}
@@ -6370,7 +6449,11 @@ function ffAdd(){
   pool.forEach(function(s){if(!course.sections.find(function(x){return x.num===s.sec;})){course.sections.push({num:s.sec,meets:s.meets,closed:ffIsClosed(s)?1:0,cap:(s.cap==null?null:s.cap),reg:(s.reg==null?null:s.reg)});added++;}});
   saveGen();renderGenCourses();
   if(typeof buildOffdayPicker==='function')try{buildOffdayPicker();}catch(e){}
-  toast(added?('\u062a\u0645\u062a \u0625\u0636\u0627\u0641\u0629 '+key+' ('+added+' \u0634\u0639\u0628\u0629) \u2705'+(pool.filter(ffIsClosed).length?(' \u26d4 \u062a\u0646\u0628\u064a\u0647: '+pool.filter(ffIsClosed).length+' \u0645\u0646\u0647\u0627 \u0645\u0642\u0641\u0644\u0629 (\u0627\u0644\u0633\u0639\u0629 0)'):'')):('\u0643\u0644 \u0634\u0639\u0628 '+key+' \u0645\u0636\u0627\u0641\u0629 \u0645\u0633\u0628\u0642\u0627\u064b'));
+  const closedCount=pool.filter(ffIsClosed).length,noTimeCount=pool.filter(function(s){return !s.meets||!s.meets.length;}).length;
+  let extra='';
+  if(closedCount)extra+=' \u26d4 \u0645\u0646\u0647\u0627 '+closedCount+' \u0645\u0642\u0641\u0644\u0629 (\u0627\u0644\u0633\u0639\u0629 0)';
+  if(noTimeCount)extra+=' \u23f1 \u0645\u0646\u0647\u0627 '+noTimeCount+' \u0628\u062f\u0648\u0646 \u0623\u0648\u0642\u0627\u062a \u0645\u0642\u0631\u0648\u0621\u0629';
+  toast(added?('\u062a\u0645\u062a \u0625\u0636\u0627\u0641\u0629 '+key+' ('+added+' \u0634\u0639\u0628\u0629) \u2705'+extra):('\u0643\u0644 \u0634\u0639\u0628 '+key+' \u0645\u0636\u0627\u0641\u0629 \u0645\u0633\u0628\u0642\u0627\u064b'));
 }
 
 
