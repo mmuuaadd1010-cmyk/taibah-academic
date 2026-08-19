@@ -9101,6 +9101,14 @@ var OA_DEF='gpt-4o-mini';
 var OR_DEF='openai/gpt-4o-mini';
 var TG_URL='https://'+'t.me/onlychamber';
 var TG_AT='@onlychamber';
+var VIS_OR=['google/gemini-2.5-flash','google/gemini-2.0-flash-exp:free','openai/gpt-4o','qwen/qwen2.5-vl-72b-instruct'];
+var VIS_OA=['gpt-4o','gpt-4o-mini'];
+var noCredit=false, lastVisMeta='';
+function dayName(i){ try{ if(typeof DAY_AR!=='undefined'&&DAY_AR&&DAY_AR[i])return DAY_AR[i]; }catch(e){} return ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'][i]||''; }
+var VIS_OR=['google/gemini-2.5-flash','google/gemini-2.0-flash-exp:free','openai/gpt-4o','qwen/qwen2.5-vl-72b-instruct'];
+var VIS_OA=['gpt-4o','gpt-4o-mini'];
+var noCredit=false;
+var lastVisMeta='';
 var PALETTE=['#4d8dff','#3ecf8e','#e8c05a','#d98fc0','#f0645c','#39d0ff','#a78bfa','#f59e0b'];
 var DAY_AR=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
 var histKey='tuai_hist_v1';
@@ -9128,7 +9136,20 @@ function fixModel(m,p){
   return m;
 }
 function aiModel(){ return fixModel(cfg().openaiModel); }
-function aiVisionModel(){ return fixModel(cfg().openaiVisionModel||cfg().openaiModel); }
+function aiVisionModel(){
+  var c=cfg(), m=String(c.openaiVisionModel||'').trim();
+  if(m)return m;
+  return (aiProvider()==='openrouter')?VIS_OR[0]:VIS_OA[0];
+}
+function visionHQ(){ return cfg().aiVisionHQ!==false; }
+function isFreeModel(m){ return /:free$/i.test(String(m||'')); }
+function visionChain(){
+  var p=aiProvider(), base=(p==='openrouter')?VIS_OR.slice():VIS_OA.slice(), out=[aiVisionModel()];
+  for(var i=0;i<base.length;i++){ if(out.indexOf(base[i])<0)out.push(base[i]); }
+  if(noCredit){ var f=out.filter(isFreeModel), r=out.filter(function(m){return !isFreeModel(m);}); out=f.concat(r); }
+  return out;
+}
+
 function aiHeaders(key){
   var h={'Content-Type':'application/json','Authorization':'Bearer '+key};
   if(aiProvider()==='openrouter'){ try{ h['HTTP-Referer']=(location&&location.origin)||'https://tu-academic.app'; h['X-Title']='TU Academic'; }catch(e){} }
@@ -9568,140 +9589,454 @@ function fileToImage(file){
     fr.onerror=rej; fr.readAsDataURL(file);
   });
 }
+function visBoost(x,w,h){
+  if(w*h>4200000)return;
+  var d=x.getImageData(0,0,w,h), a=d.data, i, v, k=1.16, b=-12;
+  for(i=0;i<a.length;i+=4){
+    v=a[i]*k+b;   a[i]  =v<0?0:(v>255?255:v);
+    v=a[i+1]*k+b; a[i+1]=v<0?0:(v>255?255:v);
+    v=a[i+2]*k+b; a[i+2]=v<0?0:(v>255?255:v);
+  }
+  x.putImageData(d,0,0);
+}
+function visDraw(im,sx,sy,sw,sh,maxSide,q){
+  var sc=Math.min(2,(maxSide||2048)/Math.max(sw,sh));
+  var cw=Math.max(1,Math.round(sw*sc)), ch=Math.max(1,Math.round(sh*sc));
+  var c=document.createElement('canvas'); c.width=cw; c.height=ch;
+  var x=c.getContext('2d');
+  try{ x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high'; }catch(e){}
+  x.fillStyle='#fff'; x.fillRect(0,0,cw,ch);
+  x.drawImage(im,sx,sy,sw,sh,0,0,cw,ch);
+  try{ visBoost(x,cw,ch); }catch(e){}
+  return c.toDataURL('image/jpeg',q||0.95);
+}
 async function shrink(file,maxSide){
   var im=await fileToImage(file);
-  var w=im.naturalWidth||im.width, h=im.naturalHeight||im.height;
-  var sc=Math.min(1,maxSide/Math.max(w,h));
-  var cw=Math.max(1,Math.round(w*sc)), ch=Math.max(1,Math.round(h*sc));
-  var c=document.createElement('canvas'); c.width=cw; c.height=ch;
-  var x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,cw,ch); x.drawImage(im,0,0,cw,ch);
-  return c.toDataURL('image/jpeg',0.9);
+  return visDraw(im,0,0,im.width,im.height,maxSide||2048,0.95);
 }
+function visBoost(x,w,h){
+  if(w*h>4200000)return;
+  try{
+    var d=x.getImageData(0,0,w,h), a=d.data, k=1.16, b=-12, i;
+    for(i=0;i<a.length;i+=4){
+      a[i]=Math.max(0,Math.min(255,a[i]*k+b));
+      a[i+1]=Math.max(0,Math.min(255,a[i+1]*k+b));
+      a[i+2]=Math.max(0,Math.min(255,a[i+2]*k+b));
+    }
+    x.putImageData(d,0,0);
+  }catch(e){}
+}
+function visDraw(im,sx,sy,sw,sh,maxSide,q){
+  var sc=Math.min(2,(maxSide||2048)/Math.max(sw,sh));
+  if(!isFinite(sc)||sc<=0)sc=1;
+  var w=Math.max(1,Math.round(sw*sc)), h=Math.max(1,Math.round(sh*sc));
+  var c=document.createElement('canvas'); c.width=w; c.height=h;
+  var x=c.getContext('2d');
+  x.fillStyle='#ffffff'; x.fillRect(0,0,w,h);
+  try{ x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high'; }catch(e){}
+  x.drawImage(im,sx,sy,sw,sh,0,0,w,h);
+  visBoost(x,w,h);
+  return c.toDataURL('image/jpeg',q||0.95);
+}
+async function imgViews(file){
+  var im=await fileToImage(file), w=im.width, h=im.height, v=[];
+  v.push({label:'الصورة كاملة',url:visDraw(im,0,0,w,h,2048,0.95)});
+  if(h>=480){
+    var ov=Math.round(h*0.13);
+    v.push({label:'النصف الأعلى',url:visDraw(im,0,0,w,Math.min(h,Math.round(h/2)+ov),1900,0.95)});
+    var y=Math.max(0,Math.round(h/2)-ov);
+    v.push({label:'النصف الأسفل',url:visDraw(im,0,y,w,h-y,1900,0.95)});
+  }
+  return v;
+}
+
 function schStatus(msg,color){
   var el=document.getElementById('tuai-sch-status'); if(!el)return;
   el.style.display=msg?'block':'none'; el.style.color=color||'var(--t2)'; el.textContent=msg||'';
 }
 function clean(v){ return String(v==null?'':v).replace(/\s+/g,' ').trim(); }
+function mins(t){ var m=String(t||'').match(/(\d{1,2}):(\d{2})/); return m?(+m[1]*60+ +m[2]):0; }
+function addMins(t,n){
+  var v=mins(t)+(n||0); if(v<0)v=0; if(v>1439)v=1439;
+  return String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0');
+}
+function mins(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(String(t||'')); return m?(+m[1]*60+ +m[2]):-1; }
+function addMins(t,n){ var v=mins(t); if(v<0)return t; v=Math.max(0,Math.min(1439,v+n)); return String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0'); }
 function fixTime(t){
-  t=clean(t).replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);});
-  var m=t.match(/(\d{1,2})\s*[:.]\s*(\d{1,2})/);
-  if(!m){ var only=t.match(/^(\d{1,2})$/); if(only)return String(+only[1]).padStart(2,'0')+':00'; return null; }
-  var h=+m[1],mi=+m[2];
-  if(/pm|م\b|مساء/i.test(t)&&h<12)h+=12;
-  if(/am|ص\b|صباح/i.test(t)&&h===12)h=0;
-  if(h>23||mi>59)return null;
+  var s0=String(t==null?'':t).trim();
+  if(!s0)return '';
+  s0=s0.replace(/[\u0660-\u0669]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-1584);});
+  s0=s0.replace(/[\u06f0-\u06f9]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-1728);});
+  var pm=/(pm|p\.m|مساء|مسائ|عصر|مغرب|ليل)/i.test(s0)||/(^|[\s\d.])م($|[\s.،])/.test(s0);
+  var am=/(am|a\.m|صباح|فجر)/i.test(s0)||/(^|[\s\d.])ص($|[\s.،])/.test(s0);
+  var m=/(\d{1,2})\s*[:.،٫]\s*(\d{1,2})/.exec(s0), h, mi;
+  if(m){ h=+m[1]; mi=+m[2]; }
+  else { var m2=/(\d{1,2})/.exec(s0); if(!m2)return ''; h=+m2[1]; mi=0; }
+  if(mi>59)mi=59;
+  if(pm&&h<12)h+=12;
+  else if(am&&h===12)h=0;
+  else if(!pm&&!am&&h>=1&&h<=6)h+=12;
+  if(h>23)h=h%24;
   return String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0');
 }
-function dayIdx(d){
-  if(typeof d==='number'&&d>=0&&d<=4)return d;
-  var s=clean(d).replace(/[إأآ]/g,'ا').replace(/^ال/,'');
-  var map={'احد':0,'الاحد':0,'sunday':0,'sun':0,'اثنين':1,'الاثنين':1,'monday':1,'mon':1,'ثلاثاء':2,'الثلاثاء':2,'tuesday':2,'tue':2,'اربعاء':3,'الاربعاء':3,'wednesday':3,'wed':3,'خميس':4,'الخميس':4,'thursday':4,'thu':4};
-  if(map[s]!=null)return map[s];
-  var n=parseInt(s,10);
-  return (n>=0&&n<=4)?n:null;
+
+function dayNorm(d){
+  var t=String(d==null?'':d).toLowerCase().trim();
+  t=t.replace(/[\u064b-\u0652\u0640]/g,'');
+  t=t.replace(/[\u0623\u0625\u0622]/g,'\u0627');
+  t=t.replace(/\u0649/g,'\u064a').replace(/\u0629/g,'\u0647');
+  t=t.replace(/^[\u0648\u0641]/,'');
+  t=t.replace(/^\u064a\u0648\u0645\s*/,'');
+  t=t.replace(/^\u0627\u0644/,'');
+  t=t.replace(/[^\u0621-\u064aa-z0-9]/g,'');
+  return t;
 }
-function normalizeItems(raw){
+function dayIdx(d){
+  var t=dayNorm(d);
+  if(!t)return -1;
+  if(/^[0-4]$/.test(t))return +t;
+  var ex={u:0,m:1,t:2,w:3,h:4,sun:0,mon:1,tue:2,wed:3,thu:4,sunday:0,monday:1,tuesday:2,wednesday:3,thursday:4};
+  if(ex[t]!==undefined)return ex[t];
+  var map=[['احد'],['اثنين','ثنين'],['ثلاث'],['اربع'],['خميس']];
+  for(var i=0;i<map.length;i++){ for(var j=0;j<map[i].length;j++){ if(t.indexOf(map[i][j])>-1)return i; } }
+  return -1;
+}
+
+function splitDays(v){
   var out=[];
-  (raw||[]).forEach(function(it){
-    if(!it)return;
-    var days=[];
-    if(Array.isArray(it.days))days=it.days.slice();
-    else if(it.day!=null)days=[it.day];
-    else if(it.dayName)days=[it.dayName];
-    var st=fixTime(it.start||it.from||it.begin), en=fixTime(it.end||it.to||it.finish);
-    var name=clean(it.name||it.course||it.subject||'مادة');
-    var code=clean(it.code||'');
-    var place=clean(it.place||it.room||it.hall||it.location||'');
-    if(code&&name.indexOf(code)<0)name=name+' ('+code+')';
-    if(!st||!en)return;
-    if(st>=en)return;
-    days.forEach(function(d){
-      var di=dayIdx(d);
-      if(di==null)return;
-      out.push({name:name||'مادة',place:place,day:di,start:st,end:en});
+  function push(x){ var i=dayIdx(x); if(i>=0&&out.indexOf(i)<0)out.push(i); }
+  if(v==null)return out;
+  if(Array.isArray(v)){ v.forEach(push); return out; }
+  var s0=String(v).trim();
+  push(s0);
+  s0.split(/[|+,;\/&\-\s]+/).forEach(push);
+  return out;
+}
+function nameKey(n){ return String(n||'').toLowerCase().replace(/[^\u0621-\u064aa-z0-9]/g,'').slice(0,7); }
+function normalizeItems(raw){
+  var arr=Array.isArray(raw)?raw:[], pre=[], durs=[];
+  arr.forEach(function(it){
+    if(!it||typeof it!=='object')return;
+    var name=clean(it.name||it.course||it.subject||it.course_name||it.courseName||it.title||it['المادة']||it['الماده']||'');
+    var code=clean(it.code||it.course_code||it.courseCode||it['الرمز']||'');
+    if(code&&name.indexOf(code)<0)name=(code+' '+name).trim();
+    if(!name)name=code;
+    var place=clean(it.place||it.room||it.hall||it.location||it.building||it['القاعة']||it['القاعه']||'');
+    var type=String(it.type||it.note||it.kind||it.section||'');
+    var st=fixTime(it.start||it.from||it.begin||it.start_time||it.startTime||'');
+    var en=fixTime(it.end||it.to||it.finish||it.end_time||it.endTime||'');
+    var per=String(it.time||it.period||it.hours||it['الوقت']||'');
+    if((!st||!en)&&per){
+      var p=per.split(/[-\u2013\u2014>]|الى|إلى|to/i);
+      if(!st&&p[0])st=fixTime(p[0]);
+      if(!en&&p[1])en=fixTime(p[1]);
+    }
+    if(!st)return;
+    if(!name)name='محاضرة';
+    if(/معمل|عملي|مختبر|lab/i.test(type)&&name.indexOf('معمل')<0)name=name+' (معمل)';
+    if(!place&&/اونلاين|أونلاين|online|black|zoom/i.test(type))place='أونلاين';
+    var days=splitDays(it.days!==undefined?it.days:(it.day!==undefined?it.day:(it.dayName||it.day_name||it['اليوم'])));
+    if(en&&mins(en)>mins(st))durs.push(mins(en)-mins(st));
+    pre.push({name:name,place:place,st:st,en:en,days:days});
+  });
+  durs.sort(function(a,b){return a-b;});
+  var med=durs.length?durs[Math.floor(durs.length/2)]:60;
+  if(med<25||med>240)med=60;
+  var map={}, out=[];
+  pre.forEach(function(r){
+    var en=r.en;
+    if(!en||mins(en)<=mins(r.st)){
+      var alt=en?addMins(en,720):'';
+      if(alt&&mins(alt)>mins(r.st)&&(mins(alt)-mins(r.st))<=240)en=alt; else en=addMins(r.st,med);
+    }
+    if(!r.days.length)return;
+    r.days.forEach(function(d){
+      var k=d+'|'+r.st, cur=map[k];
+      if(cur){
+        if(r.name.length>cur.name.length)cur.name=r.name;
+        if(!cur.place&&r.place)cur.place=r.place;
+        if(mins(en)>mins(cur.end))cur.end=en;
+        return;
+      }
+      var o={name:r.name,place:r.place,day:d,start:r.st,end:en};
+      map[k]=o; out.push(o);
     });
   });
-  /* dedupe */
-  var seen={},uniq=[];
-  out.forEach(function(i){
-    var k=i.day+'|'+i.start+'|'+i.end+'|'+i.name;
-    if(seen[k])return; seen[k]=1; uniq.push(i);
+  out.sort(function(a,b){ return (a.day-b.day)||(mins(a.start)-mins(b.start)); });
+  var fin=[];
+  out.forEach(function(o){
+    var last=null;
+    for(var i=fin.length-1;i>=0;i--){ if(fin[i].day===o.day){ last=fin[i]; break; } }
+    if(last&&nameKey(last.name)===nameKey(o.name)&&(mins(o.start)-mins(last.end))<=15&&mins(o.start)>=mins(last.start)){
+      if(mins(o.end)>mins(last.end))last.end=o.end;
+      if(!last.place&&o.place)last.place=o.place;
+      return;
+    }
+    fin.push(o);
   });
-  uniq.sort(function(a,b){ return a.day-b.day||a.start.localeCompare(b.start); });
-  return uniq;
+  return fin;
 }
-async function extractFromImage(file){
-  var dataUrl=await shrink(file,1500);
-  var prompt=[
-'هذه صورة جدول محاضرات جامعي (غالبًا من نظام تسجيل جامعة سعودية، والجدول بالعربية ومن اليمين لليسار).',
-'استخرج كل المحاضرات بدقة وأعِد JSON فقط بهذا الشكل:',
-'{"items":[{"name":"اسم المادة","code":"رمز ورقم المادة إن وجد","place":"القاعة/المبنى أو أونلاين","days":["الأحد","الثلاثاء"],"start":"HH:MM","end":"HH:MM"}]}',
-'قواعد مهمة:',
-'- الأوقات بنظام ٢٤ ساعة (مثال 13:00 و 19:20). أعمدة «بداية» و«نهاية» هي وقت المحاضرة.',
-'- أعمدة أيام الأسبوع (أحد، اثنين، ثلاثاء، أربعاء، خميس) قد تُعلَّم بنقطة أو دائرة أو علامة أو لون؛ ضع في days كل يوم معلَّم لهذا الصف فقط، وتجاهل الأعمدة الفارغة (-).',
-'- إذا كان للمادة أكثر من يوم في نفس الصف فاجمعها في days.',
-'- إذا كان الصف بدون اسم مادة (تكملة/معمل لنفس المادة السابقة) فاستخدم اسم المادة الأقرب فوقه وأضف كلمة (معمل) إذا كان واضحًا.',
-'- place: اكتب القاعة والمبنى مثل «172GB004 - مبنى 172» أو «Blackboard/أونلاين» إن كانت المحاضرة عن بعد.',
-'- لا تخترع مواد غير موجودة، ولا تكتب أي شرح خارج JSON.'
-  ].join('\n');
-  var msgs=[
-    {role:'system',content:'أنت محرّك استخراج بيانات دقيق من صور الجداول. تُخرج JSON صالحًا فقط بدون أي نص إضافي.'},
-    {role:'user',content:[{type:'text',text:prompt},{type:'image_url',image_url:{url:dataUrl,detail:'high'}}]}
-  ];
-  var txt=await oaChat(msgs,{model:aiVisionModel(),json:true,temperature:0,max_tokens:2500});
-  var raw=String(txt||'').replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
-  var obj=null;
-  try{ obj=JSON.parse(raw); }catch(e){
-    var m=raw.match(/\{[\s\S]*\}/);
-    if(m){ try{ obj=JSON.parse(m[0]); }catch(_){ } }
+
+function visPrompt(extra){
+  var p=[];
+  p.push('أنت خبير في قراءة جداول المحاضرات الجامعية السعودية من الصور.');
+  p.push('المهمة: استخرج كل صفوف الجدول بدقة تامة بدون أي نقص.');
+  p.push('أولاً عُد الصفوف الموجودة في الصورة، ثم اكتبها كلها من أعلى الصورة إلى أسفلها.');
+  p.push('قواعد:');
+  p.push('- أدخل كل المواد بدون استثناء: المحاضرات والمعامل والمواد أونلاين ومواد مثل GSE أو النشاط.');
+  p.push('- الأيام قد تكون أعمدة فيها علامة أو لون، أو مكتوبة مثل (أحد - أربعاء). أرجع كل أيام المادة في مصفوفة days.');
+  p.push('- الوقت بنطام 24 ساعة: (5:40 مساءً = 17:40) و (1:00 في جدول جامعي = 13:00).');
+  p.push('- لا تدمج مادتين ولا تكرر نفس الصف.');
+  p.push('- تجاهل سطور المجاميع مثل (مجموع الوحدات).');
+  p.push('- إن كان الصف تكملة لمادة فوقه خـذ الاسم من الصف السابق وأضف (معمل).');
+  p.push('- إن لم تجد وقت النهاية اتركه فارغاً ولا تحذف الصف.');
+  if(extra)p.push(extra);
+  p.push('أرجع JSON فقط بهذا الشكل:');
+  p.push('{"count": 3, "items":[{"name":"CS 205","code":"CS 205","days":["الأحد","الأربعاء"],"start":"11:45","end":"13:00","place":"172GD005","type":"محاضرة"}]}');
+  return p.join('\n');
+}
+function parseItems(txt){
+  var t=String(txt||'').trim();
+  t=t.replace(/```json/gi,'').replace(/```/g,'').trim();
+  var i=t.indexOf('{'), j=t.lastIndexOf('}');
+  if(i>-1&&j>i)t=t.slice(i,j+1);
+  var o=null;
+  try{ o=JSON.parse(t); }catch(e){ return []; }
+  if(!o)return [];
+  if(Array.isArray(o))return o;
+  var a=o.items||o.schedule||o.courses||o.rows||o.data||o.lectures;
+  return Array.isArray(a)?a:[];
+}
+async function visionPass(url,extra,model){
+  var msgs=[{role:'user',content:[{type:'text',text:visPrompt(extra)},{type:'image_url',image_url:{url:url,detail:'high'}}]}];
+  var txt=await oaChat(msgs,{model:model,json:true,temperature:0,max_tokens:4000});
+  return parseItems(txt);
+}
+async function visionTry(url,extra,onStep){
+  var chain=visionChain(), lastErr=null;
+  for(var i=0;i<chain.length;i++){
+    try{
+      if(onStep&&i>0)onStep('أجرب موديل أدق: '+chain[i]);
+      var r=await visionPass(url,extra,chain[i]);
+      if(r&&r.length){ lastVisMeta=chain[i]; return r; }
+      lastErr=lastErr||new Error('EMPTY');
+    }catch(e){
+      var m=String((e&&e.message)||e);
+      if(/NOKEY/.test(m))throw e;
+      if(/402|credit|quota|insufficient|رصيد/i.test(m))noCredit=true;
+      lastErr=e;
+    }
   }
-  if(!obj)throw new Error('تعذّر قراءة نتيجة الاستخراج');
-  var items=normalizeItems(obj.items||obj.schedule||obj.courses||[]);
-  if(!items.length)throw new Error('ما لقيت مواد واضحة في الصورة');
+  if(lastErr&&/NOKEY/.test(String((lastErr.message)||lastErr)))throw lastErr;
+  return [];
+}
+async function extractFromImage(file,onStep){
+  var hq=visionHQ();
+  var views=hq?await imgViews(file):[{label:'الصورة كاملة',url:await shrink(file,2048)}];
+  var all=[], reads=0, total=views.length+(hq?1:0);
+  for(var i=0;i<views.length;i++){
+    if(onStep)onStep('أقرأ '+views[i].label+' ('+(i+1)+'/'+total+')');
+    var part=await visionTry(views[i].url,i?'ركز على هذا الجزء من الصورة واستخرج كل صفوفه.':'',onStep);
+    reads++;
+    all=all.concat(part||[]);
+  }
+  var items=normalizeItems(all);
+  if(hq&&items.length){
+    try{
+      if(onStep)onStep('أراجع الصفوف الناقصة ('+total+'/'+total+')');
+      var have=items.map(function(o){ return o.name+' '+dayName(o.day)+' '+o.start; }).join(' | ');
+      var ex='استخرجت مسبقاً: '+have+'. راجع الصورة وأرجع فقط الصفوف الناقصة التي لم تُذكر، وإن لم يوجد ناقص أرجع items فارغة.';
+      var miss=await visionTry(views[0].url,ex,onStep);
+      reads++;
+      if(miss&&miss.length)items=normalizeItems(all.concat(miss));
+    }catch(e){}
+  }
+  lastVisMeta=(lastVisMeta||aiVisionModel())+' · '+reads+' قراءات';
   return items;
 }
+
 async function handleFile(file){
   if(!file)return;
-  if(!/^image\//.test(file.type||'')){ notify('ارفع صورة (JPG أو PNG) لجدولك 🖼️',true); return; }
-  if(file.size>12*1024*1024){ notify('حجم الصورة كبير — الحد ١٢ ميجابايت',true); return; }
-  if(!aiKey()){
-    notify(isAdmin()?'أضف مفتاح الذكاء (OpenRouter أو OpenAI) من لوحة المطوّر ← قسم «🤖 المساعد الذكي» أولاً.':'خدمة الاستخراج غير مفعّلة حاليًا — تواصل مع المطوّر.',true);
-    return;
-  }
-  var chatMode=(pickMode==='chat');
-  var btn=document.getElementById('tuai-sch-btn');
+  var nm=String(file.name||'');
+  var okT=/^image\//.test(String(file.type||''))||/\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(nm);
+  if(!okT){ notify('لازم تكون صورة للجدول (JPG أو PNG).',true); return; }
+  if(file.size>20*1024*1024){ notify('الصورة كبيرة جداً (أكبر من 20 ميجا). صورها من جديد بحجم أقل.',true); return; }
+  var btn=document.getElementById('tuai-sch-btn'), old=btn?btn.textContent:'', chip=null;
   if(btn){ btn.disabled=true; btn.textContent='⏳ جارٍ قراءة الصورة...'; }
-  schStatus('⏳ أقرأ الصورة وأستخرج المواد والأوقات...','var(--a2)');
-  var typing=null;
-  if(chatMode){ tuaiToggle(true); addMsg('me','📎 أرسلت صورة جدولي'); typing=typingOn(); }
+  function step(t){
+    try{ schStatus('⏳ '+t,''); }catch(e){}
+    if(pickMode==='chat'){
+      try{
+        if(!chip){ if(typeof addTool==='function')addTool('قراءة صورة الجدول',t); var al=document.querySelectorAll('.tuai-tool'); chip=al[al.length-1]||null; }
+        if(chip)chip.textContent='🖼️ '+t;
+      }catch(e){}
+    }
+  }
   try{
-    var items=await extractFromImage(file);
-    if(chatMode){ typingOff(); addMsg('bot','تمام ✅ استخرجت '+items.length+' محاضرة من الصورة. راجعها وبعدين أطبّقها على جدولك.'); }
-    schStatus('✅ استخرجت '+items.length+' محاضرة — راجعها ثم طبّقها','var(--g,#3ecf8e)');
+    step('أجهز الصورة بدقة عالية');
+    var items=await extractFromImage(file,step);
+    if(!items.length)throw new Error('EMPTY');
+    if(chip)chip.textContent='🖼️ تمت القراءة ('+lastVisMeta+')';
+    schStatus('','');
+    notify('تمام ✅ استخرجت '+items.length+' محاضرة. راجع القائمة: تقدر تعدل ✏️ أو تحذف ✕ أو تضيف ➕ قبل الحفظ.');
     openRev(items);
   }catch(e){
-    if(chatMode){ typingOff(); addMsg('bot','ما قدرت أستخرج الجدول: '+(e&&e.message||'خطأ غير معروف')+'\nجرّب صورة أوضح أو أقرب للجدول.'); }
-    schStatus('⚠️ '+((e&&e.message)||'تعذّر الاستخراج')+' — جرّب صورة أوضح','var(--r,#f0645c)');
-    notify('تعذّر استخراج الجدول: '+((e&&e.message)||''),true);
+    var m=String((e&&e.message)||e);
+    if(chip&&chip.parentNode)chip.parentNode.removeChild(chip);
+    if(/NOKEY/.test(m))notify(isAdmin()?'ما فيه مفتاح ذكاء اصطناعي. افتح لوحة المطور وحط مفتاح OpenRouter.':('خدمة قراءة الجدول غير مفعلة حالياً. راسل المطور على تلجرام '+TG_AT),true);
+    else if(/heic|heif/i.test(nm))notify('صيغة HEIC ما تُقرأ دائماً. حولها JPG أو صور الجدول من الشاشة.',true);
+    else if(/EMPTY/.test(m))notify('ما قدرت أقرأ الجدول من هذي الصورة. صور الجدول كامل وواضح بدون ميلان، أو أرسله على جزئين.',true);
+    else notify('صار خطأ أثناء القراءة: '+m,true);
+    schStatus('','');
   }
-  if(btn){ btn.disabled=false; btn.textContent='✨ ترتيب جدولي من صورة'; }
+  if(btn){ btn.disabled=false; btn.textContent=old||'✨ ترتيب جدولي من صورة'; }
+  var inp=document.getElementById('tuai-file'); if(inp)inp.value='';
 }
+
 function notify(msg,warn){ try{ if(typeof window.toast==='function')window.toast((warn?'⚠️ ':'')+msg); else alert(msg); }catch(e){} }
 
 /* ---------------- review + apply ---------------- */
-function openRev(items){
-  pendingItems=items;
+function openRev(items){ try{ pendingItems=items; }catch(e){} openRevBase(items); decorRev(); }
+function openRevBase(items){
+  pendingItems=items||[];
+  renderRev();
+  var ov=document.getElementById('tuai-rev'); if(ov)ov.classList.add('on');
+}
+function renderRev(){
   var list=document.getElementById('tuai-rev-list'); if(!list)return;
+  var items=pendingItems||[];
   var t=document.getElementById('tuai-rev-title');
   if(t)t.textContent='راجع '+items.length+' محاضرة مستخرجة';
   list.innerHTML=items.map(function(i,ix){
     var col=PALETTE[ix%PALETTE.length];
-    return '<div class="tuai-row"><span class="rdot" style="background:'+col+'"></span>'+
-      '<span class="rname" title="'+esc2(i.name)+'">'+esc2(i.name)+(i.place?(' <span style="color:var(--t3);font-weight:600">· '+esc2(i.place)+'</span>'):'')+'</span>'+
-      '<span class="rday">'+DAY_AR[i.day]+'</span><span class="rmeta">'+i.start+' - '+i.end+'</span></div>';
-  }).join('');
-  var ov=document.getElementById('tuai-rev'); if(ov)ov.classList.add('on');
+    return '<div class=\"tuai-row\"><span class=\"rdot\" style=\"background:'+col+'\"></span>'+
+      '<span class=\"rname\" title=\"'+esc2(i.name)+'\">'+esc2(i.name)+(i.place?(' <span style=\"color:var(--t3);font-weight:600\">· '+esc2(i.place)+'</span>'):'')+'</span>'+
+      '<span class=\"rday\">'+DAY_AR[i.day]+'</span><span class=\"rmeta\">'+i.start+' - '+i.end+'</span>'+
+      '<button class=\"rbtn\" type=\"button\" title=\"تعديل\" onclick=\"tuaiRevEdit('+ix+')\">✏️</button>'+
+      '<button class=\"rbtn\" type=\"button\" title=\"حذف\" onclick=\"tuaiRevDel('+ix+')\">✕</button></div>';
+  }).join('')+'<div style=\"font-size:.72rem;color:var(--t3);line-height:1.8;padding:3px 2px 0\">✏️ عدّل أي صف · ✕ احذف الغلط · ➕ محاضرة لإضافة الناقص'+(lastVisMeta?(' · القراءة: '+esc2(lastVisMeta)):'')+'</div>';
 }
+function revPrompt(it){
+  var cur=[it.name,DAY_AR[it.day],it.start,it.end,it.place||''].join(' | ');
+  var v=window.prompt('عدّل بهذا الشكل:  الاسم | اليوم | البداية | النهاية | القاعة',cur);
+  if(v==null)return null;
+  var p=String(v).split('|');
+  var name=clean(p[0]||''), di=dayIdx(p[1]||''), st=fixTime(p[2]||''), en=fixTime(p[3]||''), pl=clean(p[4]||'');
+  return {name:name||it.name,day:(di==null?it.day:di),start:st||it.start,end:en||it.end,place:pl};
+}
+function tuaiRevEdit(ix){
+  var it=(pendingItems||[])[ix]; if(!it)return;
+  var v=revPrompt(it); if(!v)return;
+  if(mins(v.end)<=mins(v.start))v.end=addMins(v.start,60);
+  pendingItems[ix]={name:v.name,place:v.place,day:v.day,start:v.start,end:v.end};
+  renderRev();
+}
+function tuaiRevDel(ix){
+  if(!pendingItems||!pendingItems.length)return;
+  pendingItems.splice(ix,1);
+  renderRev();
+}
+function tuaiRevAdd(){
+  var v=revPrompt({name:'',day:0,start:'08:00',end:'09:40',place:''});
+  if(!v||!clean(v.name))return;
+  if(mins(v.end)<=mins(v.start))v.end=addMins(v.start,60);
+  if(!pendingItems)pendingItems=[];
+  pendingItems.push({name:v.name,place:v.place,day:v.day,start:v.start,end:v.end});
+  pendingItems.sort(function(a,b){ return a.day-b.day||mins(a.start)-mins(b.start); });
+  renderRev();
+}
+window.tuaiRevEdit=tuaiRevEdit;
+window.tuaiRevDel=tuaiRevDel;
+window.tuaiRevAdd=tuaiRevAdd;
+
+function decorRev(){
+  try{
+    var list=document.getElementById('tuai-rev-list');
+    if(!list)return;
+    var bs='flex:0 0 auto;width:27px;height:27px;border-radius:8px;border:1px solid var(--bor2,#161b22);background:var(--s3,#10141a);color:var(--t2,#b1bac6);font-size:.72rem;line-height:1;cursor:pointer;padding:0;margin-inline-start:4px';
+    var rows=list.querySelectorAll('.tuai-row');
+    for(var i=0;i<rows.length;i++){
+      if(rows[i].querySelector('.rbtn'))continue;
+      var e=document.createElement('button'); e.type='button'; e.className='rbtn'; e.textContent='✏️'; e.title='تعديل'; e.style.cssText=bs; e.setAttribute('onclick','tuaiRevEdit('+i+')');
+      var d=document.createElement('button'); d.type='button'; d.className='rbtn'; d.textContent='✕'; d.title='حذف'; d.style.cssText=bs; d.setAttribute('onclick','tuaiRevDel('+i+')');
+      rows[i].appendChild(e); rows[i].appendChild(d);
+    }
+    var hint=document.getElementById('tuai-rev-hint');
+    if(!hint){ hint=document.createElement('div'); hint.id='tuai-rev-hint'; hint.style.cssText='font-size:.68rem;color:var(--t3);padding:10px 4px 2px;line-height:1.8'; list.appendChild(hint); }
+    hint.textContent='راجع الصفوف: ✏️ تعديل · ✕ حذف · ➕ إضافة'+(lastVisMeta?(' — '+lastVisMeta):'');
+    var f=document.querySelector('.tuai-rev-f');
+    if(f&&!f.querySelector('.radd')){
+      var a=document.createElement('button'); a.type='button'; a.className='tuai-btn-soft radd'; a.textContent='➕ محاضرة'; a.setAttribute('onclick','tuaiRevAdd()');
+      f.insertBefore(a,f.firstChild);
+    }
+  }catch(e){}
+}
+function revPrompt(it){
+  var cur=[it.name||'',dayName(it.day)||'',it.start||'',it.end||'',it.place||''].join(' | ');
+  var v=window.prompt('عدل بهذا الترتيب:\nالاسم | اليوم | البداية | النهاية | القاعة',cur);
+  if(v==null)return null;
+  var p=String(v).split('|');
+  var nm=clean(p[0]||''), dy=dayIdx(p[1]||''), st=fixTime(p[2]||''), en=fixTime(p[3]||''), pl=clean(p[4]||'');
+  if(dy<0)dy=it.day||0;
+  if(!st)st=it.start||'08:00';
+  if(!en||mins(en)<=mins(st))en=addMins(st,60);
+  return {name:nm||it.name||'محاضرة',day:dy,start:st,end:en,place:pl};
+}
+function tuaiRevEdit(ix){
+  var arr=pendingItems||[], it=arr[ix]; if(!it)return;
+  var r=revPrompt(it); if(!r)return;
+  arr[ix]=r; openRev(arr);
+}
+function tuaiRevDel(ix){
+  var arr=pendingItems||[]; if(!arr[ix])return;
+  arr.splice(ix,1);
+  if(!arr.length){ try{ tuaiCloseRev(); }catch(e){} return; }
+  openRev(arr);
+}
+function tuaiRevAdd(){
+  var arr=pendingItems||[];
+  var r=revPrompt({name:'',day:0,start:'08:00',end:'09:40',place:''});
+  if(!r)return;
+  arr.push(r);
+  arr.sort(function(a,b){ return (a.day-b.day)||(mins(a.start)-mins(b.start)); });
+  openRev(arr);
+}
+window.tuaiRevEdit=tuaiRevEdit; window.tuaiRevDel=tuaiRevDel; window.tuaiRevAdd=tuaiRevAdd;
+function visionOptions(c){
+  function ee(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  var cur=String((c&&c.openaiVisionModel)||'').trim();
+  var A=[['','تلقائي'],['google/gemini-2.5-flash','⭐ الأدق للجداول'],['openai/gpt-4o','دقيق جداً'],['qwen/qwen2.5-vl-72b-instruct','جيد ورخيص'],['google/gemini-2.0-flash-exp:free','مجاني'],['meta-llama/llama-3.2-11b-vision-instruct:free','مجاني']];
+  var B=[['','تلقائي'],['gpt-4o','⭐ الأدق'],['gpt-4.1','دقيق'],['gpt-4o-mini','أرخص']];
+  function grp(t,arr){
+    return '<optgroup label="'+t+'">'+arr.map(function(m){
+      return '<option value="'+ee(m[0])+'"'+((cur===m[0])?' selected':'')+'>'+(m[0]?ee(m[0]):m[1])+(m[0]?' — '+m[1]:'')+'</option>';
+    }).join('')+'</optgroup>';
+  }
+  var known=A.concat(B).some(function(m){ return m[0]===cur; });
+  var extra=(cur&&!known)?('<option value="'+ee(cur)+'" selected>'+ee(cur)+'</option>'):'';
+  return extra+grp('OpenRouter',A)+grp('OpenAI',B);
+}
+function ensureVisionFields(){
+  try{
+    if(document.getElementById('tuai-cfg-vmodel'))return;
+    if(!document.getElementById('tuai-cfg-key'))return;
+    var an=document.getElementById('tuai-cfg-model-custom')||document.getElementById('tuai-cfg-model');
+    if(!an)return;
+    var row=an.parentNode; if(!row||!row.parentNode)return;
+    var c=cfg(), w=document.createElement('div');
+    w.id='tuai-vis-fields';
+    w.innerHTML='<div style="margin:12px 0 10px"><label style="font-size:.78rem;color:var(--t2);display:block;margin-bottom:4px">🖼️ موديل قراءة صور الجداول</label>'+
+      '<select id="tuai-cfg-vmodel" style="padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);width:100%">'+visionOptions(c)+'</select>'+
+      '<div style="font-size:.7rem;color:var(--t3);margin-top:5px;line-height:1.7">لو الجدول يطلع ناقص: اختر <b>google/gemini-2.5-flash</b> أو <b>openai/gpt-4o</b>. الموديلات المجانية (:free) تنسى صفوف.</div></div>'+
+      '<label style="display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--t);margin-bottom:12px;cursor:pointer"><input type="checkbox" id="tuai-cfg-hq"'+(c.aiVisionHQ!==false?' checked':'')+' style="width:18px;height:18px"> 🎯 وضع الدقة العالية (يقرأ الصورة ٤ مرات ويدمج)</label>';
+    row.parentNode.insertBefore(w,row.nextSibling);
+    var sel=document.getElementById('tuai-cfg-vmodel');
+    if(sel)sel.addEventListener('change',function(){ try{ SITE_CFG.openaiVisionModel=String(sel.value||'').trim(); }catch(e){} });
+    var hq=document.getElementById('tuai-cfg-hq');
+    if(hq)hq.addEventListener('change',function(){ try{ SITE_CFG.aiVisionHQ=!!hq.checked; }catch(e){} });
+  }catch(e){}
+}
+try{ setInterval(ensureVisionFields,2000); }catch(e){}
 function tuaiCloseRev(){ var ov=document.getElementById('tuai-rev'); if(ov)ov.classList.remove('on'); }
 window.tuaiCloseRev=tuaiCloseRev;
 function SD(){
@@ -9933,6 +10268,10 @@ function tuaiCfgSave(){
     SITE_CFG.openaiKey=k;
     SITE_CFG.aiEngine=formEngine();
     SITE_CFG.openaiModel=fixModel(formModel(),formProvider());
+    var vmEl=document.getElementById('tuai-cfg-vmodel');
+    if(vmEl)SITE_CFG.openaiVisionModel=String(vmEl.value||'').trim();
+    var hqEl=document.getElementById('tuai-cfg-hq');
+    if(hqEl)SITE_CFG.aiVisionHQ=!!hqEl.checked;
     SITE_CFG.aiAssistOn=!!document.getElementById('tuai-cfg-on').checked;
     SITE_CFG.aiWelcome=(document.getElementById('tuai-cfg-welcome').value||'').trim();
     try{ localStorage.setItem('tu_site_cfg',JSON.stringify(SITE_CFG)); }catch(e){}
