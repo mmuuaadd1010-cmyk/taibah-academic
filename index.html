@@ -9790,6 +9790,12 @@ function visPrompt(extra){
   p.push('- تجاهل سطور المجاميع مثل (مجموع الوحدات).');
   p.push('- إن كان الصف تكملة لمادة فوقه خـذ الاسم من الصف السابق وأضف (معمل).');
   p.push('- إن لم تجد وقت النهاية اتركه فارغاً ولا تحذف الصف.');
+  p.push('شكل الجدول: شبكة أعمدتها أيام الأسبوع (الأحد → الخميس) وصفوفها فترات الوقت.');
+  p.push('مهم جداً: كل محاضرة تظهر كنقطة/علامة ملونة (غالباً حمراء) داخل الشبكة. عدد النقاط الحمراء = عدد المحاضرات بالضبط: لو فيه 10 نقاط فأرجع 10 صفوف ولا أقل.');
+  p.push('لكل نقطة: حدد العمود (اليوم) والصف (وقت البداية) بدقة، وخذ اسم المادة والرمز والقاعة من داخل النقطة أو من نفس الصف أو من قائمة المواد في الصورة.');
+  p.push('إن امتدت النقطة أو المستطيل على أكثر من خانة وقت: البداية أول خانة والنهاية آخر خانة.');
+  p.push('نفس المادة قد يكون لها نقاط في أيام مختلفة: أرجع كل الأيام في days.');
+  p.push('أضف حقل dots = عدد النقاط/العلامات التي رأيتها، ويجب أن يساوي عدد عناصر items.');
   if(extra)p.push(extra);
   p.push('أرجع JSON فقط بهذا الشكل:');
   p.push('{"count": 3, "items":[{"name":"CS 205","code":"CS 205","days":["الأحد","الأربعاء"],"start":"11:45","end":"13:00","place":"172GD005","type":"محاضرة"}]}');
@@ -9805,6 +9811,7 @@ function parseItems(txt){
   if(!o)return [];
   if(Array.isArray(o))return o;
   var a=o.items||o.schedule||o.courses||o.rows||o.data||o.lectures;
+  try{ var dn=+(o.dots||o.count||0); if(dn>0&&dn<80&&dn>(+window.__tuDots||0))window.__tuDots=dn; }catch(e){}
   return Array.isArray(a)?a:[];
 }
 async function visionPass(url,extra,model){
@@ -9832,26 +9839,38 @@ async function visionTry(url,extra,onStep){
 }
 async function extractFromImage(file,onStep){
   var hq=visionHQ();
+  try{ window.__tuDots=0; }catch(e){}
   var views=hq?await imgViews(file):[{label:'الصورة كاملة',url:await shrink(file,2048)}];
-  var all=[], reads=0, total=views.length+(hq?1:0);
+  var all=[], reads=0, total=views.length+(hq?2:0);
   for(var i=0;i<views.length;i++){
     if(onStep)onStep('أقرأ '+views[i].label+' ('+(i+1)+'/'+total+')');
-    var part=await visionTry(views[i].url,i?'ركز على هذا الجزء من الصورة واستخرج كل صفوفه.':'',onStep);
+    var part=await visionTry(views[i].url,i?'ركز على هذا الجزء من الصورة واستخرج كل نقاطه.':'',onStep);
     reads++;
     all=all.concat(part||[]);
   }
-  var items=normalizeItems(all);
+  var items=normalizeItems(all), expect=0;
+  try{ expect=+window.__tuDots||0; }catch(e){}
   if(hq&&items.length){
-    try{
-      if(onStep)onStep('أراجع الصفوف الناقصة ('+total+'/'+total+')');
-      var have=items.map(function(o){ return o.name+' '+dayName(o.day)+' '+o.start; }).join(' | ');
-      var ex='استخرجت مسبقاً: '+have+'. راجع الصورة وأرجع فقط الصفوف الناقصة التي لم تُذكر، وإن لم يوجد ناقص أرجع items فارغة.';
-      var miss=await visionTry(views[0].url,ex,onStep);
-      reads++;
-      if(miss&&miss.length)items=normalizeItems(all.concat(miss));
-    }catch(e){}
+    var tries=0;
+    while(tries<3){
+      var need=expect>items.length;
+      if(tries>0&&!need)break;
+      tries++;
+      try{
+        if(onStep)onStep(need?('ناقص '+(expect-items.length)+' محاضرة — أعيد القراءة'):'أراجع الناقص');
+        var have=items.map(function(o){ return o.name+' '+dayName(o.day)+' '+o.start; }).join(' | ');
+        var ex='في الصورة '+(expect||items.length)+' نقطة/محاضرة واستخرجت '+items.length+': '+have+'. راجع الصورة نقطة نقطة وأرجع فقط الصفوف الناقصة، وإن لم يوجد ناقص أرجع items فارغة.';
+        var miss=await visionTry(views[0].url,ex,onStep);
+        reads++;
+        if(!miss||!miss.length)break;
+        all=all.concat(miss);
+        var merged=normalizeItems(all);
+        if(merged.length<=items.length)break;
+        items=merged;
+      }catch(e){ break; }
+    }
   }
-  lastVisMeta=(lastVisMeta||aiVisionModel())+' · '+reads+' قراءات';
+  lastVisMeta=(lastVisMeta||aiVisionModel())+' · '+reads+' قراءات'+(expect?(' · النقاط: '+expect+' / المستخرج: '+items.length):'');
   return items;
 }
 
@@ -10037,6 +10056,84 @@ function ensureVisionFields(){
   }catch(e){}
 }
 try{ setInterval(ensureVisionFields,2000); }catch(e){}
+function yearPrice(n){ n=parseInt(n,10)||1; if(n<1)n=1; if(n>20)n=20; return n===1?30:(50+(n-2)*25); }
+function subQty(){ var v=parseInt(window.__tuSubQty||1,10)||1; return Math.max(1,Math.min(20,v)); }
+function renderSubOffer(){
+  var n=subQty(), tot=yearPrice(n), per=Math.round(tot/n*10)/10, save=(30*n)-tot;
+  var q=document.getElementById('tu-sub-qty'); if(q)q.textContent=n;
+  var t=document.getElementById('tu-sub-total'); if(t)t.innerHTML=tot+' <span style="font-size:.7rem">ريال</span>';
+  var d=document.getElementById('tu-sub-det');
+  if(d)d.textContent=(n===1)?'كود واحد سنوي · 30 ريال':(n+' أكواد سنوية · '+per+' ريال للشخص'+(save>0?(' · توفير '+save+' ريال'):''));
+  var b=document.getElementById('tu-sub-cta');
+  if(b)b.textContent='اشترك الآن — '+tot+' ريال'+(n>1?(' · '+n+' أكواد'):'')+' 🛡️';
+}
+function tuSubQtyAdd(d){ window.__tuSubQty=Math.max(1,Math.min(20,subQty()+d)); renderSubOffer(); }
+function tuQuickPay(type){
+  var n=(type==='year')?subQty():1, tot=(type==='year')?yearPrice(n):15;
+  window.__tuPayQty=n; window.__tuPayTotal=tot;
+  var label=(type==='year')?('الاشتراك السنوي — '+tot+' ريال'+(n>1?(' · '+n+' أكواد'):'')):'اشتراك الترم — 15 ريال';
+  try{ tuOpenPayment(label,type); }catch(e){ return; }
+  var ph=''; try{ ph=localStorage.getItem('tu_pay_phone')||''; }catch(e){}
+  var pi=document.getElementById('tu-phone-input'); if(pi&&ph)pi.value=ph;
+  var note=document.getElementById('tu-payment-note');
+  if(note){ try{ note.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
+  var cl=String(ph).replace(/[^0-9]/g,'');
+  if(/^(05|5)[0-9]{8}$/.test(cl)){
+    try{ tuPayMsg('جارٍ تحويلك لتمارا مباشرة...',true); }catch(e){}
+    setTimeout(function(){ try{ tuStartTamaraPay(); }catch(e){} },300);
+  } else if(pi){ try{ pi.focus(); }catch(e){} }
+}
+function injectSubOffers(){
+  try{
+    var sec=document.querySelector('#p-subscription .subx-plans'); if(!sec)return;
+    if(document.getElementById('tu-sub-offer'))return;
+    var arts=sec.querySelectorAll('.subx-plan'); if(!arts.length)return;
+    var year=sec.querySelector('.subx-plan.is-best')||arts[arts.length-1];
+    var yb=year.querySelector('.subx-buy'); if(!yb)return;
+    var termBtn=(arts[0]!==year)?arts[0].querySelector('.subx-buy'):null;
+    var bs='width:34px;height:34px;border-radius:10px;border:1px solid var(--bor2,#161b22);background:var(--s3,#10141a);color:var(--t,#f5f7fa);font-size:1.15rem;font-weight:900;cursor:pointer;line-height:1';
+    var box=document.createElement('div');
+    box.id='tu-sub-offer';
+    box.style.cssText='margin:12px 0 12px;border:1px solid rgba(77,141,255,.35);background:linear-gradient(140deg,rgba(77,141,255,.10),rgba(77,141,255,.02));border-radius:16px;padding:13px';
+    box.innerHTML='<div style="font-size:.8rem;font-weight:900;margin-bottom:6px">🎁 عرض المجموعة (سنوي فقط)</div>'+
+      '<div style="font-size:.72rem;color:var(--t3);line-height:1.9;margin-bottom:10px">شخص = 30 ريال · شخصين = 50 ريال (كودين) · كل شخص إضافي +25 ريال</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">'+
+        '<div style="display:flex;align-items:center;gap:9px">'+
+          '<button type="button" onclick="tuSubQtyAdd(-1)" style="'+bs+'">−</button>'+
+          '<div style="text-align:center;min-width:70px"><div id="tu-sub-qty" style="font-size:1.1rem;font-weight:900">1</div><div style="font-size:.62rem;color:var(--t3)">عدد الأشخاص</div></div>'+
+          '<button type="button" onclick="tuSubQtyAdd(1)" style="'+bs+'">+</button>'+
+        '</div>'+
+        '<div style="text-align:end"><div id="tu-sub-total" style="font-size:1.4rem;font-weight:900;color:var(--a2,#73a7ff)">30 <span style="font-size:.7rem">ريال</span></div><div id="tu-sub-det" style="font-size:.66rem;color:var(--t3)">كود واحد سنوي · 30 ريال</div></div>'+
+      '</div>';
+    yb.parentNode.insertBefore(box,yb);
+    yb.id='tu-sub-cta';
+    yb.setAttribute('onclick',"tuQuickPay('year')");
+    if(termBtn)termBtn.setAttribute('onclick',"tuQuickPay('term')");
+    renderSubOffer();
+  }catch(e){}
+}
+function patchPay(){
+  if(window.__tuPayFetchPatched)return;
+  window.__tuPayFetchPatched=true;
+  var of=window.fetch;
+  window.fetch=function(u,o){
+    try{
+      var url=String((u&&u.url)||u||'');
+      if(url.indexOf('tamara-checkout')>-1&&o&&typeof o.body==='string'){
+        var b=JSON.parse(o.body);
+        b.quantity=window.__tuPayQty||1;
+        b.codes_count=b.quantity;
+        if(window.__tuPayTotal)b.expected_amount=window.__tuPayTotal;
+        if(b.quantity>1)b.offer='year_multi';
+        o.body=JSON.stringify(b);
+        if(b.phone_number){ try{ localStorage.setItem('tu_pay_phone',b.phone_number); }catch(e){} }
+      }
+    }catch(e){}
+    return of.apply(this,arguments);
+  };
+}
+window.tuSubQtyAdd=tuSubQtyAdd; window.tuQuickPay=tuQuickPay;
+try{ setInterval(function(){ try{ injectSubOffers(); patchPay(); }catch(e){} },2000); }catch(e){}
 function tuaiCloseRev(){ var ov=document.getElementById('tuai-rev'); if(ov)ov.classList.remove('on'); }
 window.tuaiCloseRev=tuaiCloseRev;
 function SD(){
@@ -10096,13 +10193,12 @@ function injectSchCard(){
       '<button class="tuai-btn-soft" type="button" onclick="tuaiToggle(true)">🤖 اسأل المساعد</button>'+
     '</div>'+
     '<div id="tuai-sch-status"></div>';
-  var acts=card.querySelector('.sch-actions');
-  if(acts&&acts.parentNode)acts.parentNode.insertBefore(box,acts);
-  else card.appendChild(box);
+  card.appendChild(box);
 }
 
 /* ---------------- dynamic time range for the weekly grid ---------------- */
 function patchCal(){
+  return; /* شكل الجدول الأصلي */
   if(typeof window.schCalMarkup!=='function'||window.__tuaiCalPatched)return;
   window.__tuaiCalPatched=true;
   window.schCalMarkup=function(pm){
