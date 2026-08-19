@@ -10444,7 +10444,6 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
 
 
 
-<!-- ==== TU-PARSE v2 + TU-PROF v1 (مدمج) ==== -->
 <script>
 /*! TU-PARSE v1 — استيراد جدول الطالب من صورة نظام التسجيل (جامعة طيبة)
  *  يعمل مع Edge Function: /functions/v1/parse-schedule
@@ -10776,8 +10775,13 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
           body: JSON.stringify({ imageBase64: img.base64, mimeType: img.mimeType, force: !!opts.force })
         });
       }).then(function (res) {
-        return res.json().then(function (body) {
+        return res.json().catch(function () { return {}; }).then(function (body) {
           if (!res.ok) {
+            if (res.status === 404) {
+              var eDep = new Error("قارئ الصور ما انفعل في السيرفر بعد. يحتاج تفعيل مرة واحدة. لين ذاك الوقت أضف موادك من زر إضافة مادة.");
+              eDep.needsDeploy = true;
+              throw eDep;
+            }
             var msg = {
               rate_limited: "حاولت مرات كثيرة، انتظر شوي وأعد المحاولة",
               image_too_large: "الصورة كبيرة مرة، صوّر لقطة شاشة بدل صورة الكاميرا",
@@ -11112,8 +11116,13 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
         body: JSON.stringify(payload)
       });
     }).then(function (res) {
-      return res.json().then(function (body) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
         if (!res.ok) {
+          if (res.status === 404 || /not\s*found/i.test(String((body && (body.message || body.error)) || ""))) {
+            var e404 = new Error("ميزة تقييم الدكاترة ما انفعّلت في السيرفر بعد — تحتاج تفعيل مرة واحدة. لين داك الوقت افتح قيّم من الرابط تحت.");
+            e404.needsDeploy = true;
+            throw e404;
+          }
           var msg = {
             not_authenticated: "انتهت الجلسة، سجل الدخول من جديد",
             missing_ai_key: "مفتاح الذكاء الاصطناعي ما انضاف في السيرفر",
@@ -11126,6 +11135,14 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
         }
         return body;
       });
+    }).catch(function (err) {
+      if (err && err.needsDeploy) throw err;
+      if (err instanceof TypeError) {
+        var e2 = new Error("ما قدرت أوصل للسيرفر — تأكد من الإنترنت أو إن الميزة مفعّلة.");
+        e2.needsDeploy = true;
+        throw e2;
+      }
+      throw err;
     });
   }
 
