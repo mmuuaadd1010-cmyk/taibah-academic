@@ -11131,6 +11131,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
             lookup_failed: "ما قدرت أوصل لقيّم الحقين، جرّب بعد شوي",
             bad_url: "الرابط لازم يكون من qeeem.com"
           }[body && body.error] || (body && (body.detail || body.error)) || "تعذر جلب التقييمات";
+          if (body && body.detail) msg = String(body.detail);
           throw new Error(msg);
         }
         return body;
@@ -11530,6 +11531,11 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     return name.length >= 4 ? name : null;
   }
 
+  function profUrl(q) {
+    var m = String(q || '').match(/https?:\/\/(?:www\.)?qeeem\.com\/[^\s]+/i);
+    return m ? m[0] : null;
+  }
+
   function bubble(html, cls) {
     var b = document.getElementById('tuai-body');
     if (!b) return null;
@@ -11552,11 +11558,11 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     box.appendChild(btn);
   }
 
-  function answerProf(name) {
-    bubble(esc(name), 'me');
+  function answerProf(name, url) {
+    bubble(esc(url || name), 'me');
     var box = bubble('🎓 أقرأ تقييمات <b>' + esc(name) + '</b> من موقع قيّم…');
-    if (!box) { window.tprOpen(name); return; }
-    window.TU_PROF.ask({ name: name }).then(function (body) {
+    if (!box) { window.tprOpen(url || name); return; }
+    window.TU_PROF.ask(url ? { url: url } : { name: name }).then(function (body) {
       if (body && body.ok === false && body.error === 'not_found') {
         var h = 'ما لقيت <b>' + esc(name) + '</b> بالضبط في قيّم.';
         if ((body.suggestions || []).length) {
@@ -11586,7 +11592,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
       t += '<br><br>المصدر: <a href="' + esc(body.sourceUrl || 'https://qeeem.com/taibahu') +
            '" target="_blank" rel="noopener">صفحته في قيّم</a>';
       box.innerHTML = t;
-      fullCardBtn(box, p.name || name);
+      fullCardBtn(box, p.name || name || url);
     }, function (err) {
       box.innerHTML = '⚠️ ' + esc((err && err.message) || 'تعذر جلب التقييمات') +
         '<br><a href="https://qeeem.com/taibahu" target="_blank" rel="noopener">افتح قيّم يدويًا</a>';
@@ -11601,11 +11607,12 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
       try {
         var inp = document.getElementById('tuai-input');
         var q = inp ? String(inp.value || '').trim() : '';
-        var name = q ? profIntent(q) : null;
-        if (name && window.TU_PROF) {
+        var purl = q ? profUrl(q) : null;
+        var name = purl ? null : (q ? profIntent(q) : null);
+        if ((name || purl) && window.TU_PROF) {
           inp.value = '';
           try { inp.style.height = ''; } catch (e) {}
-          answerProf(name);
+          answerProf(name, purl);
           return;
         }
       } catch (e) {}
@@ -11624,14 +11631,15 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
       var t = e.target;
       if (!t || t.id !== 'tuai-input') return;
       var q = String(t.value || '').trim();
-      var name = q ? profIntent(q) : null;
-      if (!name || !window.TU_PROF) return;
+      var purl = q ? profUrl(q) : null;
+      var name = purl ? null : (q ? profIntent(q) : null);
+      if ((!name && !purl) || !window.TU_PROF) return;
       e.preventDefault();
       e.stopPropagation();
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
       t.value = '';
       try { t.style.height = ''; } catch (e2) {}
-      answerProf(name);
+      answerProf(name, purl);
     } catch (e3) {}
   }, true);
 
