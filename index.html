@@ -2809,7 +2809,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <div class="card-h">📅 جدولي الأسبوعي <span class="sub">عرض أسبوعي كامل بدون سحب — اضغط أي مادة لتعديلها</span></div>
         <div id="my-sch-banner"></div>
         <div class="sch-view" id="schedule-grid-wrap"><div class="empty" style="padding:34px 14px"><span class="ei">📅</span>لا توجد مواد بعد — اضغط «➕ إضافة مادة» بالأسفل لإضافة محاضراتك</div></div>
-        <div class="sch-actions no-print"><button class="btn-add-goal" style="flex:1" onclick="openSchAdd()">إضافة مادة</button><button class="btn-add-goal" style="flex:1" onclick="tupOpen()">📷 استيراد من صورة</button><button class="btn-ghost" style="flex:1" onclick="exportSchPDF()">طباعة / PDF</button><button class="btn-ghost" style="flex:1" onclick="exportSchImage()">حفظ كصورة</button></div>
+        <div class="sch-actions no-print"><button class="btn-add-goal" style="flex:1" onclick="openSchAdd()">إضافة مادة</button><button class="btn-add-goal" style="flex:1" onclick="tupOpen()">📷 استيراد من صورة</button><button class="btn-add-goal" style="flex:1" onclick="tprOpen()">🎓 تقييم دكتور</button><button class="btn-ghost" style="flex:1" onclick="exportSchPDF()">طباعة / PDF</button><button class="btn-ghost" style="flex:1" onclick="exportSchImage()">حفظ كصورة</button></div>
       </div>
     </div>
 
@@ -10443,316 +10443,8 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
 </script>
 
 
-<!-- ==== TU-SCHED v1 : جدول التسجيل (10 محاضرات / 17 وحدة) ==== -->
-<script>
-/* =====================================================================
- * TU Academic — جدولي (مقروء يدويًا من صورة جدول التسجيل)
- * كل نقطة حمراء = محاضرة واحدة في يومها.
- * المجموع: 10 محاضرات أسبوعيًا ، 17 وحدة مسجلة.
- * أرقام الأيام: 0=الأحد 1=الاثنين 2=الثلاثاء 3=الأربعاء 4=الخميس
- * ===================================================================== */
-(function (root) {
-  "use strict";
 
-  var DAY_NAMES = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
-
-  var DATA = {
-    meta: {
-      source: "صورة جدول التسجيل",
-      totalUnits: 17,
-      totalMeetings: 10,
-      dayNames: DAY_NAMES
-    },
-    courses: [
-      {
-        code: "COE", num: "124", section: "M1", units: 4,
-        name: "تنظيم وبناء الحاسب الآلي (1)",
-        short: "تنظيم وبناء الحاسب",
-        color: "#5b9dfd",
-        meetings: [
-          { day: 0, start: "10:30", end: "11:45", room: "172GB004", floor: "الأرضي - جناح B", building: "172", kind: "نظري" },
-          { day: 1, start: "10:30", end: "11:45", room: "172GB004", floor: "الأرضي - جناح B", building: "172", kind: "نظري" },
-          { day: 2, start: "10:45", end: "12:25", room: "172GB004", floor: "الأرضي - جناح B", building: "172", kind: "عملي" }
-        ]
-      },
-      {
-        code: "CS", num: "205", section: "M1", units: 3,
-        name: "نظرية الحوسبة",
-        short: "نظرية الحوسبة",
-        color: "#a78bfa",
-        meetings: [
-          { day: 1, start: "11:45", end: "13:00", room: "172GD005", floor: "الأرضي - جناح D", building: "172", kind: "نظري" },
-          { day: 3, start: "11:45", end: "13:00", room: "172GD005", floor: "الأرضي - جناح D", building: "172", kind: "نظري" }
-        ]
-      },
-      {
-        code: "ENGL", num: "214", section: "M2", units: 3,
-        name: "مهارات الكتابة الفنية",
-        short: "مهارات الكتابة",
-        color: "#e39a5c",
-        meetings: [
-          { day: 0, start: "13:00", end: "14:15", room: "172GD005", floor: "الأرضي - جناح D", building: "172", kind: "نظري" },
-          { day: 3, start: "13:00", end: "14:15", room: "172FA003", floor: "الأول - جناح A", building: "172", kind: "نظري" }
-        ]
-      },
-      {
-        code: "MATH", num: "106", section: "M1", units: 3,
-        name: "تفاضل وتكامل (2)",
-        short: "تفاضل وتكامل (2)",
-        color: "#36c5a8",
-        meetings: [
-          { day: 0, start: "08:30", end: "10:10", room: "172FA001", floor: "الأول - جناح A", building: "172", kind: "نظري" },
-          { day: 3, start: "08:30", end: "10:10", room: "172FA001", floor: "الأول - جناح A", building: "172", kind: "نظري" }
-        ]
-      },
-      {
-        code: "GSE", num: "1", section: "M36", units: 2,
-        name: "مقرر متطلب جامعة اختياري (1)",
-        short: "متطلب جامعة (أونلاين)",
-        color: "#3ecf8e",
-        online: true,
-        meetings: [
-          { day: 3, start: "17:40", end: "19:20", room: "Blackboard", floor: "أونلاين", building: "أونلاين", kind: "أونلاين" }
-        ]
-      },
-      {
-        code: "FE", num: "1", section: "M89", units: 2,
-        name: "مقرر اختياري حر",
-        short: "اختياري حر",
-        color: "#94a3b8",
-        unscheduled: true,
-        note: "ما فيه أي نقطة حمراء في الصورة (الوقت المكتوب 10:30-12:10 بدون يوم) — يحدده القسم",
-        meetings: []
-      }
-    ]
-  };
-
-  /* ---------- أدوات وقت ---------- */
-  function t2m(s) {
-    var p = String(s || "").split(":");
-    return (+p[0] || 0) * 60 + (+p[1] || 0);
-  }
-  function m2t(m) {
-    var h = Math.floor(m / 60), mm = m % 60;
-    var ap = h >= 12 ? "م" : "ص";
-    var h12 = h % 12; if (h12 === 0) h12 = 12;
-    return h12 + ":" + String(mm).padStart(2, "0") + " " + ap;
-  }
-
-  /* ---------- قائمة مسطحة: محاضرة واحدة = عنصر واحد ---------- */
-  function lectures() {
-    var out = [];
-    DATA.courses.forEach(function (c) {
-      (c.meetings || []).forEach(function (m) {
-        out.push({
-          courseCode: c.code + " " + c.num,
-          courseName: c.name,
-          short: c.short || c.name,
-          section: c.section,
-          units: c.units,
-          color: c.color,
-          online: !!c.online,
-          kind: m.kind,
-          day: m.day,
-          dayName: DAY_NAMES[m.day],
-          start: m.start,
-          end: m.end,
-          startMin: t2m(m.start),
-          endMin: t2m(m.end),
-          durationMin: t2m(m.end) - t2m(m.start),
-          room: m.room,
-          floor: m.floor,
-          building: m.building
-        });
-      });
-    });
-    out.sort(function (a, b) { return a.day - b.day || a.startMin - b.startMin; });
-    return out;
-  }
-
-  function byDay() {
-    var d = [[], [], [], [], []];
-    lectures().forEach(function (l) { d[l.day].push(l); });
-    return d;
-  }
-
-  /* ---------- تعارضات وقتية (تحقق من سلامة القراءة) ---------- */
-  function conflicts() {
-    var res = [], d = byDay();
-    d.forEach(function (list) {
-      for (var i = 0; i < list.length; i++) {
-        for (var j = i + 1; j < list.length; j++) {
-          if (list[j].startMin < list[i].endMin && list[i].startMin < list[j].endMin) {
-            res.push([list[i], list[j]]);
-          }
-        }
-      }
-    });
-    return res;
-  }
-
-  /* ---------- المحاضرة الحالية / القادمة ---------- */
-  // أيام JS: 0=الأحد ... فهي نفس ترقيمنا للأحد-الخميس
-  function nowInfo(ref) {
-    var now = ref ? new Date(ref) : new Date();
-    var jd = now.getDay(), min = now.getHours() * 60 + now.getMinutes();
-    var all = lectures();
-    var current = null;
-    if (jd <= 4) {
-      current = all.filter(function (l) {
-        return l.day === jd && min >= l.startMin && min < l.endMin;
-      })[0] || null;
-    }
-    var next = null, bestDelta = Infinity;
-    all.forEach(function (l) {
-      var delta = (l.day - jd) * 1440 + (l.startMin - min);
-      if (delta < 0) delta += 7 * 1440;             // لفّ للأسبوع الجاي
-      if (delta > 0 && delta < bestDelta) { bestDelta = delta; next = l; }
-    });
-    return { current: current, next: next, minutesToNext: next ? Math.round(bestDelta) : null };
-  }
-
-  /* ---------- تحويل لـ «جدولي» في الموقع ---------- */
-  function siteItems() {
-    return lectures().map(function (l, i) {
-      return {
-        id: "tu" + (i + 1) + l.day + l.start.replace(":", ""),
-        name: l.courseCode + " · " + l.short + (l.kind === "عملي" ? " (عملي)" : ""),
-        place: l.online ? "أونلاين · Blackboard" : (l.room + " · " + l.floor),
-        day: l.day,
-        start: l.start,
-        end: l.end,
-        color: l.color
-      };
-    });
-  }
-
-  // يكتب الجدول داخل الموقع (نفس مفتاح التخزين tu_pro_sch)
-  function importToSite(opts) {
-    opts = opts || {};
-    var items = siteItems();
-    var sd = { items: items, __generated: true };
-    if (opts.merge && root.scheduleData && Array.isArray(root.scheduleData.items)) {
-      var keep = root.scheduleData.items.filter(function (e) {
-        return String(e.id || "").indexOf("tu") !== 0;
-      });
-      sd.items = keep.concat(items);
-    }
-    try { root.scheduleData = sd; } catch (e) {}
-    try { localStorage.setItem("tu_pro_sch", JSON.stringify(sd)); } catch (e) {}
-    if (typeof root.renderSchedule === "function") { try { root.renderSchedule(); } catch (e) {} }
-    if (typeof root.renderAchievements === "function") { try { root.renderAchievements(); } catch (e) {} }
-    if (typeof root.toast === "function") { root.toast("تم استيراد " + items.length + " محاضرة للجدول ✅"); }
-    return items.length;
-  }
-
-  /* ---------- تصدير تقويم (ICS) ---------- */
-  // عدّل تواريخ الفصل قبل التصدير
-  var TERM = { start: "2026-08-23", end: "2026-12-17" };
-  var BYDAY = ["SU", "MO", "TU", "WE", "TH"];
-
-  function pad(n) { return String(n).padStart(2, "0"); }
-  function firstDateOn(day, fromISO) {
-    var d = new Date(fromISO + "T00:00:00");
-    while (d.getDay() !== day) d.setDate(d.getDate() + 1);
-    return d;
-  }
-  function stamp(d, hhmm) {
-    var p = String(hhmm).split(":");
-    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(p[0]) + pad(p[1]) + "00";
-  }
-  function ics(term) {
-    term = term || TERM;
-    var until = term.end.replace(/-/g, "") + "T235900";
-    var L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//TU Academic//Schedule//AR", "CALSCALE:GREGORIAN"];
-    lectures().forEach(function (l, i) {
-      var d0 = firstDateOn(l.day, term.start);
-      L.push(
-        "BEGIN:VEVENT",
-        "UID:tu-" + (i + 1) + "-" + l.day + "-" + l.start.replace(":", "") + "@tu.academic",
-        "SUMMARY:" + l.courseCode + " - " + l.courseName + (l.kind === "عملي" ? " (عملي)" : ""),
-        "LOCATION:" + (l.online ? "Blackboard (أونلاين)" : l.room + " - " + l.floor + " - مبنى " + l.building),
-        "DESCRIPTION:شعبة " + l.section + " - " + l.units + " وحدات",
-        "DTSTART:" + stamp(d0, l.start),
-        "DTEND:" + stamp(d0, l.end),
-        "RRULE:FREQ=WEEKLY;BYDAY=" + BYDAY[l.day] + ";UNTIL=" + until,
-        "BEGIN:VALARM", "TRIGGER:-PT15M", "ACTION:DISPLAY", "DESCRIPTION:محاضرة بعد 15 دقيقة", "END:VALARM",
-        "END:VEVENT"
-      );
-    });
-    L.push("END:VCALENDAR");
-    return L.join("\r\n");
-  }
-  function downloadIcs(term) {
-    var blob = new Blob([ics(term)], { type: "text/calendar;charset=utf-8" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "tu-schedule.ics";
-    document.body.appendChild(a); a.click(); a.remove();
-  }
-
-  /* ---------- ملخص نصي للتحقق ---------- */
-  function summary() {
-    var d = byDay(), lines = [];
-    lines.push("المجموع: " + lectures().length + " محاضرة · " + DATA.meta.totalUnits + " وحدة");
-    d.forEach(function (list, i) {
-      lines.push("— " + DAY_NAMES[i] + " (" + list.length + "): " + (list.length
-        ? list.map(function (l) { return l.courseCode + " " + l.start + "-" + l.end; }).join(" | ")
-        : "فاضي"));
-    });
-    return lines.join("\n");
-  }
-
-  var API = {
-    data: DATA,
-    dayNames: DAY_NAMES,
-    lectures: lectures,
-    byDay: byDay,
-    conflicts: conflicts,
-    nowInfo: nowInfo,
-    siteItems: siteItems,
-    importToSite: importToSite,
-    ics: ics,
-    downloadIcs: downloadIcs,
-    summary: summary,
-    t2m: t2m,
-    fmt: m2t,
-    TERM: TERM
-  };
-
-  root.TU_SCHED = API;
-  root.TU_SCHED_DATA = DATA;
-  if (typeof module !== "undefined" && module.exports) module.exports = API;
-})(typeof window !== "undefined" ? window : globalThis);
-
-</script>
-<script>
-(function(){
-  function boot(){
-    try{
-      if(!window.TU_SCHED) return;
-      if(localStorage.getItem('tu_sched_v1')==='1') return;
-      var old=localStorage.getItem('tu_pro_sch');
-      if(old) localStorage.setItem('tu_pro_sch_backup', old);
-      var payload={items:TU_SCHED.siteItems(), __generated:true};
-      localStorage.setItem('tu_pro_sch', JSON.stringify(payload));
-      localStorage.setItem('tu_sched_v1','1');
-      var applied=false;
-      try{ scheduleData=payload; applied=true; }catch(e){ applied=false; }
-      if(applied && typeof renderSchedule==='function'){
-        try{ renderSchedule(); }catch(e){}
-        if(typeof renderAchievements==='function'){ try{ renderAchievements(); }catch(e){} }
-      } else {
-        location.reload();
-      }
-    }catch(e){}
-  }
-  if(document.readyState==='complete') setTimeout(boot,300);
-  else window.addEventListener('load', function(){ setTimeout(boot,300); });
-})();
-</script>
-
-<!-- ==== TU-PARSE v2 : استيراد الجدول من صورة (مدمج) ==== -->
+<!-- ==== TU-PARSE v2 + TU-PROF v1 (مدمج) ==== -->
 <script>
 /*! TU-PARSE v1 — استيراد جدول الطالب من صورة نظام التسجيل (جامعة طيبة)
  *  يعمل مع Edge Function: /functions/v1/parse-schedule
@@ -10899,7 +10591,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
   /* ---------- التحقق ---------- */
 
   function validate(payload) {
-    var errors = [], warnings = [];
+    var errors = [], warnings = [], suspicions = [];
     var list = meetings(payload);
     var units = 0;
 
@@ -10918,7 +10610,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
       var day = list.filter(function (m) { return m.day === d; });
       for (var i = 1; i < day.length; i++) {
         if (day[i].startMin < day[i - 1].endMin) {
-          errors.push("تعارض " + DAY_NAMES[d] + ": " + day[i - 1].label + " (" +
+          suspicions.push("تعارض " + DAY_NAMES[d] + ": " + day[i - 1].label + " (" +
             day[i - 1].start + "–" + day[i - 1].end + ") مع " + day[i].label +
             " (" + day[i].start + "–" + day[i].end + ")");
         }
@@ -10931,7 +10623,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     });
 
     if (payload.dotCount && payload.dotCount !== list.length) {
-      errors.push("عدد النقاط الحمراء في الصورة " + payload.dotCount +
+      suspicions.push("عدد النقاط الحمراء في الصورة " + payload.dotCount +
         " والمحاضرات اللي طلعت " + list.length);
     }
     if (payload.dotsPerDay) {
@@ -10939,7 +10631,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
         var want = payload.dotsPerDay[dd] || 0;
         var got = list.filter(function (m) { return m.day === dd; }).length;
         if (want !== got) {
-          errors.push(DAY_NAMES[dd] + ": نقاط الصورة " + want + " والمحاضرات اللي طلعت " + got);
+          suspicions.push(DAY_NAMES[dd] + ": نقاط الصورة " + want + " والمحاضرات اللي طلعت " + got);
         }
       }
     }
@@ -10954,6 +10646,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     return {
       ok: errors.length === 0,
       errors: errors,
+      suspicions: suspicions,
       warnings: warnings,
       stats: {
         meetings: list.length,
@@ -11112,6 +10805,20 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     });
   }
 
+  function mkey(m) {
+    return [m.code, m.num, m.section, m.day, m.start, m.end].join("|");
+  }
+
+  function removeMeeting(payload, key) {
+    (payload.courses || []).forEach(function (c) {
+      c.meetings = (c.meetings || []).filter(function (m) {
+        return [c.code, c.num, c.section, m.day, m.start, m.end].join("|") !== key;
+      });
+      if (!c.meetings.length) c.unscheduled = true;
+    });
+    return payload;
+  }
+
   function reviewMarkup(payload, v) {
     var list = meetings(payload);
     var h = "";
@@ -11133,9 +10840,14 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     h += "</div>";
 
     if (v.errors.length) {
-      h += '<div class="tup-alert tup-err"><b>ما طلعت مضبوطة 100%:</b><ul>';
+      h += '<div class="tup-alert tup-err"><b>ما قدرت أقرأ الصورة:</b><ul>';
       v.errors.forEach(function (e) { h += "<li>" + esc(e) + "</li>"; });
       h += '</ul><div class="tup-tips">جرّب: لقطة شاشة من النظام بدل صورة كاميرا · الجدول كامل داخل الصورة · بدون ميل أو ظل · وضوح عالي</div></div>';
+    }
+    if ((v.suspicions || []).length) {
+      h += '<div class="tup-alert tup-warn"><b>قرأت الجدول — بس راجع هذي النقاط قبل الحفظ:</b><ul>';
+      v.suspicions.forEach(function (e) { h += "<li>" + esc(e) + "</li>"; });
+      h += '</ul><div class="tup-tips">احذف أي صف غلط من زر ✕ جنبه، أو احفظ وعدّله من جدولك مباشرة</div></div>';
     }
     if (v.warnings.length) {
       h += '<div class="tup-alert tup-warn"><b>ملاحظات:</b><ul>';
@@ -11144,7 +10856,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     }
 
     h += '<div class="tup-tablewrap"><table class="tup-table"><thead><tr>' +
-         "<th>#</th><th>اليوم</th><th>الوقت</th><th>المادة</th><th>شعبة</th><th>القاعة</th>" +
+         "<th>#</th><th>اليوم</th><th>الوقت</th><th>المادة</th><th>شعبة</th><th>القاعة</th><th></th>" +
          "</tr></thead><tbody>";
     list.forEach(function (m, i) {
       h += "<tr>" +
@@ -11156,6 +10868,8 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
           (m.kind === "عملي" ? ' <span class="tup-tag">عملي</span>' : "") + "</td>" +
         "<td>" + esc(m.section) + "</td>" +
         "<td>" + (m.online ? "أونلاين" : esc(m.room)) + "</td>" +
+        '<td><button class="tup-del" type="button" title="احذف الصف" data-del="' +
+          esc(mkey(m)) + '">✕</button></td>' +
         "</tr>";
     });
     h += "</tbody></table></div>";
@@ -11184,6 +10898,8 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     ".tup-drop small{display:block;color:var(--t2,#777);margin-top:6px;font-size:12.5px}" +
     ".tup-chip-ok{background:rgba(62,207,142,.14);border-color:rgba(62,207,142,.55);color:#17734a}" +
     ".tup-chip-bad{background:rgba(240,100,92,.14);border-color:rgba(240,100,92,.55);color:#a3342e}" +
+    ".tup-del{background:none;border:1px solid var(--bor2,#e6e4e1);border-radius:8px;color:#c0524c;cursor:pointer;padding:2px 7px;font-size:12px;line-height:1.6}" +
+    ".tup-del:hover{background:rgba(240,100,92,.12);border-color:rgba(240,100,92,.5)}" +
     ".tup-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}" +
     ".tup-b{border:0;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}" +
     ".tup-b-main{background:#2783de;color:#fff}" +
@@ -11290,6 +11006,15 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
         close();
         if (typeof opts.onImport === "function") opts.onImport(res.payload);
       };
+      Array.prototype.forEach.call(body.querySelectorAll("[data-del]"), function (btn) {
+        btn.onclick = function () {
+          var ag = res.validation.agreement;
+          removeMeeting(res.payload, btn.getAttribute("data-del"));
+          res.validation = validate(res.payload);
+          res.validation.agreement = ag;
+          stepReview(res);
+        };
+      });
       body.querySelector('[data-a="again"]').onclick = function () { stepPick(""); };
       body.querySelector('[data-a="cancel"]').onclick = close;
     }
@@ -11316,6 +11041,7 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
     parseFile: parseFile,
     openImporter: openImporter,
     setEndpoint: function (u) { ENDPOINT = u; },
+    removeMeeting: removeMeeting,
     t2m: t2m,
     fmt: m2t
   };
@@ -11323,30 +11049,577 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
 
 </script>
 <script>
+/* =====================================================================
+ * TU Academic — مساعد تقييم الدكاترة
+ * المصدر الوحيد: موقع «قيّم» https://qeeem.com/taibahu
+ * يعمل مع Edge Function: /functions/v1/prof-rate
+ * ===================================================================== */
+(function (root) {
+  "use strict";
+
+  var ENDPOINT = null;
+  var RECENT_KEY = "tu_prof_recent";
+  var SOURCE_HOME = "https://qeeem.com/taibahu";
+
+  function endpoint() {
+    if (ENDPOINT) return ENDPOINT;
+    var base = root.SB_URL || "";
+    return base ? base + "/functions/v1/prof-rate" : "/functions/v1/prof-rate";
+  }
+
+  function getToken() {
+    var sb = root.sbClient || root.supabaseClient;
+    if (sb && sb.auth && sb.auth.getSession) {
+      return sb.auth.getSession().then(function (r) {
+        return (r && r.data && r.data.session && r.data.session.access_token) || null;
+      }).catch(function () { return null; });
+    }
+    return Promise.resolve(null);
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  function recents(add) {
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]") || []; } catch (e) { list = []; }
+    if (add) {
+      list = list.filter(function (x) { return x !== add; });
+      list.unshift(add);
+      list = list.slice(0, 8);
+      try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    return list;
+  }
+
+  /* ---------- الطلب ---------- */
+
+  function ask(q) {
+    q = q || {};
+    var payload = {};
+    if (q.url) payload.url = String(q.url).trim();
+    else payload.name = String(q.name || "").trim();
+    if (q.force) payload.force = true;
+
+    return getToken().then(function (token) {
+      if (!token) throw new Error("لازم تسجل الدخول أول عشان نقرأ التقييمات");
+      return fetch(endpoint(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify(payload)
+      });
+    }).then(function (res) {
+      return res.json().then(function (body) {
+        if (!res.ok) {
+          var msg = {
+            not_authenticated: "انتهت الجلسة، سجل الدخول من جديد",
+            missing_ai_key: "مفتاح الذكاء الاصطناعي ما انضاف في السيرفر",
+            missing_name: "اكتب اسم الدكتور",
+            page_failed: "تعذر فتح صفحة الدكتور في قيّم، جرّب بعد شوي",
+            lookup_failed: "ما قدرت أوصل لقيّم الحقين، جرّب بعد شوي",
+            bad_url: "الرابط لازم يكون من qeeem.com"
+          }[body && body.error] || (body && (body.detail || body.error)) || "تعذر جلب التقييمات";
+          throw new Error(msg);
+        }
+        return body;
+      });
+    });
+  }
+
+  /* ---------- عرض النتيجة ---------- */
+
+  function tone(n) {
+    if (n == null) return "tpf-na";
+    if (n >= 85) return "tpf-great";
+    if (n >= 70) return "tpf-good";
+    if (n >= 50) return "tpf-mid";
+    return "tpf-low";
+  }
+
+  function bar(label, n) {
+    var v = n == null ? 0 : Math.max(0, Math.min(100, n));
+    return '<div class="tpf-bar"><span class="tpf-bl">' + esc(label) + '</span>' +
+      '<span class="tpf-bt"><i class="' + tone(n) + '" style="width:' + v + '%"></i></span>' +
+      '<b>' + (n == null ? "—" : n) + '</b></div>';
+  }
+
+  function confBadge(c) {
+    var map = {
+      high: ["درجة الثقة عالية", "tpf-ok"],
+      medium: ["درجة الثقة متوسطة", "tpf-warn"],
+      low: ["عينة قليلة — خل بالك", "tpf-bad"]
+    }[c];
+    return map ? '<span class="tpf-chip ' + map[1] + '">' + map[0] + '</span>' : "";
+  }
+
+  function sentBadge(s) {
+    var map = {
+      positive: ["أغلب الآراء إيجابية", "tpf-ok"],
+      mixed: ["الآراء مختلفة", "tpf-warn"],
+      negative: ["أغلب الآراء سلبية", "tpf-bad"],
+      unknown: ["ما فيه اتجاه واضح", ""]
+    }[s];
+    return map ? '<span class="tpf-chip ' + map[1] + '">' + map[0] + '</span>' : "";
+  }
+
+  function cardMarkup(b) {
+    if (!b) return "";
+    if (b.ok === false && b.error === "not_found") {
+      var h = '<div class="tpf-alert tpf-a-warn"><b>ما لقيت الدكتور «' + esc(b.query || "") +
+        '» بالضبط.</b> جرّب اسمه الرباعي أو اختر من المقترحات:</div>';
+      if ((b.suggestions || []).length) {
+        h += '<div class="tpf-sug">';
+        b.suggestions.forEach(function (s) {
+          h += '<button class="tpf-sg" type="button" data-url="' + esc(s.url) + '">' +
+            esc(s.name) + (s.dept ? ' <small>' + esc(s.dept) + "</small>" : "") + "</button>";
+        });
+        h += "</div>";
+      }
+      h += '<div class="tpf-note">أو الصق رابط صفحته من قيّم فوق وأقرأه لك مباشرة · ' +
+        '<a href="' + SOURCE_HOME + '" target="_blank" rel="noopener">افتح قيّم</a></div>';
+      return h;
+    }
+
+    var p = b.professor || {};
+    var sc = b.scores || {};
+    var v = b.verdict || null;
+    var out = "";
+
+    out += '<div class="tpf-head">' +
+      '<div class="tpf-ring ' + tone(sc.overall) + '"><b>' +
+        (sc.overall == null ? "—" : sc.overall) + '</b><small>من 100</small></div>' +
+      '<div class="tpf-id"><h4>' + esc(p.name || "") + "</h4>" +
+        '<div class="tpf-dept">' + esc(p.dept || "القسم غير مذكور") + "</div>" +
+        '<div class="tpf-meta">' +
+          (sc.raters != null ? "<span>عدد المقيّمين: <b>" + sc.raters + "</b></span>" : "") +
+          (v && v.reviewsSeen ? "<span>تعليقات مقروءة: <b>" + v.reviewsSeen + "</b></span>" : "") +
+        "</div>" +
+      "</div></div>";
+
+    out += '<div class="tpf-bars">' + bar("الشرح", sc.teaching) +
+      bar("التعامل", sc.treatment) + bar("المساعدة", sc.help) + "</div>";
+
+    if ((b.badges || []).length) {
+      out += '<div class="tpf-chips">';
+      b.badges.forEach(function (x) { out += '<span class="tpf-chip">' + esc(x) + "</span>"; });
+      out += "</div>";
+    }
+
+    if (b.partial || !v) {
+      out += '<div class="tpf-alert tpf-a-warn">جبت الدرجات من قيّم، بس التلخيص ما اشتغل الحقين. ' +
+        'افتح المصدر واقرأ التعليقات بنفسك.</div>';
+    } else {
+      out += '<div class="tpf-badges">' + confBadge(v.confidence) + sentBadge(v.sentiment) + "</div>";
+      out += '<div class="tpf-sum">' + esc(v.summary || "") + "</div>";
+
+      out += '<div class="tpf-cols">';
+      out += '<div class="tpf-col"><h5>اللي ممدوح</h5><ul>';
+      (v.pros || []).forEach(function (x) { out += "<li>" + esc(x) + "</li>"; });
+      if (!(v.pros || []).length) out += "<li>غير مذكور</li>";
+      out += "</ul></div>";
+      out += '<div class="tpf-col tpf-cons"><h5>اللي ما عجبهم</h5><ul>';
+      (v.cons || []).forEach(function (x) { out += "<li>" + esc(x) + "</li>"; });
+      if (!(v.cons || []).length) out += "<li>غير مذكور</li>";
+      out += "</ul></div></div>";
+
+      out += '<div class="tpf-rows">' +
+        '<div><span>أسلوب الشرح</span><b>' + esc(v.teachingStyle || "غير مذكور") + "</b></div>" +
+        '<div><span>الدرجات والبونس</span><b>' + esc(v.grading || "غير مذكور") + "</b></div>" +
+        '<div><span>الغياب والحضور</span><b>' + esc(v.attendance || "غير مذكور") + "</b></div>" +
+        "</div>";
+
+      if (v.advice) out += '<div class="tpf-advice"><b>نصيحة قبل التسجيل:</b> ' + esc(v.advice) + "</div>";
+
+      if ((v.quotes || []).length) {
+        out += '<div class="tpf-quotes"><h5>من كلام الطلاب</h5>';
+        v.quotes.slice(0, 5).forEach(function (q) {
+          out += '<div class="tpf-q">“' + esc(q.text || "") + '”<small>' +
+            [q.course, q.grade, q.age].filter(Boolean).map(esc).join(" · ") + "</small></div>";
+        });
+        out += "</div>";
+      }
+    }
+
+    out += '<div class="tpf-src">المصدر: <b>موقع قيّم</b> · ' +
+      '<a href="' + esc(b.sourceUrl || SOURCE_HOME) + '" target="_blank" rel="noopener">افتح صفحة الدكتور</a>' +
+      (b.cached ? " · نسخة محفوظة" : "") + "</div>";
+    out += '<div class="tpf-dis">' + esc(b.disclaimer ||
+      "التقييمات آراء طلاب منشورة في موقع قيّم — ما تعبر عن رأي الموقع، وقد تتغير مع الوقت.") + "</div>";
+
+    return out;
+  }
+
+  /* ---------- المودال ---------- */
+
+  var CSS =
+    ".tpf-ov{position:fixed;inset:0;background:rgba(12,14,18,.62);backdrop-filter:blur(3px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}" +
+    ".tpf-box{background:var(--card,#fff);color:var(--t,#1f1f1f);border:1px solid var(--bor2,#e6e5e3);border-radius:16px;width:min(720px,100%);max-height:88vh;overflow:auto;padding:20px;direction:rtl;text-align:right;font-family:inherit}" +
+    ".tpf-h{display:flex;align-items:center;justify-content:space-between;gap:12px}" +
+    ".tpf-h h3{margin:0;font-size:18px}" +
+    ".tpf-x{background:none;border:0;font-size:22px;cursor:pointer;color:var(--t2,#777);line-height:1}" +
+    ".tpf-sub{color:var(--t2,#777);font-size:13px;margin:4px 0 14px}" +
+    ".tpf-row{display:flex;gap:8px}" +
+    ".tpf-in{flex:1;padding:11px 13px;border:1px solid var(--bor2,#e6e4e1);border-radius:11px;background:var(--bg2,#f7f6f4);color:inherit;font:inherit}" +
+    ".tpf-go{padding:11px 18px;border:0;border-radius:11px;background:#2783de;color:#fff;font:inherit;font-weight:600;cursor:pointer}" +
+    ".tpf-go:disabled{opacity:.55;cursor:default}" +
+    ".tpf-recent{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}" +
+    ".tpf-rc{background:var(--bg2,#f4f3f1);border:1px solid var(--bor2,#e6e4e1);border-radius:999px;padding:4px 11px;font-size:12.5px;cursor:pointer;color:inherit;font-family:inherit}" +
+    ".tpf-res{margin-top:16px}" +
+    ".tpf-head{display:flex;gap:14px;align-items:center;margin-bottom:14px}" +
+    ".tpf-ring{width:78px;height:78px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 78px;border:4px solid #d8d6d3;background:var(--bg2,#f7f6f4)}" +
+    ".tpf-ring b{font-size:23px;line-height:1}" +
+    ".tpf-ring small{font-size:10px;color:var(--t2,#777)}" +
+    ".tpf-ring.tpf-great{border-color:#3ecf8e}.tpf-ring.tpf-good{border-color:#4a9df8}" +
+    ".tpf-ring.tpf-mid{border-color:#e8c05a}.tpf-ring.tpf-low{border-color:#f0645c}" +
+    ".tpf-id h4{margin:0 0 3px;font-size:17px}" +
+    ".tpf-dept{color:var(--t2,#777);font-size:13px}" +
+    ".tpf-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:5px;font-size:12.5px;color:var(--t2,#777)}" +
+    ".tpf-bars{display:grid;gap:8px;margin-bottom:12px}" +
+    ".tpf-bar{display:grid;grid-template-columns:74px 1fr 34px;align-items:center;gap:9px;font-size:13px}" +
+    ".tpf-bt{height:9px;border-radius:99px;background:var(--bg2,#eeece9);overflow:hidden;display:block}" +
+    ".tpf-bt i{display:block;height:100%;border-radius:99px;background:#4a9df8}" +
+    ".tpf-bt i.tpf-great{background:#3ecf8e}.tpf-bt i.tpf-good{background:#4a9df8}" +
+    ".tpf-bt i.tpf-mid{background:#e8c05a}.tpf-bt i.tpf-low{background:#f0645c}.tpf-bt i.tpf-na{background:#c9c6c2}" +
+    ".tpf-bar b{text-align:left;font-size:12.5px;color:var(--t2,#777)}" +
+    ".tpf-chips,.tpf-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}" +
+    ".tpf-chip{background:var(--bg2,#f4f3f1);border:1px solid var(--bor2,#e6e4e1);border-radius:999px;padding:3px 11px;font-size:12.5px}" +
+    ".tpf-chip.tpf-ok{background:rgba(62,207,142,.14);border-color:rgba(62,207,142,.5);color:#17734a}" +
+    ".tpf-chip.tpf-warn{background:rgba(232,192,90,.16);border-color:rgba(232,192,90,.5);color:#8a6a16}" +
+    ".tpf-chip.tpf-bad{background:rgba(240,100,92,.14);border-color:rgba(240,100,92,.5);color:#a3342e}" +
+    ".tpf-sum{background:var(--bg2,#f7f6f4);border:1px solid var(--bor2,#e6e4e1);border-radius:12px;padding:12px 14px;line-height:1.85;font-size:14px;margin-bottom:12px}" +
+    ".tpf-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}" +
+    ".tpf-col{background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.28);border-radius:12px;padding:10px 12px}" +
+    ".tpf-col.tpf-cons{background:rgba(240,100,92,.07);border-color:rgba(240,100,92,.28)}" +
+    ".tpf-col h5{margin:0 0 6px;font-size:13px}" +
+    ".tpf-col ul{margin:0;padding-inline-start:18px;font-size:13px;line-height:1.9}" +
+    ".tpf-rows{display:grid;gap:6px;margin-bottom:12px}" +
+    ".tpf-rows>div{display:flex;gap:10px;justify-content:space-between;background:var(--bg2,#f7f6f4);border-radius:10px;padding:8px 12px;font-size:13px}" +
+    ".tpf-rows span{color:var(--t2,#777);flex:0 0 auto}" +
+    ".tpf-rows b{font-weight:600;text-align:left}" +
+    ".tpf-advice{background:rgba(39,131,222,.08);border:1px solid rgba(39,131,222,.3);border-radius:12px;padding:11px 13px;font-size:13.5px;line-height:1.8;margin-bottom:12px}" +
+    ".tpf-quotes h5{margin:0 0 8px;font-size:13px}" +
+    ".tpf-q{border-inline-start:3px solid var(--bor2,#e0ded9);padding:2px 11px;margin-bottom:9px;font-size:13px;line-height:1.8}" +
+    ".tpf-q small{display:block;color:var(--t2,#8b867f);font-size:11.5px;margin-top:3px}" +
+    ".tpf-src{border-top:1px solid var(--bor2,#eceae7);margin-top:14px;padding-top:10px;font-size:12.5px}" +
+    ".tpf-src a{color:#2783de}" +
+    ".tpf-dis{color:var(--t2,#8b867f);font-size:11.5px;margin-top:4px;line-height:1.7}" +
+    ".tpf-alert{border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.8;margin-bottom:10px}" +
+    ".tpf-a-warn{background:rgba(232,192,90,.14);border:1px solid rgba(232,192,90,.45)}" +
+    ".tpf-a-bad{background:rgba(240,100,92,.12);border:1px solid rgba(240,100,92,.45)}" +
+    ".tpf-sug{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}" +
+    ".tpf-sg{background:var(--bg2,#f4f3f1);border:1px solid var(--bor2,#e6e4e1);border-radius:10px;padding:7px 11px;cursor:pointer;font:inherit;font-size:13px;color:inherit;text-align:right}" +
+    ".tpf-sg small{display:block;color:var(--t2,#8b867f);font-size:11px}" +
+    ".tpf-note{color:var(--t2,#777);font-size:12.5px}" +
+    ".tpf-note a{color:#2783de}" +
+    ".tpf-load{text-align:center;padding:26px 0;color:var(--t2,#777);font-size:13.5px}" +
+    ".tpf-spin{width:26px;height:26px;border:3px solid var(--bor2,#e6e4e1);border-top-color:#2783de;border-radius:50%;margin:0 auto 10px;animation:tpfsp .8s linear infinite}" +
+    "@keyframes tpfsp{to{transform:rotate(360deg)}}" +
+    "@media(max-width:560px){.tpf-cols{grid-template-columns:1fr}}";
+
+  function injectCss() {
+    if (document.getElementById("tpf-css")) return;
+    var st = document.createElement("style");
+    st.id = "tpf-css";
+    st.textContent = CSS;
+    document.head.appendChild(st);
+  }
+
+  function open(opts) {
+    opts = opts || {};
+    injectCss();
+    if (opts.endpoint) ENDPOINT = opts.endpoint;
+
+    var ov = document.createElement("div");
+    ov.className = "tpf-ov";
+    ov.innerHTML =
+      '<div class="tpf-box">' +
+        '<div class="tpf-h"><h3>🎓 اسأل عن دكتور</h3>' +
+        '<button class="tpf-x" type="button" aria-label="إغلاق">×</button></div>' +
+        '<div class="tpf-sub">التقييمات من موقع «قيّم» — تقييمات طلاب جامعة طيبة الحقيقيين</div>' +
+        '<div class="tpf-row">' +
+          '<input class="tpf-in" type="text" placeholder="اكتب اسم الدكتور أو الصق رابط صفحته من قيّم">' +
+          '<button class="tpf-go" type="button">اسأل</button>' +
+        "</div>" +
+        '<div class="tpf-recent"></div>' +
+        '<div class="tpf-res"></div>' +
+      "</div>";
+    document.body.appendChild(ov);
+
+    var box = ov.querySelector(".tpf-box");
+    var input = ov.querySelector(".tpf-in");
+    var go = ov.querySelector(".tpf-go");
+    var res = ov.querySelector(".tpf-res");
+    var rc = ov.querySelector(".tpf-recent");
+
+    function close() { try { ov.remove(); } catch (e) { ov.parentNode && ov.parentNode.removeChild(ov); } }
+    ov.querySelector(".tpf-x").onclick = close;
+    ov.addEventListener("click", function (e) { if (e.target === ov) close(); });
+    document.addEventListener("keydown", function esc2(e) {
+      if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc2); }
+    });
+
+    function drawRecents() {
+      var list = recents();
+      rc.innerHTML = list.length
+        ? '<span class="tpf-note" style="align-self:center">أخيرًا:</span>' +
+          list.map(function (x) { return '<button class="tpf-rc" type="button">' + esc(x) + "</button>"; }).join("")
+        : "";
+      Array.prototype.forEach.call(rc.querySelectorAll(".tpf-rc"), function (b) {
+        b.onclick = function () { input.value = b.textContent; run(); };
+      });
+    }
+
+    function bindResult() {
+      Array.prototype.forEach.call(res.querySelectorAll("[data-url]"), function (b) {
+        b.onclick = function () { run({ url: b.getAttribute("data-url") }); };
+      });
+    }
+
+    function run(force) {
+      var q = String(input.value || "").trim();
+      var payload = force && force.url ? { url: force.url } : /^https?:\/\//i.test(q) ? { url: q } : { name: q };
+      if (!payload.url && !payload.name) { input.focus(); return; }
+      if (payload.name) recents(payload.name);
+      drawRecents();
+      go.disabled = true;
+      res.innerHTML = '<div class="tpf-load"><div class="tpf-spin"></div>أقرأ تقييماته من قيّم…</div>';
+      ask(payload).then(function (body) {
+        go.disabled = false;
+        res.innerHTML = cardMarkup(body);
+        bindResult();
+        try { box.scrollTop = box.scrollHeight; } catch (e) {}
+        if (typeof opts.onResult === "function") opts.onResult(body);
+      }, function (err) {
+        go.disabled = false;
+        res.innerHTML = '<div class="tpf-alert tpf-a-bad">' + esc((err && err.message) || "تعذر جلب التقييمات") + "</div>" +
+          '<div class="tpf-note"><a href="' + SOURCE_HOME + '" target="_blank" rel="noopener">افتح قيّم يدويًا</a></div>';
+      });
+    }
+
+    go.onclick = function () { run(); };
+    input.onkeydown = function (e) { if (e.key === "Enter") run(); };
+    drawRecents();
+    if (opts.mock) { res.innerHTML = cardMarkup(opts.mock); bindResult(); }
+    else if (opts.name) { input.value = opts.name; run(); }
+    else input.focus();
+
+    return { close: close, ask: run };
+  }
+
+  root.TU_PROF = {
+    open: open,
+    ask: ask,
+    cardMarkup: cardMarkup,
+    recents: recents,
+    setEndpoint: function (u) { ENDPOINT = u; },
+    SOURCE_HOME: SOURCE_HOME
+  };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
 (function () {
-  // الموقع يعرف SB_URL و sbClient كمتغيرات lexical مو على window — نوصّلها وقت الاستخدام
+  'use strict';
+
+  /* الموقع يعرف SB_URL / sbClient كمتغيرات lexical مو على window */
   function sync() {
-    try { if (typeof SB_URL === "string" && SB_URL) window.SB_URL = SB_URL; } catch (e) {}
-    try { if (typeof SB_KEY === "string" && SB_KEY) window.SB_KEY = SB_KEY; } catch (e) {}
-    try { if (typeof sbClient !== "undefined" && sbClient) window.sbClient = sbClient; } catch (e) {}
+    try { if (typeof SB_URL === 'string' && SB_URL) window.SB_URL = SB_URL; } catch (e) {}
+    try { if (typeof sbClient !== 'undefined' && sbClient) window.sbClient = sbClient; } catch (e) {}
   }
   sync();
-  window.tupSync = sync;
+  setInterval(sync, 2000);
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  /* ================= تنطيف الجدول التجريبي القديم (مع نسخة احتياطية) ================= */
+  function cleanupDemo() {
+    try {
+      if (!localStorage.getItem('tu_sched_v1')) return false;
+      var raw = localStorage.getItem('tu_pro_sch');
+      if (raw) { try { localStorage.setItem('tu_pro_sch_before_cleanup', raw); } catch (e) {} }
+      var cur = null;
+      try { cur = JSON.parse(raw || 'null'); } catch (e) { cur = null; }
+      var changed = false;
+      if (cur && cur.__generated) {
+        var bak = localStorage.getItem('tu_pro_sch_backup');
+        if (bak) {
+          localStorage.setItem('tu_pro_sch', bak);
+          try { cur = JSON.parse(bak); } catch (e) { cur = null; }
+        } else {
+          localStorage.removeItem('tu_pro_sch');
+          cur = null;
+        }
+        changed = true;
+      } else if (cur && cur.items && cur.items.length) {
+        var keep = cur.items.filter(function (it) {
+          return !/^tu\d/.test(String((it && it.id) || ''));
+        });
+        if (keep.length !== cur.items.length) {
+          cur.items = keep;
+          localStorage.setItem('tu_pro_sch', JSON.stringify(cur));
+          changed = true;
+        }
+      }
+      localStorage.removeItem('tu_sched_v1');
+      if (changed) {
+        try { scheduleData = cur || {}; } catch (e) {}
+        try { if (typeof renderSchedule === 'function') renderSchedule(); } catch (e) {}
+        try { if (typeof renderAchievements === 'function') renderAchievements(); } catch (e) {}
+      }
+      return changed;
+    } catch (e) { return false; }
+  }
+  cleanupDemo();
+  window.tupCleanupDemo = cleanupDemo;
+
+  /* ================= أزرار ================= */
   window.tupOpen = function () {
     sync();
-    if (!window.TU_PARSE) { try { toast("الميزة مو جاهزة — حدّث الصفحة"); } catch (e) {} return; }
+    if (!window.TU_PARSE) return;
     TU_PARSE.openImporter({
       merge: false,
       remote: false,
-      onImport: function () {
-        try { if (typeof saveSch === "function") saveSch(); } catch (e) {}
-      }
+      onImport: function () { try { if (typeof saveSch === 'function') saveSch(); } catch (e) {} }
     });
   };
-  document.addEventListener("click", function (ev) {
-    var el = ev.target && ev.target.closest ? ev.target.closest("[data-tup-open]") : null;
-    if (el) { ev.preventDefault(); window.tupOpen(); }
-  });
+  window.tprOpen = function (name) {
+    sync();
+    if (!window.TU_PROF) return;
+    TU_PROF.open(name ? { name: name } : {});
+  };
+
+  /* ================= المساعد الذكي: أسئلة الدكاترة من قيّم ================= */
+  var STOP = ['في','عن','مع','هل','وش','كيف','زين','طيب','صعب','يستاهل','ينصح','اسجل','أسجل','شعبته','شعبة','مادة','المادة','الترم','ترم','ولا','او','أو','لو','ما','من','رايك','رأيك','تقييم','تقييمه','تقييمات','ايش','إيش','كويس','حلو','ممتاز','والله','يعني','دكتور','الدكتور','دكتورة','الدكتورة','محاضر','المحاضر','استاد','أستاذ','الأستاذ','الأفضل','أفضل','مين','منو','القسم','قسم','الكلية','كلية','الجامعة','جامعة','الموقع','هنا','عندكم','عندك','عندنا','موجود','متاح','أحسن','احسن','أسوأ','الأفضل'];
+  var TRIG = /(الدكتور|دكتور|دكتوره|دكتورة|المحاضر|محاضر|الأستاذ|أستاذ|استاد|بروف)/;
+
+  function profIntent(q) {
+    var s = String(q || '');
+    if (!TRIG.test(s)) return null;
+    var m = s.match(/(?:الدكتور|دكتور|دكتوره|دكتورة|المحاضر|محاضر|الأستاذ|أستاذ|استاد|بروفيسور)\s+([\u0600-\u06FF][\u0600-\u06FF\s]{2,45})/);
+    if (!m) return null;
+    var words = m[1].replace(/[؟?!.,،:\u061B]/g, ' ').split(/\s+/).filter(function (w) {
+      return w.length > 1 && STOP.indexOf(w) < 0;
+    });
+    if (!words.length) return null;
+    var name = words.slice(0, 5).join(' ');
+    if (words.length === 1 && /^(بال|لل|وال|فال|من|عند)/.test(words[0])) return null;
+    return name.length >= 4 ? name : null;
+  }
+
+  function bubble(html, cls) {
+    var b = document.getElementById('tuai-body');
+    if (!b) return null;
+    var d = document.createElement('div');
+    d.className = 'tuai-msg ' + (cls || 'bot');
+    d.innerHTML = html;
+    b.appendChild(d);
+    try { b.scrollTop = b.scrollHeight + 400; } catch (e) {}
+    return d;
+  }
+
+  function fullCardBtn(box, name) {
+    if (!box) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tuai-navbtn';
+    btn.textContent = '🎓 البطاقة الكاملة وتعليقات الطلاب';
+    btn.onclick = function () { window.tprOpen(name); };
+    box.appendChild(document.createElement('br'));
+    box.appendChild(btn);
+  }
+
+  function answerProf(name) {
+    bubble(esc(name), 'me');
+    var box = bubble('🎓 أقرأ تقييمات <b>' + esc(name) + '</b> من موقع قيّم…');
+    if (!box) { window.tprOpen(name); return; }
+    window.TU_PROF.ask({ name: name }).then(function (body) {
+      if (body && body.ok === false && body.error === 'not_found') {
+        var h = 'ما لقيت <b>' + esc(name) + '</b> بالضبط في قيّم.';
+        if ((body.suggestions || []).length) {
+          h += '<br>تقصد: ' + body.suggestions.slice(0, 4).map(function (s) { return esc(s.name); }).join(' · ');
+        }
+        h += '<br>جرّب الاسم الرباعي، أو الصق رابط صفحته من قيّم.';
+        box.innerHTML = h;
+        fullCardBtn(box, name);
+        return;
+      }
+      var p = body.professor || {}, sc = body.scores || {}, v = body.verdict || null;
+      var t = '🎓 <b>' + esc(p.name || name) + '</b>' + (p.dept ? ' — ' + esc(p.dept) : '') + '<br>';
+      t += 'التقييم العام: <b>' + (sc.overall == null ? '—' : sc.overall) + '/100</b>';
+      if (sc.teaching != null) t += ' · الشرح ' + sc.teaching;
+      if (sc.treatment != null) t += ' · التعامل ' + sc.treatment;
+      if (sc.help != null) t += ' · المساعدة ' + sc.help;
+      if (sc.raters != null) t += ' · ' + sc.raters + ' مقيّم';
+      if (v) {
+        t += '<br><br>' + esc(v.summary || '');
+        if ((v.pros || []).length) t += '<br><br>✅ ' + v.pros.slice(0, 4).map(esc).join(' · ');
+        if ((v.cons || []).length && v.cons[0] !== 'غير مذكور') t += '<br>⚠️ ' + v.cons.slice(0, 4).map(esc).join(' · ');
+        if (v.advice) t += '<br><br>💡 ' + esc(v.advice);
+        if (v.confidence === 'low') t += '<br><small>عدد التقييمات قليل — خل بالك.</small>';
+      } else if (body.partial) {
+        t += '<br><br>جبت الدرجات من قيّم بس التلخيص ما اشتغل — افتح المصدر واقرأ التعليقات.';
+      }
+      t += '<br><br>المصدر: <a href="' + esc(body.sourceUrl || 'https://qeeem.com/taibahu') +
+           '" target="_blank" rel="noopener">صفحته في قيّم</a>';
+      box.innerHTML = t;
+      fullCardBtn(box, p.name || name);
+    }, function (err) {
+      box.innerHTML = '⚠️ ' + esc((err && err.message) || 'تعذر جلب التقييمات') +
+        '<br><a href="https://qeeem.com/taibahu" target="_blank" rel="noopener">افتح قيّم يدويًا</a>';
+    });
+  }
+
+  /* زر الإرسال */
+  function hookSend() {
+    if (typeof window.tuaiSend !== 'function' || window.tuaiSend.__tprWrapped) return;
+    var orig = window.tuaiSend;
+    var wrapped = function () {
+      try {
+        var inp = document.getElementById('tuai-input');
+        var q = inp ? String(inp.value || '').trim() : '';
+        var name = q ? profIntent(q) : null;
+        if (name && window.TU_PROF) {
+          inp.value = '';
+          try { inp.style.height = ''; } catch (e) {}
+          answerProf(name);
+          return;
+        }
+      } catch (e) {}
+      return orig.apply(this, arguments);
+    };
+    wrapped.__tprWrapped = true;
+    window.tuaiSend = wrapped;
+  }
+  hookSend();
+  setInterval(hookSend, 2500);
+
+  /* مفتاح Enter داخل الشات (قبل معالج الموقع) */
+  document.addEventListener('keydown', function (e) {
+    try {
+      if (!e || e.key !== 'Enter' || e.shiftKey) return;
+      var t = e.target;
+      if (!t || t.id !== 'tuai-input') return;
+      var q = String(t.value || '').trim();
+      var name = q ? profIntent(q) : null;
+      if (!name || !window.TU_PROF) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      t.value = '';
+      try { t.style.height = ''; } catch (e2) {}
+      answerProf(name);
+    } catch (e3) {}
+  }, true);
+
+  window.TU_PROF_INTENT = profIntent;
 })();
+
 </script>
 </body></html>
