@@ -1931,6 +1931,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .tu-payment-box h3{margin:8px 0}.tu-payment-box p{color:var(--t2);font-size:.8rem;line-height:1.8}
 .tu-payment-box button{border:0;border-radius:10px;padding:10px 20px;background:var(--grad);color:#fff;font-weight:800}
 @media(max-width:650px){.premium-pricing{grid-template-columns:1fr;gap:20px}.premium-plan.best{transform:none}.premium-plan.best:hover{transform:translateY(-4px)}}
+.tu-bank-btn{width:100%;margin-top:10px;border:1px solid var(--bor2);border-radius:14px;padding:12px;background:var(--s3);color:var(--t);font-weight:900;font-size:.84rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;transition:.18s}
+.tu-bank-btn:hover{border-color:var(--a2,#5b9dfd);color:var(--a2,#5b9dfd);background:var(--s2)}
+html[data-theme="light"] .tu-bank-btn{background:#f3f6fb!important;color:#1f5bb0!important;border-color:#cbd4df!important}
 </style>
 
 
@@ -2313,6 +2316,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
           <li>يكفي فصل دراسي كامل</li>
         </ul>
         <button class="premium-pay" onclick="tuOpenPayment('اشتراك 5 أشهر — 15 ريال','term')">🛒 اشترك الآن — 15 ريال</button>
+        <button class="tu-bank-btn" onclick="tuBankTransfer('اشتراك 5 أشهر — 15 ريال')">🏦 تحويل بنكي</button>
       </div>
 
       <div class="premium-plan best">
@@ -2331,6 +2335,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
           <li>يغطي السنة الدراسية كاملة</li>
         </ul>
         <button class="premium-pay" onclick="tuOpenPayment('اشتراك 12 شهر — 30 ريال','year')">🛒 اشترك الآن — 30 ريال</button>
+        <button class="tu-bank-btn" onclick="tuBankTransfer('اشتراك 12 شهر — 30 ريال')">🏦 تحويل بنكي</button>
       </div>
     </div>
 
@@ -3154,6 +3159,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
             <li>مزامنة بياناتك على كل الأجهزة</li>
           </ul>
           <button class="subx-buy ghost" onclick="tuOpenPayment('اشتراك الترم — 15 ريال','term')">اشترك بـ 15 ريال</button>
+          <button class="tu-bank-btn" onclick="tuBankTransfer('اشتراك الترم — 15 ريال')">🏦 تحويل بنكي</button>
         </article>
 
         <article class="subx-plan is-best">
@@ -3172,6 +3178,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
             <li>توفير مقارنة بترمين منفصلين</li>
           </ul>
           <button class="subx-buy" onclick="tuOpenPayment('الاشتراك السنوي — 30 ريال','year')">اشترك بـ 30 ريال</button>
+          <button class="tu-bank-btn" onclick="tuBankTransfer('الاشتراك السنوي — 30 ريال')">🏦 تحويل بنكي</button>
         </article>
       </section>
 
@@ -4505,6 +4512,7 @@ function schPrintDoc(){
     <input id="tu-discount-input" dir="ltr" autocomplete="off" placeholder="DISCOUNT-CODE" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:11px;color:var(--t);padding:12px;font:700 .88rem Tajawal,sans-serif;outline:none;margin-bottom:12px">
     <div id="tu-payment-msg" style="display:none;margin-bottom:10px;border-radius:10px;padding:10px 12px;font-size:.78rem"></div>
     <button onclick="tuStartTamaraPay()" id="tu-pay-btn">الدفع عبر تمارا 🛡️</button>
+    <button class="tu-bank-btn" onclick="tuBankTransfer('')">🏦 الدفع عبر تحويل بنكي</button>
     <button onclick="tuClosePayment()" style="background:transparent;color:var(--t2);margin-top:8px">إلغاء</button>
   </div>
 </div>
@@ -4555,6 +4563,8 @@ async function tuStartTamaraPay(){
     btn.disabled=false;btn.textContent='الدفع عبر تمارا 🛡️';
   }
 }
+function tuBankTransfer(plan){ try{ if(plan)localStorage.setItem('tu_pay_plan_pending',plan); }catch(e){} try{ window.open('https://t.me/onlychamber','_blank','noopener'); }catch(e){ location.href='https://t.me/onlychamber'; } }
+window.tuBankTransfer=tuBankTransfer;
 </script>
 <script>
 function exportSchPDF(){
