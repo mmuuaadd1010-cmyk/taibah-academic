@@ -9793,7 +9793,7 @@ function tuaiClosePaste(){ var ov=document.getElementById('tuai-paste-ov'); if(o
 /* استخراج الجدول عبر OpenRouter — يقرأ النص بذكاء */
 async function tuaiAIParse(txt){
   try{ if(!aiKey())return null; }catch(e){ return null; }
-  var sys='أنت محرك يحوّل نص جدول محاضرات جامعي (جامعة طيبة) إلى JSON دقيق. ترقيم الأيام: الأحد=0، الاثنين=1، الثلاثاء=2، الأربعاء=3، الخميس=4. الخلايا أو النقاط الحمراء في الجدول تعني وجود محاضرة في ذلك الوقت. استخرج كل المحاضرات بدقة. أعد JSON فقط بدون أي شرح بالشكل: {"items":[{"name":"اسم المادة","code":"CS 101","place":"القاعة/المبنى","start":"08:00","end":"09:50","days":[0,2]}]}. استخدم نظام 24 ساعة. إن لم تجد قاعة اتركها فارغة.';
+  var sys=['أنت محرّك دقيق جدًا يحوّل نص جدول محاضرات جامعة طيبة (منسوخ من بوابة الجامعة) إلى JSON. طبّق القواعد حرفيًا ولا تخطئ.','ترتيب الأعمدة: م | المادة | رمز | رقم | وحدة | شعبة | بداية | نهاية | أحد | اثنين | ثلاثاء | أربعاء | خميس | مبنى | الدور | قاعة.','ترقيم الأيام: الأحد=0، الاثنين=1، الثلاثاء=2، الأربعاء=3، الخميس=4.','(1) الأهم: في أعمدة الأيام الخمسة، الخانة الفارغة أو التي فيها نقطة/علامة تعني وجود محاضرة ذلك اليوم، والخانة التي فيها «-» تعني لا محاضرة. لا تعكس القاعدة إطلاقًا.','(2) وقت البداية والنهاية من عمودي «بداية» و«نهاية» في نفس الصف فقط.','(3) الصف الذي يبدأ بـ«-» في عمود «م» هو تكملة للمادة في الصف السابق مباشرة: انسخ نفس الاسم ونفس الرمز، وله يوم/وقت/قاعة مختلفة. لا تترك اسمه فارغًا ولا تحذفه.','(4) place هو عمود «قاعة» كما هو مثل 172GB004، وإن كانت أونلاين أو Blackboard فاجعل place=أونلاين.','(5) name هو نص «المادة» كاملًا، و code هو «رمز»+«رقم» مثل COE 124.','(6) تجاهل تمامًا صف المجاميع مثل «مجموع الوحدات المسجلة».','(7) المادة التي كل خانات أيامها «-» (غير مجدولة مثل مقرر اختياري حر) أعِدها بـ days=[] ولا تخترع لها يومًا أو وقتًا.','(8) اجمع كل أيام نفس الصف في مصفوفة days واحدة. استخدم نظام 24 ساعة، مثل 5:40 مساءً=17:40 و 1:00=13:00.','أعِد JSON فقط بلا أي شرح بهذا الشكل: {"items":[{"name":"تنظيم وبناء الحاسب الآلي (1)","code":"COE 124","place":"172GB004","start":"10:30","end":"11:45","days":[0,1]}]}'].join(String.fromCharCode(10));
   try{
     var out=await window.TUAI_CHAT([{role:'system',content:sys},{role:'user',content:String(txt||'').slice(0,8000)}],{json:true,temperature:0,max_tokens:1600});
     var data=null;
@@ -9807,7 +9807,8 @@ async function tuaiRunPaste(){
   if(!txt||txt.trim().length<10){ notify('الصق جدولك أول 🙏',true); return; }
   var btn=document.querySelector('#tuai-paste-ov button'); var oldT=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='⏳ يقرأ الجدول...'; }
   var items=null;
-  try{ var ai=await tuaiAIParse(txt); if(ai&&ai.length)items=normalizeItems(ai); }catch(e){}
+  try{ var tb=parseTaibahTable(txt); if(tb&&tb.length)items=normalizeItems(tb); }catch(e){}
+  if(!items||!items.length){ try{ var ai=await tuaiAIParse(txt); if(ai&&ai.length)items=normalizeItems(ai); }catch(e){} }
   if(!items||!items.length){ try{ items=normalizeItems(parseScheduleText(txt)); }catch(e){} }
   if(btn){ btn.disabled=false; btn.textContent=oldT||'✨ رتّب جدولي'; }
   if(!items||!items.length){ notify('ما قدرت أطلع محاضرات من النص. تأكد إنك نسخت الجدول كامل (فيه أسماء المواد والأيام والأوقات).',true); return; }
@@ -10119,6 +10120,57 @@ async function ocrLines(url,onStep){
   return out;
 }
 function tuNum(s){ return String(s==null?'':s).replace(/[\u0660-\u0669]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-1584);}).replace(/[\u06f0-\u06f9]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-1728);}); }
+function parseTaibahTable(text){
+  var TAB=String.fromCharCode(9), NL=String.fromCharCode(10), CR=String.fromCharCode(13);
+  var raw=String(text||'').split(CR).join('');
+  var all=raw.split(NL), lines=[];
+  for(var a=0;a<all.length;a++){ if(all[a].trim().length)lines.push(all[a]); }
+  var hdrIdx=-1,H=null;
+  for(var i=0;i<lines.length;i++){
+    if(lines[i].indexOf(TAB)<0)continue;
+    var c=lines[i].split(TAB), nd=0;
+    for(var q=0;q<c.length;q++){ if(dayIdx(String(c[q]).trim())>=0)nd++; }
+    if(nd>=3 && (lines[i].indexOf('بداية')>-1||lines[i].indexOf('نهاية')>-1)){ hdrIdx=i; H=c; break; }
+  }
+  if(hdrIdx<0||!H)return [];
+  var findCol=function(sub){ for(var k=0;k<H.length;k++){ if(String(H[k]).indexOf(sub)>-1)return k; } return -1; };
+  var idxStart=findCol('بداية'), idxEnd=findCol('نهاية');
+  var idxName=findCol('ماد'), idxCode=findCol('رمز'), idxNum=findCol('رقم');
+  var idxRoom=findCol('قاع'), idxBld=findCol('مبن'), idxFloor=findCol('دور');
+  var dayCols=[];
+  for(var k2=0;k2<H.length;k2++){ var di=dayIdx(String(H[k2]).trim()); if(di>=0)dayCols.push({idx:k2,day:di}); }
+  if(idxStart<0||!dayCols.length)return [];
+  var offset=idxStart-1, out=[], prev=null;
+  var marks='●•∙·*xX✓√✔⬤';
+  for(var r=hdrIdx+1;r<lines.length;r++){
+    var line=lines[r]; if(line.indexOf(TAB)<0)continue;
+    if(line.indexOf('مجموع')>-1)continue;
+    var cols=line.split(TAB), first=String(cols[0]||'').trim();
+    var isCont=(first==='-'||first==='–'||first==='');
+    if(isCont && !prev)continue;
+    var shortRow=isCont && cols.length<H.length;
+    var G=function(hIdx){ if(hIdx<0)return ''; var real=shortRow?(hIdx-offset):hIdx; if(real<0||real>=cols.length)return ''; return String(cols[real]==null?'':cols[real]).trim(); };
+    var name,code;
+    if(isCont){ name=prev.name; code=prev.code; }
+    else {
+      name=G(idxName); code=(G(idxCode)+' '+G(idxNum)).trim();
+      var fc=first.charCodeAt(0), isNum=(fc>=48&&fc<=57)||(fc>=1632&&fc<=1641);
+      if(!isNum)continue;
+    }
+    var st=G(idxStart), en=G(idxEnd), days=[];
+    for(var d2=0;d2<dayCols.length;d2++){ var dc=dayCols[d2], cell=G(dc.idx); var lec=(cell==='')||(cell.length>0 && marks.indexOf(cell.charAt(0))>-1); if(lec)days.push(dc.day); }
+    var room=G(idxRoom), bld=G(idxBld), fl=G(idxFloor), place='', allr=(room+' '+bld+' '+fl);
+    if(/black|online|zoom/i.test(allr)||allr.indexOf('أونلاين')>-1||allr.indexOf('اونلاين')>-1)place='أونلاين';
+    else if(room && room!=='اختياري' && room!=='القسم')place=room;
+    else if(bld||fl)place=(bld+' '+fl).trim();
+    if(!isCont)prev={name:name,code:code};
+    if(!st)continue;
+    if(!days.length)continue;
+    out.push({name:name,code:code,place:place,start:st,end:en,days:days});
+  }
+  return out;
+}
+try{ window.parseTaibahTable=parseTaibahTable; }catch(e){}
 function parseScheduleText(text){
   var DAYS=[['احد','الاحد','الأحد','sun'],['اثنين','الاثنين','ثنين','mon'],['ثلاثاء','الثلاثاء','ثلاث','tue'],['اربعاء','الأربعاء','الاربعاء','اربع','wed'],['خميس','الخميس','thu']];
   var rows=[], lines=String(text||'').split(/\n+/);
