@@ -9139,12 +9139,13 @@ function aiKey(){
   try{ if(!k&&window.PUBLIC_AI_KEY)pick(window.PUBLIC_AI_KEY); }catch(e){}
   return k;
 }
-function aiEngine(){ var e=(cfg().aiEngine||'auto'); return (e==='openai'||e==='openrouter'||e==='groq')?e:'auto'; }
+function aiEngine(){ try{ var lp=localStorage.getItem('tu_ai_provider'); if(lp==='openrouter'||lp==='openai'||lp==='groq'||lp==='gemini')return lp; }catch(e){} var e=(cfg().aiEngine||'auto'); return (e==='openai'||e==='openrouter'||e==='groq'||e==='gemini')?e:'auto'; }
 function aiProvider(){
   var e=aiEngine(); if(e!=='auto')return e;
   var k=aiKey();
   if(/^sk-or-/i.test(k))return 'openrouter';
   if(/^gsk_/i.test(k))return 'groq';
+  if(/^AIza/i.test(k)||/^AQ\./i.test(k))return 'gemini';
   if(/^sk-/i.test(k))return 'openai';
   return 'openrouter';
 }
@@ -9199,7 +9200,24 @@ function welcomeMsg(){
 function isAdmin(){ try{ return !!window.IS_ADMIN; }catch(e){ return false; } }
 
 /* ---------------- OpenAI ---------------- */
+async function geminiChatOnce(messages,opt,key){
+  var sys='',parts=[];
+  messages.forEach(function(m){ if(m.role==='system'){sys+=(sys?'\n':'')+String(m.content||'');} else {parts.push({role:(m.role==='assistant'?'model':'user'),parts:[{text:String(m.content||'')}]});} });
+  var body={contents:parts}; if(sys)body.systemInstruction={parts:[{text:sys}]};
+  body.generationConfig={temperature:(opt.temperature!=null?opt.temperature:0.3),maxOutputTokens:opt.max_tokens||1200};
+  if(opt.json)body.generationConfig.responseMimeType='application/json';
+  var gurl='https://'+'generativelanguage.googleapis.com'+'/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(key);
+  var r=await fetch(gurl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  var d=null; try{ d=await r.json(); }catch(_){}
+  if(!r.ok){ var m=(d&&d.error&&d.error.message)||('HTTP '+r.status); if(r.status===400||r.status===403)m='مفتاح Gemini غير صحيح أو منتهي — خذ واحد من aistudio.google.com/apikey'; var er=new Error(m); er.code=r.status; throw er; }
+  var c=d&&d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts;
+  c=Array.isArray(c)?c.map(function(x){return x.text||'';}).join(''):'';
+  c=(c||'').trim();
+  if(!c){ var e2=new Error('EMPTY_REPLY'); e2.code=200; throw e2; }
+  return c;
+}
 async function oaChatOnce(messages,opt,model,key){
+  if(aiProvider()==='gemini')return await geminiChatOnce(messages,opt,key);
   var body={model:model,messages:messages,temperature:(opt.temperature!=null?opt.temperature:0.3)};
   body.max_tokens=opt.max_tokens||900;
   var pv=aiProvider();
@@ -10532,34 +10550,27 @@ function injectDevSection(){
   var d=document.createElement('details');
   d.className='scfg-sec'; d.id='tuai-scfg-sec';
   d.style.cssText='border:1px solid var(--bor2);border-radius:14px;padding:0 12px;margin-bottom:10px;background:var(--s1)';
-  d.innerHTML='<summary style="cursor:pointer;padding:12px 0;font-weight:800;color:var(--t)">🤖 المساعد الذكي (OpenRouter / OpenAI) + ترتيب الجدول من نص</summary>'+
+  d.innerHTML='<summary style="cursor:pointer;padding:12px 0;font-weight:800;color:var(--t)">🤖 مفتاح المساعد الذكي</summary>'+
     '<div style="padding:4px 0 14px">'+
-      '<div style="font-size:.76rem;color:var(--t3);line-height:1.8;margin-bottom:12px">حط مفتاح <b>OpenRouter</b> (يبدأ بـ sk-or-v1-) أو <b>OpenAI</b> (يبدأ بـ sk-) — النظام يتعرّف على النوع تلقائيًا — ثم اضغط <b>🌍 نشر للجميع</b> لتشغيل المساعد وميزة «ترتيب الجدول من صورة» لكل الزوار.<br>مفتاح OpenRouter تأخذه مجانًا من <b>openrouter.ai/keys</b>، وفيه موديلات مجانية تقرأ صور الجداول.</div>'+
-      '<label style="display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--t);margin-bottom:12px;cursor:pointer"><input type="checkbox" id="tuai-cfg-on"'+(c.aiAssistOn!==false?' checked':'')+' style="width:18px;height:18px"> تشغيل المساعد الذكي للزوار</label>'+
-      '<div style="margin-bottom:10px"><label style="font-size:.78rem;color:var(--t2);display:block;margin-bottom:4px">⚙️ محرّك الذكاء</label>'+
-      '<select id="tuai-cfg-engine" style="padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);width:100%">'+
-        [['auto','تلقائي — يتعرّف من شكل المفتاح (موصى به)'],['openrouter','OpenRouter — openrouter.ai (فيه موديلات مجانية)'],['openai','OpenAI — platform.openai.com']].map(function(o){ var sel=((c.aiEngine||'auto')===o[0])?' selected':''; return '<option value="'+o[0]+'"'+sel+'>'+o[1]+'</option>'; }).join('')+
+      '<div style="font-size:.76rem;color:var(--t3);line-height:1.8;margin-bottom:14px">اختر المزوّد وحط مفتاحك ثم اضغط 💾 حفظ. المفتاح يُحفظ في متصفحك فقط (بدون سيرفر)، ويشغّل المساعد الذكي وقراءة الجدول الملصوق.</div>'+
+      '<div style="margin-bottom:12px"><label style="font-size:.82rem;color:var(--t2);display:block;margin-bottom:6px;font-weight:800">١） المزوّد</label>'+
+      '<select id="tuai-prov" onchange="tuaiProvChange()" style="padding:11px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);width:100%;box-sizing:border-box">'+
+        '<option value="openrouter">OpenRouter — مجاني بدون بطاقة</option>'+
+        '<option value="gemini">Google Gemini — مجاني</option>'+
       '</select></div>'+
-      devInput('tuai-cfg-key','🔑 مفتاح الـ API (OpenRouter أو OpenAI)',c.openaiKey||(function(){try{return localStorage.getItem('tu_openai_key')||localStorage.getItem('tu_aikey_openai')||localStorage.getItem('tu_aikey_openrouter')||localStorage.getItem('tu_ai_key')||localStorage.getItem('tu_aikey')||'';}catch(e){return '';}})(),'sk-or-v1-...   أو   sk-proj-...','password')+
-      '<div style="margin-bottom:10px"><label style="font-size:.78rem;color:var(--t2);display:block;margin-bottom:4px">🧠 الموديل (للمحادثة وقراءة صورة الجدول)</label>'+
-      '<select id="tuai-cfg-model" style="padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);width:100%">'+
-        modelOptions(c)+
-      '</select>'+
-      '<input type="text" id="tuai-cfg-model-custom" value="" placeholder="أو الصق اسم موديل من openrouter.ai/models" dir="ltr" style="margin-top:7px;padding:9px;border-radius:10px;border:1px dashed var(--bor2);background:var(--s2);color:var(--t);width:100%;box-sizing:border-box;font-size:.78rem">'+
-      '<div style="font-size:.7rem;color:var(--t3);margin-top:5px;line-height:1.7">تبيه مجاني ١٠٠٪؟ اضغط «📋 جلب الموديلات» واختر أي موديل ينتهي بـ <b>:free</b> — المعروضة كلها تقرأ الصور.</div></div>'+
-      '<div style="margin-bottom:10px"><label style="font-size:.78rem;color:var(--t2);display:block;margin-bottom:4px">💬 رسالة الترحيب</label>'+
-      '<textarea id="tuai-cfg-welcome" rows="3" style="padding:10px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);width:100%;box-sizing:border-box;font-family:inherit" placeholder="هلا وسهلا! أنا مساعد الموقع...">'+esc2(c.aiWelcome||'')+'</textarea></div>'+
+      '<div style="margin-bottom:6px"><label style="font-size:.82rem;color:var(--t2);display:block;margin-bottom:6px;font-weight:800">٢） المفتاح</label>'+
+      '<input type="password" id="tuai-cfg-key" value="'+esc2(aiKey())+'" placeholder="sk-or-v1-..." dir="ltr" style="padding:11px;border-radius:10px;border:1px solid var(--bor);background:var(--s2);color:var(--t);width:100%;box-sizing:border-box"></div>'+
+      '<div id="tuai-prov-hint" style="font-size:.72rem;color:var(--t3);line-height:1.7;margin:6px 0 14px"></div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+
-        '<button type="button" class="tuai-btn-main" style="flex:0 1 auto" onclick="tuaiCfgSave()">💾 حفظ الإعدادات</button>'+
+        '<button type="button" class="tuai-btn-main" style="flex:0 1 auto" onclick="tuaiCfgSave()">💾 حفظ</button>'+
         '<button type="button" class="tuai-btn-soft" onclick="tuaiCfgTest()">🧪 اختبار المفتاح</button>'+
-        '<button type="button" class="tuai-btn-soft" onclick="tuaiLoadModels()">📋 جلب الموديلات</button>'+
         '<button type="button" class="tuai-btn-soft" onclick="tuaiToggle(true)">🤖 تجربة المساعد</button>'+
       '</div>'+
       '<div id="tuai-cfg-status" style="font-size:.78rem;font-weight:700;line-height:1.7;min-height:18px;color:var(--t3)"></div>'+
-      '<div style="font-size:.72rem;color:var(--t3);line-height:1.8;margin-top:8px;border-top:1px dashed var(--bor2);padding-top:9px">⚠️ تنبيه أمني: المفتاح يُنشر مع إعدادات ��لموقع ويصير قا��لًا للقراءة م�� متصفح الزائر. ينصح تحدد سقف صرف شهري (Usage limit) لهذا المفتاح من حساب OpenRouter أو OpenAI، أو تستخدم مفتاحًا مخصصًا للموقع فقط.</div>'+
     '</div>';
   var anchor=card.children[3]||null;
   card.insertBefore(d,anchor);
+  try{ var _pv=(function(){try{return localStorage.getItem('tu_ai_provider');}catch(e){return '';}})()||aiProvider(); var _ps=document.getElementById('tuai-prov'); if(_ps)_ps.value=(_pv==='gemini'?'gemini':'openrouter'); if(typeof tuaiProvChange==='function')tuaiProvChange(); }catch(e){}
 }
 function cfgStatus(msg,color){ var el=document.getElementById('tuai-cfg-status'); if(el){ el.textContent=msg; el.style.color=color||'var(--t3)'; } }
 function formEngine(){ var e=((document.getElementById('tuai-cfg-engine')||{}).value)||'auto'; return (e==='openai'||e==='openrouter')?e:'auto'; }
@@ -10605,50 +10616,49 @@ async function tuaiLoadModels(){
   }catch(e){ cfgStatus('❌ تعذّر الجلب: '+((e&&e.message)||'خطأ')+' — تقدر تلصق اسم الموديل يدويًا بالخانة تحت القائمة','var(--r,#f0645c)'); }
 }
 window.tuaiLoadModels=tuaiLoadModels;
+function tuaiProvChange(){
+  var pv=((document.getElementById('tuai-prov')||{}).value)||'openrouter';
+  var k=document.getElementById('tuai-cfg-key');
+  var h=document.getElementById('tuai-prov-hint');
+  if(k)k.placeholder=(pv==='gemini')?'AIza...':'sk-or-v1-...';
+  if(h)h.innerHTML=(pv==='gemini')?'🔑 مفتاح Gemini مجاني من <b>aistudio.google.com/apikey</b>':'🔑 مفتاح OpenRouter مجاني بدون بطاقة من <b>openrouter.ai/keys</b> — فيه موديلات مجانية تقرأ الجداول';
+}
+window.tuaiProvChange=tuaiProvChange;
 function tuaiCfgSave(){
   try{
+    var k=(((document.getElementById('tuai-cfg-key')||{}).value)||'').trim();
+    var pv=(((document.getElementById('tuai-prov')||{}).value)||'openrouter');
     window.SITE_CFG=window.SITE_CFG||{};
-    var k=formKey();
-    SITE_CFG.openaiKey=k;
-    SITE_CFG.aiEngine=formEngine();
-    SITE_CFG.openaiModel=fixModel(formModel(),formProvider());
-    var vmEl=document.getElementById('tuai-cfg-vmodel');
-    if(vmEl)SITE_CFG.openaiVisionModel=String(vmEl.value||'').trim();
-    var hqEl=document.getElementById('tuai-cfg-hq');
-    if(hqEl)SITE_CFG.aiVisionHQ=!!hqEl.checked;
-    SITE_CFG.aiAssistOn=!!document.getElementById('tuai-cfg-on').checked;
-    SITE_CFG.aiWelcome=(document.getElementById('tuai-cfg-welcome').value||'').trim();
+    SITE_CFG.openaiKey=k; SITE_CFG.aiEngine=pv; SITE_CFG.aiAssistOn=true;
+    try{ localStorage.setItem('tu_ai_provider',pv); }catch(e){}
+    try{ if(k){localStorage.setItem('tu_ai_key',k);localStorage.setItem('tu_openai_key',k);localStorage.setItem('tu_aikey_'+pv,k);} }catch(e){}
     try{ localStorage.setItem('tu_site_cfg',JSON.stringify(SITE_CFG)); }catch(e){}
-    try{ if(k)localStorage.setItem('tu_aikey_openai',k); }catch(e){}
-    try{ if(k)localStorage.setItem('tu_openai_key',k); }catch(e){}
-    try{ if(k&&/^sk-or-/i.test(k))localStorage.setItem('tu_aikey_openrouter',k); }catch(e){}
-    try{ if(k&&/^gsk_/i.test(k))localStorage.setItem('tu_aikey_groq',k); }catch(e){}
-    try{ if(k)localStorage.setItem('tu_ai_key',k); }catch(e){}
     syncFab();
-    cfgStatus('✅ تم الحفظ ('+(aiProvider()==='openrouter'?'OpenRouter':'OpenAI')+' · '+aiModel()+') — اضغط «🌍 نشر للجميع» فوق لتطبيقه على كل الزوار','var(--g,#3ecf8e)');
-    notify('تم حفظ إعدادات المساعد الذكي ✅');
+    if(!k){ cfgStatus('اكتب مفتاحًا أولاً ثم احفظ','var(--y,#e8c05a)'); return; }
+    cfgStatus('✅ تم الحفظ في متصفحك ('+(pv==='gemini'?'Gemini':'OpenRouter')+') — المساعد جاهز','var(--g,#3ecf8e)');
+    notify('تم حفظ مفتاح المساعد ✅');
   }catch(e){ cfgStatus('⚠️ تعذّر الحفظ','var(--r,#f0645c)'); }
 }
 window.tuaiCfgSave=tuaiCfgSave;
 async function tuaiCfgTest(){
-  var k=formKey();
+  var k=(((document.getElementById('tuai-cfg-key')||{}).value)||'').trim();
   if(!k){ cfgStatus('اكتب المفتاح أولاً','var(--y,#e8c05a)'); return; }
-  var pv=formProvider(), url=(pv==='openrouter'?OR_URL:OA_URL), mdl=fixModel(formModel(),pv);
-  cfgStatus('⏳ جارٍ الاختبار على '+(pv==='openrouter'?'OpenRouter':'OpenAI')+' · '+mdl+' ...','var(--a2)');
+  var pv=(((document.getElementById('tuai-prov')||{}).value)||'openrouter');
+  cfgStatus('⏳ جارٍ اختبار '+(pv==='gemini'?'Gemini':'OpenRouter')+' ...','var(--a2)');
   try{
-    var hd={'Content-Type':'application/json','Authorization':'Bearer '+k};
-    if(pv==='openrouter'){ try{ hd['HTTP-Referer']=(location&&location.origin)||'https://tu-academic.app'; hd['X-Title']='TU Academic'; }catch(_e){} }
-    var r=await fetch(url,{method:'POST',headers:hd,
-      body:JSON.stringify({model:mdl,messages:[{role:'user',content:'اكتب كلمة: تم'}],max_tokens:5})});
-    var d=null; try{ d=await r.json(); }catch(_){}
-    if(!r.ok){
-      var em=(d&&d.error&&d.error.message)||('HTTP '+r.status);
-      if(r.status===401)em='المفتاح غير صحيح لهذا المحرّك — OpenRouter يبدأ بـ sk-or-v1- و OpenAI يبدأ بـ sk-';
-      else if(pv==='openrouter'&&(r.status===402||/credit|insufficient/i.test(em)))em='رصيد OpenRouter غير كافٍ — اختر موديل ينتهي بـ :free';
-      else if(pv==='openrouter'&&r.status===404)em='الموديل غير موجود — اضغط «�� جلب الموديلات» واختر واحدًا';
-      throw new Error(em);
+    if(pv==='gemini'){
+      var gurl='https://'+'generativelanguage.googleapis.com'+'/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(k);
+      var gr=await fetch(gurl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:'اكتب كلمة: تم'}]}],generationConfig:{maxOutputTokens:8}})});
+      var gd=null; try{ gd=await gr.json(); }catch(_){}
+      if(!gr.ok){ var gm=(gd&&gd.error&&gd.error.message)||('HTTP '+gr.status); if(gr.status===400||gr.status===403)gm='مفتاح Gemini غير صحيح — خذ واحد من aistudio.google.com/apikey'; throw new Error(gm); }
+      cfgStatus('✅ مفتاح Gemini يعمل — لا تنسَ 💾 حفظ','var(--g,#3ecf8e)'); return;
     }
-    cfgStatus('✅ المفتاح يعمل مع '+(pv==='openrouter'?'OpenRouter':'OpenAI')+' ('+mdl+') — لا تنسَ «💾 حفظ» ثم «🌍 نشر للجميع»','var(--g,#3ecf8e)');
+    var hd={'Content-Type':'application/json','Authorization':'Bearer '+k};
+    try{ hd['HTTP-Referer']=(location&&location.origin)||'https://tu-academic.app'; hd['X-Title']='TU Academic'; }catch(_e){}
+    var r=await fetch(OR_URL,{method:'POST',headers:hd,body:JSON.stringify({model:'deepseek/deepseek-chat-v3-0324:free',messages:[{role:'user',content:'اكتب كلمة: تم'}],max_tokens:8})});
+    var d=null; try{ d=await r.json(); }catch(_){}
+    if(!r.ok){ var em=(d&&d.error&&d.error.message)||('HTTP '+r.status); if(r.status===401)em='مفتاح OpenRouter غير صحيح — يبدأ بـ sk-or-v1-'; else if(r.status===402||/credit|insufficient/i.test(em))em='رصيد OpenRouter غير كافٍ — جرّب لاحقًا'; throw new Error(em); }
+    cfgStatus('✅ مفتاح OpenRouter يعمل — لا تنسَ 💾 حفظ','var(--g,#3ecf8e)');
   }catch(e){ cfgStatus('❌ '+((e&&e.message)||'فشل الاختبار'),'var(--r,#f0645c)'); }
 }
 window.tuaiCfgTest=tuaiCfgTest;
