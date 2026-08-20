@@ -2442,6 +2442,25 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 
 <!-- SCREEN 3: APP -->
 <div class="screen" id="s-app">
+  <div class="tu-topbar" id="tu-topbar">
+    <button class="tu-topbar-in" onclick="genGoSub()">
+      <span class="tu-topbar-ic">🎓</span>
+      <span class="tu-topbar-txt">اشترك في الموقع من هنا — شاهد أسعار الباقات الآن 🚀</span>
+      <span class="tu-topbar-x" onclick="event.stopPropagation();var p=document.getElementById('tu-topbar');if(p)p.style.display='none';">×</span>
+    </button>
+  </div>
+  <style id="tu-topbar-css">
+.tu-topbar{width:100%;box-sizing:border-box}
+.tu-topbar-in{display:flex;align-items:center;gap:12px;cursor:pointer;background:linear-gradient(135deg,#5b9dfd,#3ecf8e);color:#fff;border:none;border-radius:0;padding:11px 18px;font-family:inherit;font-weight:800;font-size:.88rem;width:100%;box-sizing:border-box;position:relative;overflow:hidden;transition:.2s}
+.tu-topbar-in:hover{filter:brightness(1.06)}
+.tu-topbar-in::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%);transform:translateX(-120%);animation:tuTopbarShine 3.2s ease-in-out infinite}
+@keyframes tuTopbarShine{0%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
+.tu-topbar-txt{flex:1;text-align:center;position:relative;z-index:1}
+.tu-topbar-ic{font-size:1.1rem;position:relative;z-index:1}
+.tu-topbar-x{display:grid;place-items:center;background:rgba(255,255,255,.22);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:.95rem;font-weight:900;position:relative;z-index:2;flex:none}
+.tu-topbar-x:hover{background:rgba(255,255,255,.42)}
+@media(max-width:520px){.tu-topbar-in{font-size:.78rem;padding:10px 12px;gap:8px}}
+  </style>
   <div class="app-route-actions"><button onclick="changeUniversity()">🏫 الجامعة</button><button onclick="changeSpec()">🏛️ الكلية</button><button onclick="backToMajors()">🎓 التخصص</button></div>
   <div class="app-nav">
     <div class="nav-left">
@@ -2685,7 +2704,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
           ولّد جدولك الدراسي بضغطة زر بدل ما تعبيه يدويًا، مع تجنّب تعارض المحاضرات وتحديد يوم فراغ.
           <br>الاشتراك: <b>الترم 15 ريال</b> · <b>السنة 30 ريال</b>
         </p>
-        <a href="https://t.me/onlychamber" target="_blank" rel="noopener" style="display:inline-block;padding:12px 30px;border-radius:24px;background:var(--grad);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(91,157,253,.35);margin-bottom:12px">🚀 فعّل اشتراكك الآن</a>
+        <button type="button" onclick="genGoSub()" style="display:inline-block;padding:12px 30px;border:0;border-radius:24px;background:var(--grad);color:#fff;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(91,157,253,.35);margin-bottom:12px">🚀 فعّل اشتراكك الآن</button>
         <div><button class="btn-ghost" onclick="genGoSub()" style="margin-top:6px">عرض تفاصيل الاشتراك بالموقع</button></div>
       </div>
       <div id="gen-body-wrap">
