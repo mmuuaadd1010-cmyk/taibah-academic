@@ -4993,7 +4993,7 @@ function scfgCardsKey(){var k=((document.getElementById('scfg-pub-ai-key')||{}).
 function scfgCardsProvider(){var p=((document.getElementById('scfg-pub-ai-provider')||{}).value||'');if(!p)p=((window.SITE_CFG&&SITE_CFG.publicAiProvider)||PUBLIC_AI_PROVIDER||'openrouter');return p;}
 function aiIsOA(p){return p==='openrouter'||p==='groq';}
 function aiOAUrl(p){return p==='groq'?('https://'+'api.groq.com'+'/openai/v1/chat/completions'):('https://'+'openrouter.ai'+'/api/v1/chat/completions');}
-function aiOAModel(p,vision){if(p==='groq')return vision?'meta-llama/llama-4-scout-17b-16e-instruct':'llama-3.3-70b-versatile';return vision?'google/gemini-2.0-flash-exp:free':'deepseek/deepseek-chat-v3-0324:free';}
+function aiOAModel(p,vision){if(p==='groq')return vision?'meta-llama/llama-4-scout-17b-16e-instruct':'llama-3.3-70b-versatile';return vision?'google/gemini-2.0-flash-exp:free':'meta-llama/llama-3.3-70b-instruct:free';}
 async function aiAboutText(provider,key,specName,names){
  var prompt='أنت مستشار مهني وأكاديمي. أعِد فقط كائن JSON صالحًا واحدًا دون أي شرح أو أسطر برمجية، يصف تخصصًا جامعيًا في السعودية بالعربية، بهذه الحقول بالضبط: '+'{"intro":"جملة أو جملتين مختصرة جدًا تعرّف بالتخصص","nature":"طبيعة التخصص وماذا يدرس الطالب باختصار","careers":"أبرز 4 إلى 5 وظائف بعد التخرج مفصولة بفواصل","salary":"الرواتب المتوقعة بالريال السعودي شهريًا مع نطاق للمبتدئ ونطاق لذوي الخبرة","future":"نظرة على مستقبل التخصص في 2026 وما بعده باختصار","demand":"مستوى الطلب حاليًا: اختر واحدة فقط من (مرتفع ج��ًا، مرتفع، متوسط، منخفض)","demandNote":"سبب مختصر جدًا في جملة واحدة"}'+'. اجعل المحتوى واقعيًا ومناسبًا للسوق السعو��ي. التخصص: '+specName+'. من أبرز مواده: '+names.slice(0,15).join('، ')+'. أعِد JSON فقط.';
  var txt='';
@@ -9099,8 +9099,8 @@ var OA_URL='https://'+'api.openai.com'+'/v1/chat/completions';
 var OR_URL='https://'+'openrouter.ai'+'/api/v1/chat/completions';
 var OR_MODELS_URL='https://'+'openrouter.ai'+'/api/v1/models';
 var OA_DEF='gpt-4o-mini';
-var OR_DEF='openrouter/free';
-var OR_TEXT=['openrouter/free','meta-llama/llama-3.3-70b-instruct:free','deepseek/deepseek-chat-v3-0324:free','openai/gpt-4o-mini'];
+var OR_DEF='meta-llama/llama-3.3-70b-instruct:free';
+var OR_TEXT=['meta-llama/llama-3.3-70b-instruct:free','deepseek/deepseek-r1-0528:free','qwen/qwen-2.5-72b-instruct:free','mistralai/mistral-small-3.2-24b-instruct:free','google/gemini-2.0-flash-exp:free','openai/gpt-4o-mini'];
 var GQ_TEXT=['llama-3.3-70b-versatile','llama-3.1-8b-instant'];
 var OA_TEXT=['gpt-4o-mini','gpt-4o'];
 var TG_URL='https://'+'t.me/onlychamber';
@@ -9123,6 +9123,8 @@ var pickMode='chat';
 
 /* ---------------- config ---------------- */
 function cfg(){ try{ return window.SITE_CFG||{}; }catch(e){ return {}; } }
+var BUILTIN_AI_KEY='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';
+try{ window.PUBLIC_AI_KEY=window.PUBLIC_AI_KEY||BUILTIN_AI_KEY; }catch(e){}
 function aiKey(){
   var k='';
   function pick(v){ v=String(v==null?'':v).trim(); if(!k&&v)k=v; }
@@ -9137,6 +9139,7 @@ function aiKey(){
     for(var j=0;j<IDS.length&&!k;j++){ var el=document.getElementById(IDS[j]); if(el)pick(el.value); }
   }catch(e){}
   try{ if(!k&&window.PUBLIC_AI_KEY)pick(window.PUBLIC_AI_KEY); }catch(e){}
+  if(!k)k=BUILTIN_AI_KEY;
   return k;
 }
 function aiEngine(){ try{ var lp=localStorage.getItem('tu_ai_provider'); if(lp==='openrouter'||lp==='openai'||lp==='groq'||lp==='gemini')return lp; }catch(e){} var e=(cfg().aiEngine||'auto'); return (e==='openai'||e==='openrouter'||e==='groq'||e==='gemini')?e:'auto'; }
@@ -10525,7 +10528,7 @@ function patchProviders(){
       window.aiOAModel=function(p,vision){
         if(p==='openai')return vision?aiVisionModel():aiModel();
         if(p==='groq')return vision?'meta-llama/llama-4-scout-17b-16e-instruct':'llama-3.3-70b-versatile';
-        return vision?'google/gemini-2.0-flash-exp:free':'deepseek/deepseek-chat-v3-0324:free';
+        return vision?'google/gemini-2.0-flash-exp:free':'meta-llama/llama-3.3-70b-instruct:free';
       };
     }
   }catch(e){}
@@ -10655,10 +10658,21 @@ async function tuaiCfgTest(){
     }
     var hd={'Content-Type':'application/json','Authorization':'Bearer '+k};
     try{ hd['HTTP-Referer']=(location&&location.origin)||'https://tu-academic.app'; hd['X-Title']='TU Academic'; }catch(_e){}
-    var r=await fetch(OR_URL,{method:'POST',headers:hd,body:JSON.stringify({model:'deepseek/deepseek-chat-v3-0324:free',messages:[{role:'user',content:'اكتب كلمة: تم'}],max_tokens:8})});
-    var d=null; try{ d=await r.json(); }catch(_){}
-    if(!r.ok){ var em=(d&&d.error&&d.error.message)||('HTTP '+r.status); if(r.status===401)em='مفتاح OpenRouter غير صحيح — يبدأ بـ sk-or-v1-'; else if(r.status===402||/credit|insufficient/i.test(em))em='رصيد OpenRouter غير كافٍ — جرّب لاحقًا'; throw new Error(em); }
-    cfgStatus('✅ مفتاح OpenRouter يعمل — لا تنسَ 💾 حفظ','var(--g,#3ecf8e)');
+    var fl=OR_TEXT.filter(function(x){return /:free$/i.test(x);}); if(!fl.length)fl=['meta-llama/llama-3.3-70b-instruct:free'];
+    var okm=null,lastem='فشل الاختبار';
+    for(var fi=0;fi<fl.length;fi++){
+      try{
+        var r=await fetch(OR_URL,{method:'POST',headers:hd,body:JSON.stringify({model:fl[fi],messages:[{role:'user',content:'اكتب كلمة: تم'}],max_tokens:8})});
+        var d=null; try{ d=await r.json(); }catch(_){}
+        if(r.ok){ okm=fl[fi]; break; }
+        var em=(d&&d.error&&d.error.message)||('HTTP '+r.status);
+        if(r.status===401){ lastem='مفتاح OpenRouter غير صحيح — يبدأ بـ sk-or-v1-'; break; }
+        if(r.status===402||/credit|insufficient|quota/i.test(em)){ lastem='رصيد OpenRouter غير كافٍ'; break; }
+        lastem=em;
+      }catch(e2){ lastem=(e2&&e2.message)||'فشل الاتصال'; }
+    }
+    if(!okm){ cfgStatus('❌ '+lastem,'var(--r,#f0645c)'); return; }
+    cfgStatus('✅ مفتاح OpenRouter يعمل ('+okm.replace(/:free$/,'')+') — لا تنسَ 💾 حفظ','var(--g,#3ecf8e)');
   }catch(e){ cfgStatus('❌ '+((e&&e.message)||'فشل الاختبار'),'var(--r,#f0645c)'); }
 }
 window.tuaiCfgTest=tuaiCfgTest;
