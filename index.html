@@ -6412,24 +6412,27 @@ function ffFillCodes(){
   ffOnCode();
 }
 function ffOnCode(){
-  const sel=document.getElementById('ff-code');if(!sel)return;const code=sel.value;
-  const list=FILESECS.filter(function(s){return s.code===code;});
-  const seen={},opts=[];
-  list.forEach(function(s){var k=String(s.num||'');if(seen[k])return;seen[k]=1;opts.push({num:k,name:s.name||''});});
-  opts.sort(function(a,b){return (+a.num||0)-(+b.num||0);});
-  const ns=document.getElementById('ff-num');const prev=ns.value;
-  ns.innerHTML=opts.map(function(o){
-    var lbl=(o.num&&o.num!=='0')?(o.num+(o.name?(' \u2014 '+o.name):'')):(o.name||o.num||'-');
-    return '<option value="'+o.num+'">'+(typeof esc==='function'?esc(lbl):lbl)+'</option>';
+  var sel=document.getElementById('ff-code');if(!sel)return;var code=sel.value;
+  var list=FILESECS.filter(function(s){return s.code===code;});
+  var seen={},opts=[];
+  list.forEach(function(s){var nm=String(s.name||'').trim();var num=String(s.num||'');var k=num+'|#|'+nm;if(seen[k])return;seen[k]=1;opts.push({num:num,name:nm});});
+  opts.sort(function(a,b){var d=(+a.num||0)-(+b.num||0);if(d)return d;return a.name<b.name?-1:(a.name>b.name?1:0);});
+  FF_NUMOPTS=opts;
+  var ns=document.getElementById('ff-num');
+  ns.innerHTML=opts.map(function(o,i){
+    var lbl=(o.num&&o.num!=='0')?(o.num+(o.name?(' — '+o.name):'')):(o.name||o.num||'-');
+    return '<option value="'+i+'">'+(typeof esc==='function'?esc(lbl):lbl)+'</option>';
   }).join('');
-  if(opts.some(function(o){return o.num===prev;}))ns.value=prev;
+  if(ns.options.length)ns.selectedIndex=0;
   ffOnNum();
 }
+var FF_NUMOPTS=[];
+function ffNumSel(){var ns=document.getElementById('ff-num');if(!ns)return {num:'',name:''};var o=FF_NUMOPTS[ns.selectedIndex];if(o)return {num:String(o.num||''),name:String(o.name||'')};return {num:String(ns.value||''),name:''};}
 function ffSeat(s){if(ffIsClosed(s))return ' \u26d4 \u0645\u0642\u0641\u0644\u0629 (\u0627\u0644\u0633\u0639\u0629 0)';if(s.cap==null)return '';return ' ['+(s.reg!=null?s.reg:'?')+'/'+s.cap+(ffIsFull(s)?' \u0645\u0645\u062a\u0644\u0626\u0629':'')+']';}
 function ffOnNum(){
-  const code=document.getElementById('ff-code').value,num=document.getElementById('ff-num').value;
-  const all=FILESECS.filter(function(s){return s.code===code&&s.num===num;});
-  const ss=document.getElementById('ff-sec');
+  var code=document.getElementById('ff-code').value;var sel=ffNumSel();var num=sel.num,nm=sel.name;
+  var all=FILESECS.filter(function(s){return s.code===code&&String(s.num||'')===num&&(nm?String(s.name||'').trim()===nm:true);});
+  var ss=document.getElementById('ff-sec');
   ss.innerHTML='<option value="__ALL__">الكل ('+all.length+' شعبة)</option>'+all.map(function(s){
     var nt=(!s.meets||!s.meets.length);
     return '<option value="'+s.sec+'">'+s.sec+(s.instr?' — '+s.instr:'')+ffSeat(s)+(nt?' ⏱ بدون أوقات':'')+'</option>';
@@ -6437,34 +6440,34 @@ function ffOnNum(){
   ffPreview();
 }
 function ffPreview(){
-  const host=document.getElementById('ff-preview');if(!host)return;
-  const code=document.getElementById('ff-code').value,num=document.getElementById('ff-num').value,secv=document.getElementById('ff-sec').value;
-  let pool=FILESECS.filter(function(s){return s.code===code&&s.num===num;});
+  var host=document.getElementById('ff-preview');if(!host)return;
+  var code=document.getElementById('ff-code').value;var sel=ffNumSel();var num=sel.num,nm=sel.name;var secv=document.getElementById('ff-sec').value;
+  var pool=FILESECS.filter(function(s){return s.code===code&&String(s.num||'')===num&&(nm?String(s.name||'').trim()===nm:true);});
   if(secv&&secv!=='__ALL__')pool=pool.filter(function(s){return s.sec===secv;});
-  const nameEl=document.getElementById('ff-name');if(nameEl)nameEl.textContent=pool.length?pool[0].name:'';
-  const DN=['\u0627\u0644\u0623\u062d\u062f','\u0627\u0644\u0627\u062b\u0646\u064a\u0646','\u0627\u0644\u062b\u0644\u0627\u062b\u0627\u0621','\u0627\u0644\u0623\u0631\u0628\u0639\u0627\u0621','\u0627\u0644\u062e\u0645\u064a\u0633'];
-  host.innerHTML=pool.slice(0,40).map(function(s){return '<div class="ff-prow"><span class="ff-psec">'+s.sec+'</span><span class="ff-pdays">'+s.meets.map(function(m){return DN[m.days[0]]+' '+m2t(m.from)+'-'+m2t(m.to);}).join(' \u00b7 ')+'</span><span class="ff-pseat">'+ffSeat(s)+'</span></div>';}).join('');
+  var nameEl=document.getElementById('ff-name');if(nameEl)nameEl.textContent=pool.length?pool[0].name:'';
+  var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+  host.innerHTML=pool.slice(0,40).map(function(s){return '<div class="ff-prow"><span class="ff-psec">'+s.sec+'</span><span class="ff-pdays">'+(s.meets||[]).map(function(m){return DN[m.days[0]]+' '+m2t(m.from)+'-'+m2t(m.to);}).join(' · ')+'</span><span class="ff-pseat">'+ffSeat(s)+'</span></div>';}).join('');
 }
 function ffAdd(){
-  const code=document.getElementById('ff-code').value,num=document.getElementById('ff-num').value,secv=document.getElementById('ff-sec').value;
-  /* ملاحظة مهمة: ما نفلتر هنا على ffEligible إطلاقًا — كل شعبة موجودة بالملف
-     تنضاف بدون استثناء، سواء كانت مقفلة (السعة 0)، متاحة، أو حتى بدون
-     أوقات محاضرات مقروءة (تنضاف بدون مواعيد ويقدر الطالب يضيف وقتها يدويًا). */
-  let pool=FILESECS.filter(function(s){return s.code===code&&s.num===num;});
+  var code=document.getElementById('ff-code').value;var sel=ffNumSel();var num=sel.num,nm=sel.name;var secv=document.getElementById('ff-sec').value;
+  var pool=FILESECS.filter(function(s){return s.code===code&&String(s.num||'')===num&&(nm?String(s.name||'').trim()===nm:true);});
   if(secv&&secv!=='__ALL__')pool=pool.filter(function(s){return s.sec===secv;});
-  if(!pool.length)return toast('\u0644\u0627 \u062a\u0648\u062c\u062f \u0634\u0639\u0628 \u0644\u0647\u0630\u0647 \u0627\u0644\u0645\u0627\u062f\u0629 \u0641\u064a \u0627\u0644\u0645\u0644\u0641');
-  const key=(num&&num!=='0')?(code+' '+num):(code+((pool[0]&&pool[0].name)?(' '+pool[0].name):''));
-  let course=genData.courses.find(function(c){return c.code===key;});
-  if(!course){course={code:key,name:pool[0].name||key,sections:[],on:true};genData.courses.push(course);}
-  let added=0;
+  if(!pool.length)return toast('لا توجد شعب لهذه المادة في الملف');
+  var pname=(pool[0]&&pool[0].name)?String(pool[0].name).trim():'';
+  var key=(num&&num!=='0')?(code+' '+num):(code+(pname?(' '+pname):''));
+  var idn=pname||key;
+  var course=genData.courses.find(function(c){return c.code===key&&String(c.name||'')===idn;});
+  if(!course){course={code:key,name:idn,sections:[],on:true};genData.courses.push(course);}
+  var added=0;
   pool.forEach(function(s){if(!course.sections.find(function(x){return x.num===s.sec;})){course.sections.push({num:s.sec,meets:s.meets,closed:ffIsClosed(s)?1:0,cap:(s.cap==null?null:s.cap),reg:(s.reg==null?null:s.reg)});added++;}});
   saveGen();renderGenCourses();
   if(typeof buildOffdayPicker==='function')try{buildOffdayPicker();}catch(e){}
-  const closedCount=pool.filter(ffIsClosed).length,noTimeCount=pool.filter(function(s){return !s.meets||!s.meets.length;}).length;
-  let extra='';
-  if(closedCount)extra+=' \u26d4 \u0645\u0646\u0647\u0627 '+closedCount+' \u0645\u0642\u0641\u0644\u0629 (\u0627\u0644\u0633\u0639\u0629 0)';
-  if(noTimeCount)extra+=' \u23f1 \u0645\u0646\u0647\u0627 '+noTimeCount+' \u0628\u062f\u0648\u0646 \u0623\u0648\u0642\u0627\u062a \u0645\u0642\u0631\u0648\u0621\u0629';
-  toast(added?('\u062a\u0645\u062a \u0625\u0636\u0627\u0641\u0629 '+key+' ('+added+' \u0634\u0639\u0628\u0629) \u2705'+extra):('\u0643\u0644 \u0634\u0639\u0628 '+key+' \u0645\u0636\u0627\u0641\u0629 \u0645\u0633\u0628\u0642\u0627\u064b'));
+  var closedCount=pool.filter(ffIsClosed).length,noTimeCount=pool.filter(function(s){return !s.meets||!s.meets.length;}).length;
+  var extra='';
+  if(closedCount)extra+=' ⛔ منها '+closedCount+' مقفلة (السعة 0)';
+  if(noTimeCount)extra+=' ⏱ منها '+noTimeCount+' بدون أوقات مقروءة';
+  var disp=key+((pname&&key.indexOf(pname)<0)?(' — '+pname):'');
+  toast(added?('تمت إضافة '+disp+' ('+added+' شعبة) ✅'+extra):('كل شعب '+disp+' مضافة مسبقاً'));
 }
 
 
