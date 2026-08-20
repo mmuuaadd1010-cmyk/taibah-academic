@@ -9962,17 +9962,20 @@ async function handleFile(file){
     }
   }
   try{
-    step('أجهز الصورة بدقة عالية');
-    var items=await extractFromImage(file,step);
+    step('أرسل الصورة لقارئ الجدول على السيرفر');
+    if(!window.TU_PARSE)throw new Error('قارئ الجدول غير محمّل بعد، حدّث الصفحة وحاول من جديد.');
+    var res=await window.TU_PARSE.parseFile(file,{});
+    var items=window.TU_PARSE.toSiteItems(res.payload);
     if(!items.length)throw new Error('EMPTY');
-    if(chip)chip.textContent='🖼️ تمت القراءة ('+lastVisMeta+')';
+    if(chip)chip.textContent='🖼️ تمت القراءة ('+(res.model||'قارئ السيرفر')+')';
     schStatus('','');
     notify('تمام ✅ استخرجت '+items.length+' محاضرة. راجع القائمة: تقدر تعدل ✏️ أو تحذف ✕ أو تضيف ➕ قبل الحفظ.');
     openRev(items);
   }catch(e){
     var m=String((e&&e.message)||e);
     if(chip&&chip.parentNode)chip.parentNode.removeChild(chip);
-    if(/NOKEY/.test(m))notify(isAdmin()?'ما فيه مفتاح ذكاء اصطناعي. افتح لوحة المطور وحط مفتاح OpenRouter.':('خدمة قراءة الجدول غير مفعلة حالياً. راسل المطور على تلجرام '+TG_AT),true);
+    if(e&&e.needsDeploy)notify(isAdmin()?'قارئ الصور على السيرفر لسه ما اتفعل. فعّله من Supabase Edge Functions باسم parse-schedule.':('خدمة قراءة الجدول غير مفعلة حالياً. راسل المطور على تلجرام '+TG_AT),true);
+    else if(/تسجل الدخول/.test(m))notify('لازم تسجل الدخول أول عشان نقرأ جدولك ونحفظه بحسابك.',true);
     else if(/heic|heif/i.test(nm))notify('صيغة HEIC ما تُقرأ دائماً. حولها JPG أو صور الجدول من الشاشة.',true);
     else if(/EMPTY/.test(m))notify('ما قدرت أقرأ الجدول من هذي الصورة. صور الجدول كامل وواضح بدون ميلان، أو أرسله على جزئين.',true);
     else notify('صار خطأ أثناء القراءة: '+m,true);
