@@ -3335,6 +3335,15 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
         <input class="t-inp" type="text" id="adm-users-search" placeholder="🔍 ابحث بالاسم أو اليوزرنيم أو البريد" oninput="drawAdminUsers(this.value)" style="margin-bottom:12px">
         <div id="adm-users"></div>
       </div>
+      <div class="card" style="border-color:rgba(240,100,92,.4)">
+        <div class="card-h">🔑 دخول باسم مستخدم (دعم فني)</div>
+        <div style="font-size:.76rem;color:var(--t2);margin-bottom:10px;line-height:1.7">للمستخدمين اللي ما يعرفون يضبطون حسابهم. بيسجّل خروجك من حسابك الحالي وبيفتح لك حساب الزبون مباشرة — رجّع سجّل دخول بحسابك بعدها.</div>
+        <div style="display:flex;gap:8px">
+          <input class="t-inp" type="email" id="adm-imp-email" placeholder="ايميل المستخدم" style="flex:1" onkeydown="if(event.key==='Enter')adminImpersonate()">
+          <button class="btn-danger" onclick="adminImpersonate()" style="white-space:nowrap;padding:0 16px">دخول</button>
+        </div>
+        <div id="adm-imp-msg" style="font-size:.76rem;margin-top:8px;color:var(--t2)"></div>
+      </div>
     </div>
 
   </div>
@@ -7883,6 +7892,31 @@ async function adminToggleRole(uid,current){
     loadAdminUsers();
   }catch(e){ toast('تعذّر التحديث'); }
 }
+window.adminImpersonate=async function(){
+  var inp=document.getElementById('adm-imp-email'); var msg=document.getElementById('adm-imp-msg');
+  var email=((inp&&inp.value)||'').trim();
+  if(!email){ if(msg){msg.textContent='⚠️ اكتب الايميل أولاً';msg.style.color='var(--r)';} return; }
+  if(!confirm('بيسجّل خروجك من حسابك الحالي وبيفتح لك حساب:\n'+email+'\n\nمتأكد؟'))return;
+  if(msg){msg.textContent='⏳ جارٍ التحضير...';msg.style.color='var(--t2)';}
+  try{
+    var sess=await sbClient.auth.getSession();
+    var token=sess&&sess.data&&sess.data.session&&sess.data.session.access_token;
+    if(!token)throw new Error('no_session');
+    var resp=await fetch(SB_URL+'/functions/v1/admin-impersonate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({email:email})
+    });
+    var data=await resp.json().catch(function(){return{};});
+    if(!resp.ok||!data.action_link){
+      var errMap={not_admin:'ما عندك صلاحية مطوّر',user_not_found:'ما لقيت مستخدم بهذا الايميل',invalid_token:'الجلسة غير صالحة، سجّل دخول من جديد',missing_email:'اكتب الايميل'};
+      if(msg){msg.textContent='❌ '+(errMap[data.error]||data.error||'صار خطأ، جرّب مرة ثانية');msg.style.color='var(--r)';}
+      return;
+    }
+    if(msg){msg.textContent='✅ جارٍ الدخول...';msg.style.color='var(--g)';}
+    location.href=data.action_link;
+  }catch(e){ if(msg){msg.textContent='❌ تعذّر الاتصال بالسيرفر';msg.style.color='var(--r)';} }
+};
 window.openChatAdmin=function(uid){
   var p=null; for(var i=0;i<adminUsersCache.length;i++){ if(adminUsersCache[i].user_id===uid){p=adminUsersCache[i];break;} }
   if(!p)return; chatPeer=p; chatLastId=0;
