@@ -4454,7 +4454,18 @@ function schPrintDoc(){
     <div style="font-size:2rem">💳</div>
     <h3>إتمام الاشتراك</h3>
     <p id="tu-payment-plan"></p>
-    <label for="tu-discount-input" style="display:block;text-align:right;color:var(--t2);font-size:.76rem;margin:10px 0 6px">كود خصم (اختياري)</label>
+    <label for="tu-pay-phone" style="display:block;text-align:right;color:var(--t2);font-size:.78rem;margin:12px 0 7px">رقم الجوال</label>
+    <div style="position:relative;margin-bottom:12px">
+      <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--t2);font:700 .86rem Tajawal,sans-serif;pointer-events:none">+966</span>
+      <input id="tu-pay-phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="9" dir="ltr"
+        placeholder="5xxxxxxxx"
+        aria-label="رقم الجوال السعودي"
+        style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:12px;color:var(--t);padding:13px 58px 13px 13px;font:700 .92rem Tajawal,sans-serif;outline:none;transition:border-color .2s,box-shadow .2s"
+        oninput="this.value=this.value.replace(/\\D/g,'').replace(/^0+/,'').slice(0,9)"
+        onfocus="this.style.borderColor='var(--a1)';this.style.boxShadow='0 0 0 3px rgba(77,141,255,.10)'"
+        onblur="this.style.borderColor='var(--bor)';this.style.boxShadow='none'">
+    </div>
+    <label for="tu-discount-input" style="display:block;text-align:right;color:var(--t2);font-size:.76rem;margin:8px 0 6px">كود خصم (اختياري)</label>
     <input id="tu-discount-input" dir="ltr" autocomplete="off" placeholder="DISCOUNT-CODE" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:11px;color:var(--t);padding:12px;font:700 .88rem Tajawal,sans-serif;outline:none;margin-bottom:14px">
     <div id="tu-payment-msg" style="display:none;margin-bottom:10px;border-radius:10px;padding:10px 12px;font-size:.78rem"></div>
     <p style="font-size:.72rem;color:var(--t2);margin:0 0 8px">اضغط شعار تمارا ويوصلك مباشرة لصفحتها — تدخل رقم جوالك هناك عندهم.</p>
@@ -4582,7 +4593,16 @@ async function tuStartTamaraPay(){
     var token=sess&&sess.data&&sess.data.session&&sess.data.session.access_token;
     if(!token)throw new Error('انتهت الجلسة، سجّل الدخول من جديد');
     var fnUrl=SB_URL+'/functions/v1/tamara-checkout';
-    var res=await fetch(fnUrl,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:TU_CURRENT_PLAN_TYPE,discount_code:code})});
+    var phoneInput=document.getElementById('tu-pay-phone');
+    var phone=(phoneInput&&phoneInput.value||'').trim();
+    if(!phone){
+      phone=String(CURRENT_USER.phone||((CURRENT_USER.user_metadata||{}).phone)||'').trim();
+      phone=phone.replace(/^\\+?966/,'').replace(/^0+/,'');
+    }
+    if(!/^5\\d{8}$/.test(phone))throw new Error('أدخل رقم جوال سعودي صحيح: 5xxxxxxxx');
+    try{ localStorage.setItem('tu_pay_phone', phone); }catch(e){}
+    phone='+966'+phone;
+    var res=await fetch(fnUrl,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:TU_CURRENT_PLAN_TYPE,discount_code:code,phone_number:phone})});
     var data=await res.json();
     if(!res.ok)throw new Error(data.error||data.message||JSON.stringify(data)||'تعذّر بدء الدفع');
     location.href=data.checkout_url;
@@ -4610,7 +4630,16 @@ async function tuPayTamaraDirect(plan,planType){
     var sess=await sbClient.auth.getSession();
     var token=sess&&sess.data&&sess.data.session&&sess.data.session.access_token;
     if(!token)throw new Error('انتهت الجلسة، سجّل الدخول من جديد');
-    var res=await fetch(SB_URL+'/functions/v1/tamara-checkout',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:planType,discount_code:''})});
+    var phoneInput=document.getElementById('tu-pay-phone');
+    var phone=(phoneInput&&phoneInput.value||'').trim();
+    if(!phone){
+      phone=String(CURRENT_USER.phone||((CURRENT_USER.user_metadata||{}).phone)||'').trim();
+      phone=phone.replace(/^\\+?966/,'').replace(/^0+/,'');
+    }
+    if(!/^5\\d{8}$/.test(phone))throw new Error('أدخل رقم جوال سعودي صحيح: 5xxxxxxxx');
+    try{ localStorage.setItem('tu_pay_phone', phone); }catch(e){}
+    phone='+966'+phone;
+    var res=await fetch(SB_URL+'/functions/v1/tamara-checkout',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:planType,discount_code:'',phone_number:phone})});
     var data=await res.json();
     if(!res.ok)throw new Error(data.error||data.message||'تعذّر بدء الدفع');
     if(!data.checkout_url)throw new Error('لم يصل رابط الدفع من تمارا');
