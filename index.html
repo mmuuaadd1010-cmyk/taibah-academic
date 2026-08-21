@@ -1573,7 +1573,7 @@ input::placeholder,textarea::placeholder{color:#707b89!important}
 .app-route-actions{background:rgba(5,6,8,.97)!important;border-color:#2c333d!important}
 .toast{background:#f5f7fa!important;color:#050608!important;box-shadow:0 12px 35px rgba(0,0,0,.65)!important}
 </style>
-<script>try{document.documentElement.removeAttribute('data-theme');localStorage.setItem('tu_theme','dark');var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content='#050608';}catch(e){}</script>
+<script>try{var sk=localStorage.getItem('tu_skin')||'dark';var L=['light','morning','rose','sage'];var d=document.documentElement;if(L.indexOf(sk)>=0){d.setAttribute('data-theme','light');}else{d.removeAttribute('data-theme');}if(sk==='dark'||sk==='light'){d.removeAttribute('data-skin');}else{d.setAttribute('data-skin',sk);}var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=(L.indexOf(sk)>=0?'#ffffff':'#05060d');}catch(e){}</script>
 
 <script>
 (function(){
@@ -1600,19 +1600,21 @@ hr,.divider,.sec-title::after{border-color:#151a20!important;background:#151a20!
 
 
 <style id="fixed-black-runtime-css">
-#theme-btn,#theme-btn-auth,#tu-theme-fab,.lp-theme,#lp-theme,#lp-theme-btn{display:none!important}
-html,body{background:#050608!important;background-image:none!important}
+#theme-btn-auth,.lp-theme,#lp-theme,#lp-theme-btn{display:none!important}
 </style>
 <script id="fixed-black-runtime">
-function tuEnforceBlack(){
- var r=document.documentElement,b=document.body,vals={bg:'#050608',s1:'#080a0d',s2:'#0b0e12',s3:'#10141a',s4:'#151a21',bor:'#11151a',bor2:'#161b22',bor3:'#20262e',a1:'#4d8dff',a2:'#73a7ff',a3:'#a9c7ff',t:'#f5f7fa',t2:'#b1bac6',t3:'#778291'};
- r.removeAttribute('data-theme');Object.keys(vals).forEach(function(k){r.style.setProperty('--'+k,vals[k],'important');});
- r.style.setProperty('--grad','linear-gradient(135deg,#2563eb,#2563eb)','important');r.style.setProperty('--shadow','none','important');r.style.setProperty('--shadow-sm','none','important');
- if(b){b.style.setProperty('background','#050608','important');b.style.setProperty('background-image','none','important');}
- /* custom CSS is intentionally preserved */
- try{localStorage.setItem('tu_theme','dark');}catch(e){}
+function tuApplySkin(skin){
+  var LIGHT=['light','morning','rose','sage'];
+  var d=document.documentElement;
+  if(!skin)skin='dark';
+  if(LIGHT.indexOf(skin)>=0){d.setAttribute('data-theme','light');}else{d.removeAttribute('data-theme');}
+  if(skin==='dark'||skin==='light'){d.removeAttribute('data-skin');}else{d.setAttribute('data-skin',skin);}
+  try{localStorage.setItem('tu_skin',skin);localStorage.setItem('tu_theme',LIGHT.indexOf(skin)>=0?'light':'dark');}catch(e){}
+  try{var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=(LIGHT.indexOf(skin)>=0?'#ffffff':'#05060d');}catch(e){}
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){tuEnforceBlack();setTimeout(tuEnforceBlack,50);setTimeout(tuEnforceBlack,1200);});else tuEnforceBlack();
+window.tuApplySkin=tuApplySkin;
+function tuEnforceBlack(){ try{ tuApplySkin(localStorage.getItem('tu_skin')||'dark'); }catch(e){} }
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){tuEnforceBlack();});else tuEnforceBlack();
 </script>
 
 <style id="tu-square-logo-v5">
@@ -2442,25 +2444,6 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 
 <!-- SCREEN 3: APP -->
 <div class="screen" id="s-app">
-  <div class="tu-topbar" id="tu-topbar">
-    <button class="tu-topbar-in" onclick="genGoSub()">
-      <span class="tu-topbar-ic">🎓</span>
-      <span class="tu-topbar-txt">اشترك في الموقع من هنا — شاهد أسعار الباقات الآن 🚀</span>
-      <span class="tu-topbar-x" onclick="event.stopPropagation();var p=document.getElementById('tu-topbar');if(p)p.style.display='none';">×</span>
-    </button>
-  </div>
-  <style id="tu-topbar-css">
-.tu-topbar{width:100%;box-sizing:border-box}
-.tu-topbar-in{display:flex;align-items:center;gap:12px;cursor:pointer;background:linear-gradient(135deg,#5b9dfd,#3ecf8e);color:#fff;border:none;border-radius:0;padding:11px 18px;font-family:inherit;font-weight:800;font-size:.88rem;width:100%;box-sizing:border-box;position:relative;overflow:hidden;transition:.2s}
-.tu-topbar-in:hover{filter:brightness(1.06)}
-.tu-topbar-in::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%);transform:translateX(-120%);animation:tuTopbarShine 3.2s ease-in-out infinite}
-@keyframes tuTopbarShine{0%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
-.tu-topbar-txt{flex:1;text-align:center;position:relative;z-index:1}
-.tu-topbar-ic{font-size:1.1rem;position:relative;z-index:1}
-.tu-topbar-x{display:grid;place-items:center;background:rgba(255,255,255,.22);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:.95rem;font-weight:900;position:relative;z-index:2;flex:none}
-.tu-topbar-x:hover{background:rgba(255,255,255,.42)}
-@media(max-width:520px){.tu-topbar-in{font-size:.78rem;padding:10px 12px;gap:8px}}
-  </style>
   <div class="app-route-actions"><button onclick="changeUniversity()">🏫 الجامعة</button><button onclick="changeSpec()">🏛️ الكلية</button><button onclick="backToMajors()">🎓 التخصص</button></div>
   <div class="app-nav">
     <div class="nav-left">
@@ -2468,7 +2451,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
       <div class="nav-spec-pill" id="nav-spec-pill" onclick="changeSpec()">التخصص ‹</div>
     </div>
     <div class="nav-right">
-      <button id="theme-btn" onclick="toggleTheme()" title="الوضع الصباحي" aria-label="الوضع الصباحي">☀️</button>
+      <button id="theme-btn" onclick="tuThemePick()" title="الوضع الصباحي" aria-label="الوضع الصباحي">☀️</button>
       <button class="tu-menu-btn" onclick="tuOpenDrawer()" title="القائمة" aria-label="القائمة">☰</button>
       <div class="nav-gpa"><div class="nav-gpa-val" id="nav-gpa">–</div><div class="nav-gpa-lbl">معدلك</div></div>
     </div>
@@ -2516,17 +2499,17 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <button class="tab-item" onclick="goTab('subscription',this)"><span class="tu-inline-logo tu-logo-img" aria-hidden="true"></span> اشترا��ي</button>
     <button class="tab-item on" onclick="goTab('home',this)">🏠 الرئيسية</button>
     <button class="tab-item" onclick="goTab('plan',this)">📋 الخطة</button>
-    <button class="tab-item" onclick="goTab('abs',this)">🚫 الغياب والحرمان</button>
-    <button class="tab-item" onclick="goTab('roadmap',this)">🗺️ صور خطتي</button>
+    <button class="tab-item tu-locked-tab" onclick="goTab('abs',this)">🚫 الغياب والحرمان</button>
+    <button class="tab-item tu-locked-tab" onclick="goTab('roadmap',this)">🗺️ صور خطتي</button>
     <button class="tab-item" onclick="goTab('gen',this)">🧠 مولّد الجداول</button>
-    <button class="tab-item" onclick="goTab('chart',this)">📈 الإحصاء</button>
+    <button class="tab-item tu-locked-tab" onclick="goTab('chart',this)">📈 الإحصاء</button>
     <button class="tab-item" onclick="goTab('pomo',this)">🍅 بومودورو</button>
-    <button class="tab-item" onclick="goTab('target',this)">😼 المعدل المستهدف</button>
+    <button class="tab-item tu-locked-tab" onclick="goTab('target',this)">😼 المعدل المستهدف</button>
     <button class="tab-item" onclick="goTab('goals',this)">✅ أهدافي</button>
     <button class="tab-item" onclick="goTab('schedule',this)">📅 جدولي</button>
     <button class="tab-item" onclick="goTab('planner',this)">🗓️ تقويم الجامعة</button>
     <button class="tab-item" onclick="goTab('peers',this)">👥 الزملاء</button>
-    <button class="tab-item" onclick="goTab('compare',this)">⚖️ مقارنة تخصصين</button>
+    <button class="tab-item tu-locked-tab" onclick="goTab('compare',this)">⚖️ مقارنة تخصصين</button>
     <button class="tab-item" onclick="goTab('countdown',this)">⏳ التخرج</button>
     <button class="tab-item" onclick="goTab('fans',this);renderFans()">🏆 نجوم المنصة</button>
     <button class="tab-item" onclick="goTab('settings',this)">⚙️ الإعدادات</button>
@@ -2555,6 +2538,25 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 @media(max-width:520px){#p-home.on{gap:12px;padding:4px 0 26px}}
 </style>
     <div class="tab-pane on" id="p-home">
+      <div class="tu-promo" id="tu-home-promo">
+        <button class="tu-promo-in" onclick="genGoSub()">
+          <span class="tu-promo-ic">🎓</span>
+          <span class="tu-promo-txt">اشترك في الموقع من هنا — شاهد أسعار الباقات الآن 🚀</span>
+          <span class="tu-promo-x" onclick="event.stopPropagation();var p=document.getElementById('tu-home-promo');if(p)p.style.display='none';">×</span>
+        </button>
+      </div>
+      <style id="tu-home-promo-css">
+.tu-promo{margin:0 0 14px}
+.tu-promo-in{display:flex;align-items:center;gap:12px;cursor:pointer;background:linear-gradient(135deg,#5b9dfd,#3ecf8e);color:#fff;border:none;border-radius:16px;padding:14px 18px;font-family:inherit;font-weight:800;font-size:.9rem;width:100%;box-shadow:0 12px 30px -14px rgba(91,157,253,.7);position:relative;overflow:hidden;transition:.2s}
+.tu-promo-in:hover{transform:translateY(-2px);box-shadow:0 18px 40px -14px rgba(91,157,253,.85)}
+.tu-promo-in::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%);transform:translateX(-120%);animation:tuPromoShine 3.2s ease-in-out infinite}
+@keyframes tuPromoShine{0%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
+.tu-promo-txt{flex:1;text-align:center;position:relative;z-index:1}
+.tu-promo-ic{font-size:1.15rem;position:relative;z-index:1}
+.tu-promo-x{display:grid;place-items:center;background:rgba(255,255,255,.22);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:1rem;font-weight:900;position:relative;z-index:2;flex:none}
+.tu-promo-x:hover{background:rgba(255,255,255,.42)}
+@media(max-width:520px){.tu-promo-in{font-size:.8rem;padding:12px 13px;gap:8px}}
+      </style>
       <div class="profile-header-card">
         <div class="profile-avatar" id="home-avatar" onclick="pickAvatar()" title="اضغط لتغيير صورتك"><span class="pa-letter">ج</span><span class="pa-cam">📷</span></div>
         <div class="profile-info">
@@ -4567,13 +4569,14 @@ async function tuStartTamaraPay(){
   var code=((document.getElementById('tu-discount-input')||{}).value||'').trim();
   var phone=((document.getElementById('tu-phone-input')||{}).value||'').trim().replace(/[^0-9]/g,'');
   if(!/^(05|5)[0-9]{8}$/.test(phone))return tuPayMsg('اكتب رقم جوال سعودي صحيح (05XXXXXXXX)',false);
+  var email=''; try{ email=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.email)||''; }catch(e){}
   btn.disabled=true;btn.textContent='جاري التحويل لتمارا...';
   try{
     var sess=await sbClient.auth.getSession();
     var token=sess&&sess.data&&sess.data.session&&sess.data.session.access_token;
     if(!token)throw new Error('انتهت الجلسة، سجّل الدخول من جديد');
     var fnUrl=SB_URL+'/functions/v1/tamara-checkout';
-    var res=await fetch(fnUrl,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:TU_CURRENT_PLAN_TYPE,discount_code:code,phone_number:phone})});
+    var res=await fetch(fnUrl,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:TU_CURRENT_PLAN_TYPE,discount_code:code,phone_number:phone,email:email,customer_email:email})});
     var data=await res.json();
     if(!res.ok)throw new Error(data.error||data.message||JSON.stringify(data)||'تعذّر بدء الدفع');
     location.href=data.checkout_url;
@@ -8344,7 +8347,7 @@ async function tuLoadSpecCounts(){
   }catch(e){ if(tot)tot.textContent="تعذّر الحساب."; }
 }
 </script>
-<button id="tu-theme-fab" onclick="toggleTheme()" title="الوضع الصباحي" aria-label="الوضع الصباحي" style="display: flex;">☀️</button>
+<button id="tu-theme-fab" onclick="tuThemePick()" title="الوضع الصباحي" aria-label="الوضع الصباحي" style="display: flex;">☀️</button>
 <script id="tu-theme-everywhere">
 (function(){
   function real(){ return typeof tuThemeApply==='function'; }
@@ -10527,6 +10530,7 @@ function patchPay(){
         if(b.quantity>1)b.offer='year_multi';
         o.body=JSON.stringify(b);
         if(b.phone_number){ try{ localStorage.setItem('tu_pay_phone',b.phone_number); }catch(e){} }
+        if(!b.email){ var _ei=document.getElementById('tu-email-input'); var _ev=(_ei&&_ei.value?_ei.value.trim():''); if(!_ev){ try{ _ev=localStorage.getItem('tu_pay_email')||''; }catch(e){} } if(_ev){ b.email=_ev; b.customer_email=_ev; } }
       }
     }catch(e){}
     return of.apply(this,arguments);
@@ -12195,4 +12199,142 @@ setInterval(function(){ try{ injectSchCard(); injectDevSection(); patchProviders
 })();
 
 </script>
+<style id="tu-lock-css">
+.tu-locked-tab{position:relative}
+.tu-locked-tab::after{content:'🔒';font-size:.6rem;margin-inline-start:4px;opacity:.8;vertical-align:middle}
+#s-app.tu-subbed .tu-locked-tab::after{content:none}
+#s-app.tu-trialing .tu-locked-tab::after{content:'🎁';opacity:.95}
+.tu-lock-ov{display:none;text-align:center;padding:38px 18px 34px}
+.tu-lock-ov .tu-lock-card{max-width:440px;margin:0 auto;background:var(--s1,#0f141b);border:1px solid var(--bor,#1c2530);border-radius:18px;padding:28px 20px}
+.tu-lock-cta{display:inline-block;padding:12px 30px;border:0;border-radius:24px;background:var(--grad);color:#fff;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(91,157,253,.35)}
+</style>
+<script id="tu-lock-js">
+(function(){
+  var TU_GATED=['chart','roadmap','abs','target','compare'];
+  var TU_TRIAL_MS=3*24*60*60*1000;
+  function tuTrialTs(){ try{ var k=localStorage.getItem('tu_trial_start'); if(!k)return 0; var n=parseInt(k,10); return isNaN(n)?0:n; }catch(e){ return 0; } }
+  window.tuTrialState=function(){ var n=tuTrialTs(); if(!n)return 'none'; return (Date.now()-n)<TU_TRIAL_MS?'active':'expired'; };
+  window.tuTrialActive=function(){ return window.tuTrialState()==='active'; };
+  window.tuTrialDaysLeft=function(){ var n=tuTrialTs(); if(!n)return 0; var ms=TU_TRIAL_MS-(Date.now()-n); return ms>0?Math.ceil(ms/86400000):0; };
+  window.tuStartTrial=function(){ try{ if(!localStorage.getItem('tu_trial_start'))localStorage.setItem('tu_trial_start',String(Date.now())); }catch(e){} try{ window.tuLockRefresh(); }catch(e){} var ov=document.getElementById('tu-lock-ov'); var id=ov?ov.getAttribute('data-tab'):''; try{ if(ov)ov.style.display='none'; }catch(e){} try{ var b=(typeof tuTabButton==='function')?tuTabButton(id):null; if(b)window.goTab(id,b); }catch(e){} try{ if(typeof toast==='function')toast('🎁 بدأت تجربتك المجانية 3 أيام'); }catch(e){} };
+  function tuRealSub(){ try{ if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN)return true; }catch(e){} try{ return (typeof tuSubActive==='function')?!!tuSubActive():false; }catch(e){ return false; } }
+  function isSub(){ if(tuRealSub())return true; try{ if(window.tuTrialActive())return true; }catch(e){} return false; }
+  window.tuLockRefresh=function(){ try{ var app=document.getElementById('s-app'); if(!app)return; var real=tuRealSub(); var trial=!real && !!(window.tuTrialActive&&window.tuTrialActive()); app.classList.toggle('tu-subbed', real); app.classList.toggle('tu-trialing', trial); }catch(e){} };
+  function ensureOverlay(){
+    var tb=document.querySelector('.tab-body'); if(!tb)return null;
+    var ov=document.getElementById('tu-lock-ov');
+    if(!ov){
+      ov=document.createElement('div'); ov.id='tu-lock-ov'; ov.className='tu-lock-ov';
+      ov.innerHTML='<div class="tu-lock-card"><div style="font-size:2.6rem;margin-bottom:8px">🔒</div><h3 style="margin:0 0 8px;font-size:1.18rem">هذه الميزة للمشتركين فقط</h3><p style="color:var(--t2);font-size:.86rem;line-height:1.9;margin:0 auto 16px">فعّل اشتراكك للوصول لهذه الميزة وباقي مزايا المنصة المتقدمة.<br>الاشتراك: <b>الترم 15 ريال</b> · <b>السنة 30 ريال</b></p><button type="button" id="tu-trial-btn" class="tu-lock-cta" style="background:#16a34a;box-shadow:0 4px 14px rgba(22,163,74,.35);margin-bottom:12px" onclick="tuStartTrial()">🎁 جرّب مجانًا 3 أيام</button><div id="tu-trial-note" style="display:none;font-size:.82rem;color:var(--t2);margin-bottom:12px">🎁 انتهت تجربتك المجانية (3 أيام)</div><br><button type="button" class="tu-lock-cta" onclick="genGoSub()">🚀 فعّل اشتراكك الآن</button><div><button type="button" class="btn-ghost" style="margin-top:12px" onclick="tuLockRecheck()">🔄 تحقق من الاشتراك</button></div><div id="tu-lock-msg" style="min-height:18px;font-size:.8rem;color:var(--t2);margin-top:10px"></div></div>';
+      tb.appendChild(ov);
+    }
+    return ov;
+  }
+  function showLock(id){ var ov=ensureOverlay(); if(!ov)return; ov.setAttribute('data-tab',id||''); ov.style.display='block'; var pp=document.getElementById('p-'+id); if(pp)pp.classList.remove('on'); try{ var st=(window.tuTrialState?window.tuTrialState():'none'); var tbn=document.getElementById('tu-trial-btn'); var tnt=document.getElementById('tu-trial-note'); if(tbn)tbn.style.display=(st==='none')?'inline-block':'none'; if(tnt)tnt.style.display=(st==='expired')?'block':'none'; }catch(e){} }
+  function hideLock(){ var ov=document.getElementById('tu-lock-ov'); if(ov)ov.style.display='none'; }
+  window.tuLockRecheck=async function(){
+    var msg=document.getElementById('tu-lock-msg'); if(msg)msg.textContent='⏳ جارٍ التحقق...';
+    try{ if(typeof subInit==='function')await subInit(); }catch(e){}
+    try{ if(typeof genVerifySubscription==='function')await genVerifySubscription(); }catch(e){}
+    window.tuLockRefresh();
+    if(isSub()){
+      if(msg)msg.textContent='✅ تم فتح الميزة.';
+      var ov=document.getElementById('tu-lock-ov'); var id=ov?ov.getAttribute('data-tab'):'';
+      hideLock();
+      try{ var b=(typeof tuTabButton==='function')?tuTabButton(id):null; if(b)window.goTab(id,b); }catch(e){}
+    } else if(msg){ msg.textContent='❌ لا يوجد اشتراك فعال لهذا الحساب.'; }
+  };
+  function wrap(){
+    if(typeof window.goTab!=='function'){ setTimeout(wrap,200); return; }
+    if(window.__tuGateWrapped)return; window.__tuGateWrapped=true;
+    var _og=window.goTab;
+    window.goTab=function(id,btn){
+      var r=_og.apply(this,arguments);
+      try{ window.tuLockRefresh(); if(TU_GATED.indexOf(id)>=0 && !isSub()){ showLock(id); } else { hideLock(); } }catch(e){}
+      return r;
+    };
+  }
+  wrap();
+  try{ document.addEventListener('DOMContentLoaded',function(){ setTimeout(window.tuLockRefresh,400); }); }catch(e){}
+  try{ setTimeout(window.tuLockRefresh,1500); }catch(e){}
+})();
+</script>
+
+<style id="tu-skin-css">
+html[data-skin="midnight"]{--bg:#0b0a1a;--s1:#12122a;--s2:#171736;--s3:#1e1e44;--s4:#282856;--bor:#242247;--bor2:#302e5c;--bor3:#403c73;--a1:#8b7bff;--a2:#a99bff;--a3:#c7bcff;--grad:linear-gradient(135deg,#7c5cff,#a98bff);--grad3:linear-gradient(135deg,#7c5cff,#a98bff,#c7bcff);--ring:0 0 0 2px rgba(139,123,255,.32)}
+html[data-skin="ocean"]{--bg:#05121a;--s1:#0a1b26;--s2:#0e2431;--s3:#123040;--s4:#173c4f;--bor:#153241;--bor2:#1d4356;--bor3:#28596f;--a1:#33b3c9;--a2:#57cfe0;--a3:#8fe6f0;--grad:linear-gradient(135deg,#0f9bb4,#33c9d8);--grad3:linear-gradient(135deg,#0f9bb4,#33c9d8,#8fe6f0);--ring:0 0 0 2px rgba(51,179,201,.32)}
+html[data-skin="morning"]{--a1:#ef8a3c;--a2:#f7a85a;--a3:#d9722a;--grad:linear-gradient(135deg,#ef8a3c,#f7a85a);--grad3:linear-gradient(135deg,#ef8a3c,#f7a85a,#d9722a);--ring:0 0 0 2px rgba(239,138,60,.26)}
+html[data-skin="morning"] body{background:#fdf6ec!important}
+html[data-skin="morning"] .tab-item.on,html[data-skin="morning"] .fbtn.on,html[data-skin="morning"] .btn-prim,html[data-skin="morning"] .abs-btn.prim,html[data-skin="morning"] .btn-next{background:#ef8a3c!important;border-color:#ef8a3c!important}
+html[data-skin="morning"] .tab-item.on *,html[data-skin="morning"] .btn-prim *,html[data-skin="morning"] .abs-btn.prim *{color:#fff!important}
+html[data-skin="morning"] #plan-cnt .lv-block.open .lv-num{background:#ef8a3c!important;border-color:#ef8a3c!important;color:#fff!important}
+html[data-skin="morning"] #plan-cnt .lv-num{color:#d9722a!important}
+html[data-skin="rose"]{--a1:#e0518a;--a2:#ef7aa6;--a3:#c93b74;--grad:linear-gradient(135deg,#e0518a,#ef7aa6);--grad3:linear-gradient(135deg,#e0518a,#ef7aa6,#c93b74);--ring:0 0 0 2px rgba(224,81,138,.26)}
+html[data-skin="rose"] body{background:#fdf1f5!important}
+html[data-skin="rose"] .tab-item.on,html[data-skin="rose"] .fbtn.on,html[data-skin="rose"] .btn-prim,html[data-skin="rose"] .abs-btn.prim,html[data-skin="rose"] .btn-next{background:#e0518a!important;border-color:#e0518a!important}
+html[data-skin="rose"] .tab-item.on *,html[data-skin="rose"] .btn-prim *,html[data-skin="rose"] .abs-btn.prim *{color:#fff!important}
+html[data-skin="rose"] #plan-cnt .lv-block.open .lv-num{background:#e0518a!important;border-color:#e0518a!important;color:#fff!important}
+html[data-skin="rose"] #plan-cnt .lv-num{color:#c93b74!important}
+html[data-skin="sage"]{--a1:#2e9e73;--a2:#46b98b;--a3:#1f8460;--grad:linear-gradient(135deg,#2e9e73,#46b98b);--grad3:linear-gradient(135deg,#2e9e73,#46b98b,#1f8460);--ring:0 0 0 2px rgba(46,158,115,.26)}
+html[data-skin="sage"] body{background:#eef6f1!important}
+html[data-skin="sage"] .tab-item.on,html[data-skin="sage"] .fbtn.on,html[data-skin="sage"] .btn-prim,html[data-skin="sage"] .abs-btn.prim,html[data-skin="sage"] .btn-next{background:#2e9e73!important;border-color:#2e9e73!important}
+html[data-skin="sage"] .tab-item.on *,html[data-skin="sage"] .btn-prim *,html[data-skin="sage"] .abs-btn.prim *{color:#fff!important}
+html[data-skin="sage"] #plan-cnt .lv-block.open .lv-num{background:#2e9e73!important;border-color:#2e9e73!important;color:#fff!important}
+html[data-skin="sage"] #plan-cnt .lv-num{color:#1f8460!important}
+.tu-skin-modal{display:none;position:fixed;inset:0;z-index:100000;background:rgba(3,6,12,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
+.tu-skin-sheet{background:var(--s1);border:1px solid var(--bor);border-radius:22px 22px 0 0;width:100%;max-width:520px;padding:18px 18px 26px;box-shadow:0 -20px 60px -20px rgba(0,0,0,.55);animation:tuSkinUp .28s ease}
+@keyframes tuSkinUp{from{transform:translateY(28px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.tu-skin-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.tu-skin-h b{font-size:1.05rem;font-weight:800}
+.tu-skin-x{border:0;background:var(--s3);color:var(--t);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:.85rem}
+.tu-skin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px}
+.tu-skin-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border:2px solid var(--bor);border-radius:16px;background:var(--s2);color:var(--t);cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:700;transition:transform .18s,border-color .18s}
+.tu-skin-item:hover{border-color:var(--a1);transform:translateY(-2px)}
+.tu-skin-item.on{border-color:var(--a1);box-shadow:var(--ring)}
+.tu-skin-sw{width:100%;height:44px;border-radius:11px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.tu-skin-foot{margin-top:16px;font-size:.75rem;color:var(--t2);text-align:center;line-height:1.7}
+@media(min-width:560px){.tu-skin-modal{align-items:center}.tu-skin-sheet{border-radius:20px}}
+</style>
+<script id="tu-skin-js">
+(function(){
+  var TU_SKINS=[
+    {id:'dark',name:'ليلي',emoji:'🌙',grad:'linear-gradient(135deg,#4f8ef7,#6aa9ff)'},
+    {id:'midnight',name:'بنفسجي',emoji:'🌌',grad:'linear-gradient(135deg,#7c5cff,#a98bff)'},
+    {id:'ocean',name:'محيط',emoji:'🌊',grad:'linear-gradient(135deg,#0f9bb4,#33c9d8)'},
+    {id:'light',name:'نهاري',emoji:'☀️',grad:'linear-gradient(135deg,#2f6fd0,#4f8ef7)'},
+    {id:'morning',name:'صباحي',emoji:'🌅',grad:'linear-gradient(135deg,#ef8a3c,#f7a85a)'},
+    {id:'rose',name:'وردي',emoji:'🌸',grad:'linear-gradient(135deg,#e0518a,#ef7aa6)'},
+    {id:'sage',name:'هادئ',emoji:'🌿',grad:'linear-gradient(135deg,#2e9e73,#46b98b)'}
+  ];
+  function curSkin(){ try{ return localStorage.getItem('tu_skin')||'dark'; }catch(e){ return 'dark'; } }
+  function tuSkinRender(){
+    var g=document.getElementById('tu-skin-grid'); if(!g)return;
+    var cur=curSkin(); var h='';
+    TU_SKINS.forEach(function(sm){ h+='<button type="button" class="tu-skin-item'+(sm.id===cur?' on':'')+'" data-sk="'+sm.id+'"><span class="tu-skin-sw" style="background:'+sm.grad+'"></span><span class="tu-skin-nm">'+sm.emoji+' '+sm.name+'</span></button>'; });
+    g.innerHTML=h;
+    g.querySelectorAll('.tu-skin-item').forEach(function(b){ b.onclick=function(){ tuSetSkin(b.getAttribute('data-sk')); }; });
+  }
+  window.tuThemePick=function(){
+    var m=document.getElementById('tu-skin-modal');
+    if(!m){
+      m=document.createElement('div'); m.id='tu-skin-modal'; m.className='tu-skin-modal';
+      m.innerHTML='<div class="tu-skin-sheet"><div class="tu-skin-h"><b>🎨 المظهر والأوضاع</b><button type="button" class="tu-skin-x" onclick="tuThemeClose()">✕</button></div><div class="tu-skin-grid" id="tu-skin-grid"></div><div class="tu-skin-foot">اختر الوضع الذي يريحك — يُحفظ تلقائيًا على جهازك.</div></div>';
+      m.onclick=function(e){ if(e.target===m)window.tuThemeClose(); };
+      document.body.appendChild(m);
+    }
+    tuSkinRender();
+    m.style.display='flex';
+  };
+  window.tuThemeClose=function(){ var m=document.getElementById('tu-skin-modal'); if(m)m.style.display='none'; };
+  function tuSetSkin(id){
+    try{ if(typeof window.tuApplySkin==='function')window.tuApplySkin(id); }catch(e){}
+    try{ tuSkinRender(); }catch(e){}
+    try{ var cp=document.getElementById('p-chart'); if(cp&&cp.classList.contains('on')&&typeof renderCharts==='function')renderCharts(); }catch(e){}
+    try{ if(typeof toast==='function')toast('🎨 تم تغيير المظهر'); }catch(e){}
+  }
+  window.tuSetSkin=tuSetSkin;
+  try{ if(typeof window.tuApplySkin==='function')window.tuApplySkin(curSkin()); }catch(e){}
+})();
+</script>
+
 </body></html>
