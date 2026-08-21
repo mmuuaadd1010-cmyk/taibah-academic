@@ -4452,13 +4452,10 @@ function schPrintDoc(){
 <div id="tu-payment-note" onclick="if(event.target===this)tuClosePayment()">
   <div class="tu-payment-box" style="max-width:420px;padding:28px 24px">
     <h3 style="margin:0 0 20px;text-align:center;font:800 24px Tajawal,sans-serif;color:var(--t)">حط رقمك</h3>
-    <div style="position:relative;margin-bottom:16px">
-      <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--t2);font:700 15px Tajawal,sans-serif;pointer-events:none">+966</span>
-      <input id="tu-pay-phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" dir="ltr"
-        placeholder="05xxxxxxxx" aria-label="رقم الجوال"
-        style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:13px;color:var(--t);padding:14px 62px 14px 14px;font:700 16px Tajawal,sans-serif;outline:none;text-align:left">
-    </div>
-    <div id="tu-payment-msg" style="display:none;margin:0 0 12px;border-radius:10px;padding:10px 12px;font-size:.78rem"></div>
+    <input id="tu-pay-phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="14"
+      dir="ltr" placeholder="05xxxxxxxx" aria-label="رقم الجوال"
+      style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bor);border-radius:13px;color:var(--t);padding:14px;font:700 16px Tajawal,sans-serif;outline:none;text-align:center">
+    <div id="tu-payment-msg" style="display:none;margin:12px 0;border-radius:10px;padding:10px 12px;font-size:.78rem;text-align:center"></div>
     <button type="button" id="tu-pay-btn" onclick="tuStartTamaraPay()"
       style="width:100%;border:0;border-radius:13px;padding:14px 16px;background:var(--a1);color:#fff;font:800 15px Tajawal,sans-serif;cursor:pointer">
       الانتقال للدفع
@@ -4468,7 +4465,6 @@ function schPrintDoc(){
       إلغاء
     </button>
   </div>
-</div>
 </div>
 <script>
 /* ===== إعدادات الباقات — عدّل الأسعار/المدد هنا فقط وتنعكس بكل الموقع ===== */
@@ -4578,31 +4574,42 @@ function tuPayMsg(t,ok){
 async function tuStartTamaraPay(){
   var msg=document.getElementById('tu-payment-msg');
   var btn=document.getElementById('tu-pay-btn');
+  function show(t){
+    if(msg){msg.style.display='block';msg.style.background='rgba(220,80,70,.12)';msg.style.color='#d85a50';msg.textContent=t;}
+    if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent='الانتقال للدفع';}
+  }
   try{
-    var raw=(document.getElementById('tu-pay-phone')||{}).value||'';
-    raw=String(raw).replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[\s-]/g,'');
-    var phone=raw.replace(/^\+?966/,'').replace(/^0/,'');
-    if(!/^5\d{8}$/.test(phone)){
-      if(msg){msg.style.display='block';msg.style.background='rgba(220,80,70,.12)';msg.style.color='#d85a50';msg.textContent='أدخل رقم جوال سعودي صحيح';}
-      return;
-    }
-    phone='+966'+phone;
+    var input=document.getElementById('tu-pay-phone');
+    var raw=String((input&&input.value)||'');
+    raw=raw.replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);})
+           .replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d);})
+           .replace(/[^0-9]/g,'');
+    if(raw.indexOf('00966')===0)raw=raw.slice(5);
+    else if(raw.indexOf('966')===0)raw=raw.slice(3);
+    if(raw.indexOf('0')===0)raw=raw.slice(1);
+    if(!/^5\d{8}$/.test(raw)){show('أدخل رقم جوال سعودي صحيح');return;}
+    var phone='+966'+raw;
     if(btn){btn.disabled=true;btn.style.opacity='.65';btn.textContent='جارٍ التحويل...';}
+    if(typeof sbClient==='undefined'||!sbClient){show('تعذّر الاتصال، حدّث الصفحة وحاول مرة أخرى');return;}
     var sess=await sbClient.auth.getSession();
     var token=sess&&sess.data&&sess.data.session&&sess.data.session.access_token;
-    if(!token)throw new Error('انتهت الجلسة، سجّل الدخول من جديد');
+    if(!token){show('سجّل الدخول أولًا');return;}
     var res=await fetch(SB_URL+'/functions/v1/tamara-checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({plan_type:TU_CURRENT_PLAN_TYPE||'term',discount_code:'',phone_number:phone})
+      body:JSON.stringify({plan_type:window.TU_CURRENT_PLAN_TYPE||'term',discount_code:'',quantity:1,phone_number:phone})
     });
-    var data=await res.json();
-    if(!res.ok)throw new Error(data.error||data.message||'تعذّر بدء الدفع');
-    if(!data.checkout_url)throw new Error('لم يصل رابط الدفع');
-    location.href=data.checkout_url;
+    var text=await res.text();
+    var data={};
+    try{data=JSON.parse(text||'{}');}catch(e){}
+    if(!res.ok){
+      show(data.error||data.message||data.detail||'تعذّر بدء الدفع مع تمارا');
+      return;
+    }
+    if(!data.checkout_url){show('لم يصل رابط الدفع من تمارا');return;}
+    window.location.href=data.checkout_url;
   }catch(e){
-    if(msg){msg.style.display='block';msg.style.background='rgba(220,80,70,.12)';msg.style.color='#d85a50';msg.textContent=e.message||'تعذّر بدء الدفع';}
-    if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent='الانتقال للدفع';}
+    show(e&&e.message?e.message:'تعذّر بدء الدفع');
   }
 }
 function tuBankTransfer(plan){ try{ if(plan)localStorage.setItem('tu_pay_plan_pending',plan); }catch(e){} try{ window.open('https://t.me/onlychamber','_blank','noopener'); }catch(e){ location.href='https://t.me/onlychamber'; } }
@@ -4612,14 +4619,14 @@ function tuTamaraLogoSrc(){ var im=document.querySelector('#tu-pay-btn img'); re
 function tuFillTamaraLogos(scope){ var src=tuTamaraLogoSrc(); if(!src)return; var list=(scope||document).querySelectorAll('.tu-tamara-buy-logo'); for(var i=0;i<list.length;i++){ if(!list[i].getAttribute('src'))list[i].src=src; } }
 document.addEventListener('DOMContentLoaded',function(){ try{ tuFillTamaraLogos(document); }catch(e){} });
 function tuPayTamaraDirect(plan,planType){
-  TU_CURRENT_PLAN=plan||'';
-  TU_CURRENT_PLAN_TYPE=planType||'term';
+  window.TU_CURRENT_PLAN=plan||'';
+  window.TU_CURRENT_PLAN_TYPE=planType||'term';
   try{localStorage.setItem('tu_pay_plan_pending',plan||'');}catch(e){}
   try{tuOpenPayment(plan,planType);}catch(e){try{toast('تعذّر فتح الدفع');}catch(_){}}
   setTimeout(function(){
     var el=document.getElementById('tu-pay-phone');
     if(el){try{el.focus();}catch(e){}}
-  },120);
+  },100);
 }
 window.tuPayTamaraDirect=tuPayTamaraDirect;
 </script>
