@@ -4617,7 +4617,7 @@ window.tuBankTransfer=tuBankTransfer;
 function tuTamaraLogoSrc(){ var im=document.querySelector('#tu-pay-btn img'); return im?im.src:''; }
 function tuFillTamaraLogos(scope){ var src=tuTamaraLogoSrc(); if(!src)return; var list=(scope||document).querySelectorAll('.tu-tamara-buy-logo'); for(var i=0;i<list.length;i++){ if(!list[i].getAttribute('src'))list[i].src=src; } }
 document.addEventListener('DOMContentLoaded',function(){ try{ tuFillTamaraLogos(document); }catch(e){} });
-async function tuPayTamaraDirect(plan,planType){
+function tuPayTamaraDirect(plan,planType){
   TU_CURRENT_PLAN_TYPE=planType;
   try{ if(plan)localStorage.setItem('tu_pay_plan_pending',plan); }catch(e){}
   if(typeof CURRENT_USER==='undefined'||!CURRENT_USER||!sbClient){
@@ -4626,25 +4626,18 @@ async function tuPayTamaraDirect(plan,planType){
     return;
   }
   try{
-    try{ toast('جاري تحويلك لتمارا...'); }catch(e){}
-    var sess=await sbClient.auth.getSession();
-    var token=sess&&sess.data&&sess.data.session&&sess.data.session.access_token;
-    if(!token)throw new Error('انتهت الجلسة، سجّل الدخول من جديد');
-    var phoneInput=document.getElementById('tu-pay-phone');
-    var phone=(phoneInput&&phoneInput.value||'').trim();
-    if(!phone){
-      phone=String(CURRENT_USER.phone||((CURRENT_USER.user_metadata||{}).phone)||'').trim();
-      phone=phone.replace(/^\\+?966/,'').replace(/^0+/,'');
+    tuOpenPayment(plan,planType);
+    var phone=document.getElementById('tu-pay-phone');
+    if(phone){
+      try{
+        var saved=localStorage.getItem('tu_pay_phone')||'';
+        if(/^5\d{8}$/.test(saved)) phone.value=saved;
+      }catch(e){}
+      setTimeout(function(){ try{phone.focus();}catch(e){} },120);
     }
-    if(!/^5\\d{8}$/.test(phone))throw new Error('أدخل رقم جوال سعودي صحيح: 5xxxxxxxx');
-    try{ localStorage.setItem('tu_pay_phone', phone); }catch(e){}
-    phone='+966'+phone;
-    var res=await fetch(SB_URL+'/functions/v1/tamara-checkout',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan_type:planType,discount_code:'',phone_number:phone})});
-    var data=await res.json();
-    if(!res.ok)throw new Error(data.error||data.message||'تعذّر بدء الدفع');
-    if(!data.checkout_url)throw new Error('لم يصل رابط الدفع من تمارا');
-    location.href=data.checkout_url;
-  }catch(e){ try{ toast(e.message||'صار خطأ، حاول مرة ثانية'); }catch(_){} }
+  }catch(e){
+    try{ toast('تعذّر فتح نافذة الدفع، حاول مرة ثانية'); }catch(_){}
+  }
 }
 window.tuPayTamaraDirect=tuPayTamaraDirect;
 </script>
