@@ -13604,257 +13604,147 @@ body.tu-v14-custom-free #p-plan.tu-v6-plan-free .plan-editbar{display:flex!impor
 
 
 
-<style id="tu-v17-schedule-restore-css">
-/* ===== Restore the original wide weekly schedule on every device ===== */
-#tu-v17-stage-wrap{position:relative;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:3px}
-#tu-v17-stage-wrap::-webkit-scrollbar{height:7px}
-#tu-v17-stage-wrap::-webkit-scrollbar-thumb{background:var(--bor2);border-radius:20px}
-#tu-v17-stage-wrap .tu-v17-sizer{pointer-events:none}
-#tu-v17-stage{width:1240px;max-width:1240px;transform-origin:top right;will-change:transform}
-html[dir="ltr"] #tu-v17-stage{transform-origin:top left}
-#tu-v17-stage .sch-day-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
-#tu-v17-stage .sch-overview{grid-template-columns:repeat(4,minmax(0,1fr))!important}
-#tu-v17-stage .sch-event-name{overflow-wrap:normal!important;word-break:normal!important;white-space:normal!important}
-#tu-v17-stage .sch-event-time{white-space:nowrap!important}
-#tu-v17-zoom-hint{display:none;margin:8px 2px 0;color:var(--t3);font-size:.62rem;font-weight:700}
-#tu-v17-stage-wrap.tu-scaled + #tu-v17-zoom-hint,#tu-v17-zoom-hint.on{display:block}
-#tu-v17-sch-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
-#tu-v17-sch-tools button{flex:1 1 140px;min-height:38px;border:1px solid var(--bor2);border-radius:10px;background:var(--s2);color:var(--t);font:800 .72rem Tajawal,sans-serif;cursor:pointer}
-#tu-v17-sch-tools button:hover{border-color:rgba(91,140,255,.42)}
-#tu-v17-sch-tools button.on{border-color:var(--a1);background:rgba(91,140,255,.12);color:var(--a2)}
-/* Full screen viewer for the schedule on small devices */
-#tu-v17-sheet{position:fixed;inset:0;z-index:9999;display:none;background:var(--s1);overflow:auto;-webkit-overflow-scrolling:touch}
-#tu-v17-sheet.on{display:block}
-#tu-v17-sheet-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bor);background:var(--s2)}
-#tu-v17-sheet-bar b{font-size:.83rem}
-#tu-v17-sheet-bar button{border:1px solid var(--bor2);border-radius:9px;background:var(--s3);color:var(--t);font:800 .72rem Tajawal,sans-serif;padding:8px 13px;cursor:pointer}
-#tu-v17-sheet-body{padding:14px}
-#tu-v17-sheet-body .sch-day-grid{grid-template-columns:minmax(0,1fr)!important}
-#tu-v17-sheet-body .sch-overview{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 
-/* ===== Free-schedule badge + conversion block ===== */
-.tu-v17-free-flag{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;padding:6px 10px;border:1px solid rgba(34,197,94,.3);border-radius:8px;background:rgba(34,197,94,.08);color:#6ee7a4;font-size:.66rem;font-weight:800}
-#tu-v17-sch-promo{margin:16px 0 0;border:1px solid var(--bor2);border-radius:16px;background:var(--s2);overflow:hidden}
-#tu-v17-sch-promo .p17-line{height:3px;background:var(--a1)}
-#tu-v17-sch-promo .p17-body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(240px,.75fr);gap:0}
-#tu-v17-sch-promo .p17-main{padding:20px 20px 18px}
-#tu-v17-sch-promo .p17-eyebrow{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid rgba(91,140,255,.3);border-radius:7px;background:rgba(91,140,255,.08);color:var(--a2);font-size:.63rem;font-weight:800}
-#tu-v17-sch-promo h3{margin:11px 0 7px;font-size:1.05rem;font-weight:900;line-height:1.6}
-#tu-v17-sch-promo p{margin:0 0 14px;color:var(--t2);font-size:.78rem;line-height:1.9}
-.p17-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.p17-grid span{display:flex;align-items:flex-start;gap:7px;padding:9px 10px;border:1px solid var(--bor);border-radius:10px;background:var(--s1);font-size:.71rem;font-weight:700;line-height:1.6}
-.p17-grid span i{font-style:normal;color:var(--a2)}
-#tu-v17-sch-promo .p17-side{padding:20px 18px;border-inline-start:1px solid var(--bor);background:var(--s3);display:flex;flex-direction:column}
-.p17-price{display:flex;align-items:baseline;gap:7px}
-.p17-price b{font-size:1.5rem;font-weight:900}
-.p17-price s{color:var(--t3);font-size:.78rem}
-.p17-price small{color:var(--t3);font-size:.62rem}
-.p17-coupon{margin:13px 0;padding:10px 11px;border:1px dashed rgba(91,140,255,.4);border-radius:10px;background:rgba(91,140,255,.06)}
-.p17-coupon b{display:block;font-size:.68rem;color:var(--a2)}
-.p17-coupon .p17-code{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px}
-.p17-coupon code{font:900 .86rem/1 monospace;letter-spacing:1.4px}
-.p17-coupon button{border:1px solid var(--bor2);border-radius:8px;background:var(--s2);color:var(--t);font:800 .64rem Tajawal,sans-serif;padding:6px 10px;cursor:pointer}
-.p17-buy{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--a1);border-radius:11px;background:var(--a1);color:#fff;font:900 .8rem Tajawal,sans-serif;text-decoration:none}
-.p17-buy:hover{filter:brightness(1.07)}
-.p17-alt{display:flex;align-items:center;justify-content:center;min-height:40px;margin-top:8px;border:1px solid var(--bor2);border-radius:11px;background:var(--s2);color:var(--t);font:800 .74rem Tajawal,sans-serif;cursor:pointer}
-.p17-safe{margin-top:auto;padding-top:13px;color:var(--t3);font-size:.58rem;text-align:center;line-height:1.7}
-@media(max-width:820px){#tu-v17-sch-promo .p17-body{grid-template-columns:1fr}#tu-v17-sch-promo .p17-side{border-inline-start:0;border-top:1px solid var(--bor)}.p17-grid{grid-template-columns:1fr}}
+
+<style id="tu-v18-schedule-native-css">
+/* schedule layout is intentionally untouched: the original base CSS handles it */
+
+/* free badge */
+.tu-v18-free-flag{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 13px;border-radius:13px;font-size:.76rem;font-weight:800;
+  border:1px solid color-mix(in srgb,var(--ok,#22c55e) 42%,var(--bor));
+  background:color-mix(in srgb,var(--ok,#22c55e) 11%,var(--s2));color:var(--tx)}
+.tu-v18-free-flag b{color:var(--ok,#22c55e);font-weight:900}
+
+/* marketing block */
+#tu-v18-sch-promo{margin-top:18px;border:1px solid var(--bor);border-radius:20px;overflow:hidden;background:var(--s2)}
+#tu-v18-sch-promo .p18-line{height:3px;background:linear-gradient(90deg,var(--ac,#5b9dfd),#7c5cff,#39d0ff)}
+#tu-v18-sch-promo .p18-body{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;padding:16px 17px}
+@media (max-width:760px){#tu-v18-sch-promo .p18-body{grid-template-columns:minmax(0,1fr)}}
+#tu-v18-sch-promo .p18-eyebrow{font-size:.68rem;font-weight:900;letter-spacing:.4px;color:var(--ac,#5b9dfd);margin-bottom:6px}
+#tu-v18-sch-promo h4{margin:0 0 8px;font-size:1.02rem;font-weight:900;line-height:1.45}
+#tu-v18-sch-promo .p18-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:7px;margin:0;padding:0;list-style:none}
+#tu-v18-sch-promo .p18-grid li{display:flex;gap:7px;align-items:flex-start;font-size:.78rem;font-weight:700;line-height:1.5;color:var(--tx2,var(--tx))}
+#tu-v18-sch-promo .p18-grid li span{color:var(--ok,#22c55e);font-weight:900}
+#tu-v18-sch-promo .p18-side{display:flex;flex-direction:column;gap:9px;justify-content:center;padding:13px;border-radius:15px;border:1px dashed color-mix(in srgb,var(--ac,#5b9dfd) 45%,var(--bor));background:color-mix(in srgb,var(--ac,#5b9dfd) 8%,var(--s1))}
+#tu-v18-sch-promo .p18-price{display:flex;align-items:baseline;gap:8px;font-weight:900}
+#tu-v18-sch-promo .p18-price b{font-size:1.7rem;line-height:1}
+#tu-v18-sch-promo .p18-price s{opacity:.55;font-size:.86rem;font-weight:700}
+#tu-v18-sch-promo .p18-price i{font-size:.72rem;font-style:normal;opacity:.75;font-weight:700}
+#tu-v18-sch-promo .p18-coupon{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 11px;border-radius:11px;font-size:.8rem;font-weight:900;border:1px solid var(--bor);background:var(--s2)}
+#tu-v18-sch-promo .p18-coupon code{font-size:.95rem;letter-spacing:1.5px;color:var(--ac,#5b9dfd)}
+#tu-v18-sch-promo .p18-coupon button{border:0;background:transparent;color:var(--ac,#5b9dfd);font:inherit;font-size:.72rem;cursor:pointer;font-weight:800}
+#tu-v18-sch-promo .p18-buy{display:block;text-align:center;padding:11px 14px;border-radius:12px;font-weight:900;font-size:.86rem;text-decoration:none;color:#04121f;
+  background:linear-gradient(135deg,var(--ac,#5b9dfd),#39d0ff);box-shadow:0 14px 30px -20px rgba(0,0,0,.9)}
+#tu-v18-sch-promo .p18-alt{border:1px solid var(--bor);background:transparent;color:var(--tx);border-radius:12px;padding:9px 12px;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer}
+#tu-v18-sch-promo .p18-safe{font-size:.68rem;opacity:.7;text-align:center;font-weight:700}
 </style>
-<script id="tu-v17-schedule-restore-js">
+<script id="tu-v18-schedule-native-js">
 (function(){
-'use strict';
-var SALLA='https://salla.sa/silvrcol';
-var STAGE_W=1240;
-var MIN_K=0.62;
-var busy=false;
+  'use strict';
+  var SALLA='https://salla.sa/silvrcol';
 
-function q(sel,root){return (root||document).querySelector(sel)}
+  function pane(){ return document.getElementById('p-schedule'); }
 
-/* ---------- keep the schedule tab free for everyone ---------- */
-function freeSchedule(){
-  var p=document.getElementById('p-schedule');
-  if(!p)return;
-  if(p.classList.contains('tu-feature-locked'))p.classList.remove('tu-feature-locked');
-  var g=p.querySelector(':scope > .tu-feature-gate');
-  if(g)g.remove();
-  document.querySelectorAll('.tab-item,[data-tab],.pro-mobile-item').forEach(function(b){
-    var id=(b.dataset&&b.dataset.tab)||((b.getAttribute('onclick')||'').match(/goTab\('([^']+)'/)||[])[1]||'';
-    if(id!=='schedule')return;
-    var bd=b.querySelector('.tu-nav-badge');
-    if(bd&&!bd.classList.contains('public')){bd.classList.add('public');bd.textContent='FREE'}
-  });
-  var head=p.querySelector('.card-h');
-  if(head&&!document.getElementById('tu-v17-free-flag')){
-    var f=document.createElement('div');
-    f.id='tu-v17-free-flag';f.className='tu-v17-free-flag';
-    f.innerHTML='\u2713 \u0627\u0644\u062c\u062f\u0648\u0644 \u0627\u0644\u0623\u0633\u0628\u0648\u0639\u064a \u0645\u062c\u0627\u0646\u064a \u0628\u0627\u0644\u0643\u0627\u0645\u0644 \u2014 \u0628\u062f\u0648\u0646 \u0627\u0634\u062a\u0631\u0627\u0643';
-    head.insertAdjacentElement('afterend',f);
+  /* the schedule tab is free forever */
+  function freeSchedule(){
+    var p=pane(); if(!p) return;
+    p.classList.remove('tu-feature-locked');
+    var gates=p.querySelectorAll(':scope > .tu-feature-gate');
+    for(var i=0;i<gates.length;i++){ gates[i].remove(); }
+    var nav=document.querySelector('[data-tab="schedule"], [onclick*="schedule"]');
+    var badges=document.querySelectorAll('.tu-nav-badge');
+    for(var j=0;j<badges.length;j++){
+      var b=badges[j];
+      var host=b.closest('[data-tab]')||b.parentElement;
+      var t=host?(host.getAttribute('data-tab')||''):'';
+      if(t==='schedule'){ b.classList.add('public'); b.textContent='مجاني'; }
+    }
   }
-}
 
-/* ---------- restore the original wide layout via a scaled stage ---------- */
-function ensureStage(){
-  var wrap=document.getElementById('schedule-grid-wrap');
-  if(!wrap)return null;
-  var big=wrap.querySelector(':scope > .sch-big');
-  var holder=wrap.querySelector(':scope > #tu-v17-stage-wrap');
-  if(!big&&!holder)return null;
-  if(big){
-    busy=true;
-    holder=document.createElement('div');holder.id='tu-v17-stage-wrap';
-    var stage=document.createElement('div');stage.id='tu-v17-stage';
-    holder.appendChild(stage);
-    wrap.insertBefore(holder,big);
-    stage.appendChild(big);
-    var hint=document.createElement('div');
-    hint.id='tu-v17-zoom-hint';
-    hint.innerHTML='\u0627\u0633\u062d\u0628 \u064a\u0645\u064a\u0646\u064b\u0627 \u0648\u064a\u0633\u0627\u0631\u064b\u0627 \u0644\u0631\u0624\u064a\u0629 \u0628\u0642\u064a\u0629 \u0627\u0644\u0623\u064a\u0627\u0645\u060c \u0623\u0648 \u0627\u0641\u062a\u062d \u00ab\u0639\u0631\u0636 \u0645\u0648\u0633\u0639\u00bb.';
-    holder.insertAdjacentElement('afterend',hint);
-    busy=false;
+  /* free ribbon above the schedule */
+  function flag(){
+    var p=pane(); if(!p) return;
+    if(document.getElementById('tu-v18-free-flag')) return;
+    var host=document.getElementById('schedule-grid-wrap')||p.querySelector('.sch-view')||p.firstElementChild;
+    if(!host||!host.parentNode) return;
+    var d=document.createElement('div');
+    d.id='tu-v18-free-flag';
+    d.className='tu-v18-free-flag';
+    d.innerHTML='<b>مجاني بالكامل</b> — جدولك ولصق جدول الجامعة والتحميل كصورة بدون اشتراك.';
+    host.parentNode.insertBefore(d,host);
   }
-  return holder;
-}
 
-function scaleStage(){
-  var holder=ensureStage();
-  if(!holder)return;
-  var stage=holder.firstElementChild;
-  if(!stage)return;
-  var avail=holder.parentElement?holder.parentElement.clientWidth:holder.clientWidth;
-  if(!avail||avail<40)return;
-  var k=Math.min(1,avail/STAGE_W);
-  if(k<MIN_K)k=MIN_K;
-  stage.style.transform=k<0.999?('scale('+k.toFixed(4)+')'):'none';
-  var natural=stage.scrollHeight||Math.round(stage.getBoundingClientRect().height/(k||1));
-  holder.style.height=Math.ceil(natural*k)+'px';
-  var sizer=holder.querySelector(':scope > .tu-v17-sizer');
-  if(!sizer){sizer=document.createElement('div');sizer.className='tu-v17-sizer';holder.appendChild(sizer)}
-  sizer.style.width=Math.ceil(STAGE_W*k)+'px';
-  sizer.style.height='1px';
-  holder.classList.toggle('tu-scaled',k<0.999);
-}
+  /* conversion block under the schedule */
+  function promo(){
+    var p=pane(); if(!p) return;
+    if(document.getElementById('tu-v18-sch-promo')) return;
+    var box=document.createElement('div');
+    box.id='tu-v18-sch-promo';
+    box.innerHTML=''
+      +'<div class="p18-line"></div>'
+      +'<div class="p18-body">'
+      +'<div class="p18-main">'
+      +'<div class="p18-eyebrow">جدولك جاهز — والأقوى ما زال مغلقًا</div>'
+      +'<h4>المشترك يحسب معدله ويدير غيابه ويبني خطته كاملة من مكان واحد</h4>'
+      +'<ul class="p18-grid">'
+      +'<li><span>✓</span> حاسبة المعدل التراكمي لكل المستويات</li>'
+      +'<li><span>✓</span> متابعة الغياب وتحذير الحرمان</li>'
+      +'<li><span>✓</span> مولّد الجداول التلقائي بدون تعارض</li>'
+      +'<li><span>✓</span> خريطة الخطة حتى التخرج</li>'
+      +'<li><span>✓</span> المعدل المستهدف وماذا تحتاج لتحقيقه</li>'
+      +'<li><span>✓</span> مقارنة الفصول وواجهة مشترك احترافية</li>'
+      +'</ul></div>'
+      +'<div class="p18-side">'
+      +'<div class="p18-price"><b>23</b><s>35</s><i>ريال فقط</i></div>'
+      +'<div class="p18-coupon"><span>كود الخصم <code id="tu-v18-code-val">TU</code></span>'
+      +'<button type="button" id="tu-v18-copy">نسخ</button></div>'
+      +'<a class="p18-buy" href="'+SALLA+'" target="_blank" rel="noopener">اشترك الآن من متجر سلة</a>'
+      +'<button type="button" class="p18-alt" id="tu-v18-code">لدي كود تفعيل</button>'
+      +'<div class="p18-safe">دفع آمن — Apple Pay ومدى والبطاقات وتمارا</div>'
+      +'</div></div>';
+    p.appendChild(box);
 
-/* ---------- expanded (one column, readable) viewer ---------- */
-function sheet(){
-  var el=document.getElementById('tu-v17-sheet');
-  if(el)return el;
-  el=document.createElement('div');
-  el.id='tu-v17-sheet';
-  el.innerHTML='<div id="tu-v17-sheet-bar"><b>\u062c\u062f\u0648\u0644\u064a \u0627\u0644\u0623\u0633\u0628\u0648\u0639\u064a</b><button type="button" id="tu-v17-sheet-x">\u0625\u063a\u0644\u0627\u0642</button></div><div id="tu-v17-sheet-body"></div>';
-  document.body.appendChild(el);
-  el.querySelector('#tu-v17-sheet-x').addEventListener('click',closeSheet);
-  return el;
-}
-function openSheet(){
-  var el=sheet(),body=el.querySelector('#tu-v17-sheet-body');
-  var src=q('#tu-v17-stage .sch-big')||q('#schedule-grid-wrap .sch-big');
-  body.innerHTML='';
-  if(src)body.appendChild(src.cloneNode(true));
-  else body.innerHTML='<div class="empty" style="padding:30px 12px">\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0648\u0627\u062f \u0628\u0639\u062f</div>';
-  el.classList.add('on');
-  document.documentElement.style.overflow='hidden';
-}
-function closeSheet(){
-  var el=document.getElementById('tu-v17-sheet');
-  if(el)el.classList.remove('on');
-  document.documentElement.style.overflow='';
-}
+    var cp=box.querySelector('#tu-v18-copy');
+    if(cp) cp.addEventListener('click',function(){
+      try{ navigator.clipboard.writeText('TU'); }catch(e){}
+      cp.textContent='تم النسخ';
+      setTimeout(function(){ cp.textContent='نسخ'; },1500);
+    });
+    var jump=box.querySelector('#tu-v18-code');
+    if(jump) jump.addEventListener('click',function(){
+      try{ if(typeof tuJumpToCode==='function'){ tuJumpToCode(); return; } }catch(e){}
+      try{ if(typeof goTab==='function') goTab('subscription'); }catch(e){}
+    });
+  }
 
-/* ---------- tools + conversion block inside the schedule tab ---------- */
-function tools(){
-  var p=document.getElementById('p-schedule');
-  if(!p||document.getElementById('tu-v17-sch-tools'))return;
-  var acts=p.querySelector('.sch-actions');
-  if(!acts)return;
-  var d=document.createElement('div');
-  d.id='tu-v17-sch-tools';
-  d.innerHTML='<button type="button" id="tu-v17-expand">\ud83d\udd0d \u0639\u0631\u0636 \u0645\u0648\u0633\u0639</button>';
-  acts.insertAdjacentElement('afterend',d);
-  d.querySelector('#tu-v17-expand').addEventListener('click',openSheet);
-}
+  function apply(){
+    try{ freeSchedule(); flag(); promo(); }catch(e){}
+  }
+  window.tuV18ApplySchedule=apply;
 
-function promo(){
-  var p=document.getElementById('p-schedule');
-  if(!p||document.getElementById('tu-v17-sch-promo'))return;
-  var host=document.getElementById('tu-v17-sch-tools')||p.querySelector('.sch-actions');
-  if(!host)return;
-  var el=document.createElement('section');
-  el.id='tu-v17-sch-promo';
-  el.innerHTML=''
-   +'<div class="p17-line"></div>'
-   +'<div class="p17-body">'
-   +'<div class="p17-main">'
-   +'<span class="p17-eyebrow">\u0627\u0644\u062c\u062f\u0648\u0644 \u0645\u062c\u0627\u0646\u064a \u00b7 \u0627\u0644\u0628\u0642\u064a\u0629 \u0644\u0644\u0645\u0634\u062a\u0631\u0643\u064a\u0646</span>'
-   +'<h3>\u062c\u062f\u0648\u0644\u0643 \u062c\u0627\u0647\u0632. \u062e\u0644\u0651\u0650 \u0628\u0627\u0642\u064a \u0641\u0635\u0644\u0643 \u064a\u0645\u0634\u064a \u0645\u0639\u0647 \u0628\u0627\u0644\u062a\u0631\u062a\u064a\u0628 \u0646\u0641\u0633\u0647</h3>'
-   +'<p>\u0627\u0644\u062c\u062f\u0648\u0644 \u0648\u0627\u0644\u0644\u0635\u0642 \u0648\u0627\u0644\u062d\u0641\u0637 \u0643\u0635\u0648\u0631\u0629 \u0645\u062c\u0627\u0646\u064a\u0629 \u0644\u0644\u0623\u0628\u062f. \u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643 \u064a\u0641\u062a\u062d \u0644\u0643 \u0627\u0644\u0623\u062f\u0648\u0627\u062a \u0627\u0644\u062a\u064a \u062a\u0648\u0641\u0631 \u0639\u0644\u064a\u0643 \u0627\u0644\u0648\u0642\u062a \u0648\u062a\u0631\u0641\u0639 \u0645\u0639\u062f\u0644\u0643.</p>'
-   +'<div class="p17-grid">'
-   +'<span><i>\u2713</i> \u0645\u0648\u0644\u0651\u062f \u0627\u0644\u062c\u062f\u0627\u0648\u0644 \u0627\u0644\u0630\u0643\u064a \u0628\u062f\u0648\u0646 \u062a\u0639\u0627\u0631\u0636</span>'
-   +'<span><i>\u2713</i> \u062d\u0627\u0633\u0628\u0629 \u0627\u0644\u063a\u064a\u0627\u0628 \u0648\u0627\u0644\u062d\u0631\u0645\u0627\u0646</span>'
-   +'<span><i>\u2713</i> \u0627\u0644\u0645\u0639\u062f\u0644 \u0627\u0644\u0645\u0633\u062a\u0647\u062f\u0641 \u0648\u0627\u0644\u062a\u062e\u0637\u064a\u0637 \u0644\u0644\u062a\u062e\u0631\u062c</span>'
-   +'<span><i>\u2713</i> \u062e\u0631\u064a\u0637\u0629 \u0627\u0644\u062e\u0637\u0629 \u0643\u0627\u0645\u0644\u0629 \u0648\u0645\u0642\u0627\u0631\u0646\u0629 \u0627\u0644\u062a\u062e\u0635\u0635\u0627\u062a</span>'
-   +'</div>'
-   +'</div>'
-   +'<aside class="p17-side">'
-   +'<div class="p17-price"><b>23</b><s>\u0631.\u0633 35</s><small>\u0644\u0644\u0641\u0635\u0644</small></div>'
-   +'<div class="p17-coupon"><b>\u062e\u0635\u0645 \u0644\u0641\u062a\u0631\u0629 \u0645\u062d\u062f\u0648\u062f\u0629</b><div class="p17-code"><code>TU</code><button type="button" id="tu-v17-copy">\u0646\u0633\u062e</button></div></div>'
-   +'<a class="p17-buy" href="'+SALLA+'" target="_blank" rel="noopener">\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643 \u0639\u0628\u0631 \u0633\u0644\u0629</a>'
-   +'<button type="button" class="p17-alt" id="tu-v17-code">\u0644\u062f\u064a \u0643\u0648\u062f \u062a\u0641\u0639\u064a\u0644</button>'
-   +'<small class="p17-safe">\u0627\u0644\u062f\u0641\u0639 \u062f\u0627\u062e\u0644 \u0645\u062a\u062c\u0631 \u0633\u0644\u0629 \u00b7 \u062a\u0641\u0639\u064a\u0644 \u0641\u0648\u0631\u064a \u0628\u0627\u0644\u0643\u0648\u062f</small>'
-   +'</aside></div>';
-  host.insertAdjacentElement('afterend',el);
-  var cp=el.querySelector('#tu-v17-copy');
-  cp.addEventListener('click',function(){
+  /* keep it applied through re-renders */
+  function wrapFn(name){
     try{
-      if(typeof tuCopyDiscount==='function'){tuCopyDiscount(cp);return}
-      navigator.clipboard.writeText('TU');
-      cp.textContent='\u062a\u0645 \u0627\u0644\u0646\u0633\u062e';
-      setTimeout(function(){cp.textContent='\u0646\u0633\u062e'},1400);
+      var f=window[name];
+      if(typeof f!=='function'||f.__v18) return;
+      var w=function(){ var r=f.apply(this,arguments); setTimeout(apply,0); return r; };
+      w.__v18=true; window[name]=w;
     }catch(e){}
-  });
-  el.querySelector('#tu-v17-code').addEventListener('click',function(){
-    try{if(typeof tuJumpToCode==='function'){tuJumpToCode();return}}catch(e){}
-    try{if(typeof goTab==='function')goTab('subscription')}catch(e){}
-  });
-}
+  }
 
-function apply(){
-  try{freeSchedule()}catch(e){}
-  try{tools()}catch(e){}
-  try{promo()}catch(e){}
-  try{scaleStage()}catch(e){}
-}
-window.tuV17ApplySchedule=apply;
-window.tuV17OpenExpanded=openSheet;
+  function boot(){
+    apply(); wrapFn('renderSchedule'); wrapFn('goTab');
+    try{
+      var p=pane();
+      if(p&&window.MutationObserver){
+        new MutationObserver(function(){ setTimeout(apply,0); }).observe(p,{childList:true,subtree:false});
+      }
+    }catch(e){}
+    setInterval(apply,1500);
+  }
 
-function boot17(){
-  apply();
-  var wrap=document.getElementById('schedule-grid-wrap');
-  if(wrap&&window.MutationObserver){
-    new MutationObserver(function(){if(busy)return;apply()}).observe(wrap,{childList:true});
-  }
-  var p=document.getElementById('p-schedule');
-  if(p&&window.MutationObserver){
-    new MutationObserver(function(){if(busy)return;try{freeSchedule()}catch(e){}}).observe(p,{childList:true});
-  }
-  if(window.ResizeObserver){
-    try{new ResizeObserver(function(){scaleStage()}).observe(document.documentElement)}catch(e){}
-  }
-  addEventListener('resize',scaleStage,{passive:true});
-  addEventListener('orientationchange',function(){setTimeout(scaleStage,220)});
-  if(typeof window.renderSchedule==='function'&&!window.renderSchedule.__v17){
-    var o=window.renderSchedule;
-    var w=function(){var r=o.apply(this,arguments);setTimeout(apply,0);return r};
-    w.__v17=true;window.renderSchedule=w;
-  }
-  if(typeof window.goTab==='function'&&!window.goTab.__v17){
-    var g=window.goTab;
-    var gw=function(){var r=g.apply(this,arguments);setTimeout(apply,0);return r};
-    gw.__v17=true;window.goTab=gw;
-  }
-  setInterval(apply,1200);
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot17,{once:true});
-else boot17();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(boot,400); });
+  else setTimeout(boot,400);
 })();
 </script>
 </body></html>
