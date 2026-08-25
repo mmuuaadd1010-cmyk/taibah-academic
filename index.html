@@ -2056,9 +2056,9 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
             </div>
             <div class="field-group" id="au-user-grp" style="display:none">
               <label>🏷️ اسم المستخدم</label>
-              <input class="field-inp" type="text" id="au-user" placeholder="username (حروف وأرقام و _)" autocomplete="username" dir="ltr">
+              <input class="field-inp" type="text" id="au-user" name="profile_handle" placeholder="username (حروف وأرقام و _)" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" data-form-type="other" data-lpignore="true" data-1p-ignore dir="ltr">
             </div>
-            <div class="field-group">
+            <div class="field-group" id="au-email-grp">
               <label id="au-email-lbl">🔑 اليوزرنيم أو البريد</label>
               <input class="field-inp" type="text" id="au-email" placeholder="username أو you@email.com" autocomplete="username" dir="ltr">
             </div>
@@ -2066,7 +2066,7 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
               <label>🔒 كلمة المرور</label>
               <input class="field-inp" type="password" id="au-pass" placeholder="٦ أحرف على الأقل" autocomplete="current-password" dir="ltr" onkeydown="if(event.key==='Enter')authSubmit()">
             </div>
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAADmvsPSAAi2p92H9" data-theme="dark" style="margin:8px 0"></div>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAADmvsPSAAi2p92H9" data-theme="dark" data-appearance="always" data-execution="render" data-size="flexible" data-refresh-expired="auto" style="margin:8px 0"></div>
             <button class="btn-next" id="au-submit" onclick="authSubmit()">تسجيل الدخول</button>
             <div class="auth-msg" id="au-msg" style="display:none"></div>
             <div class="auth-alt"><a onclick="authForgot()" id="au-forgot">🔑 نسيت كلمة المرور؟</a> <a onclick="authResend()" id="au-resend" style="display:none">📨 إعادة إرسال رسالة التحقق</a></div>
@@ -13202,6 +13202,147 @@ if(typeof window.tuApplyBusinessFinal==='function'){var _bf=window.tuApplyBusine
 var _ol=window.onload;window.onload=function(e){installCustom();syncActiveCustom();var r=typeof _ol==='function'?_ol.call(this,e):undefined;setTimeout(applyAll,40);setTimeout(applyAll,900);return r};
 document.addEventListener('DOMContentLoaded',function(){avatarSize(parseInt(localStorage.getItem(AVATAR_KEY)||'112'));ensureModals();setTimeout(applyAll,60)});
 window.tuV6ApplyAll=applyAll;
+})();
+</script>
+
+<style id="tu-v7-compact-auth-css">
+/* Compact top dashboard: profile first, GPA beside it — never two giant mobile cards. */
+#tu-v6-home-hero{display:grid!important;grid-template-columns:minmax(0,1fr) 210px!important;gap:12px!important;align-items:stretch!important;direction:rtl!important;margin-bottom:12px!important}
+#tu-v6-home-hero>.profile-header-card{grid-column:1!important;order:0!important;height:176px!important;min-height:176px!important;padding:18px 20px!important;display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;gap:17px!important;border-radius:18px!important;text-align:right!important}
+#tu-v6-home-hero>.gpa-ring-section{grid-column:2!important;order:0!important;height:176px!important;min-height:176px!important;padding:11px 8px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:5px!important;border-radius:18px!important}
+#tu-v6-home-hero .profile-avatar{width:86px!important;height:86px!important;min-width:86px!important;max-width:86px!important;font-size:1.85rem!important;border-width:3px!important;cursor:pointer!important}
+#tu-v6-home-hero .profile-avatar img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:inherit!important}
+#tu-v6-home-hero .profile-avatar .pa-cam{width:25px!important;height:25px!important;font-size:.65rem!important}
+#tu-v6-home-hero .profile-info{min-width:0!important;text-align:right!important;flex:1!important}
+#tu-v6-home-hero .profile-name{font-size:clamp(1.35rem,2.7vw,1.9rem)!important;line-height:1.18!important;margin:3px 0 7px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#tu-v6-home-hero .profile-meta{font-size:.72rem!important;gap:10px!important;flex-wrap:wrap!important}
+#tu-v6-home-hero .tu-v6-profile-kicker{font-size:.62rem!important;margin-bottom:3px!important}
+#tu-v6-home-hero .tu-v6-avatar-tools{display:none!important}
+#tu-v6-home-hero .ring-wrap{width:108px!important;height:108px!important;min-width:108px!important;margin:0!important}
+#tu-v6-home-hero .ring-gpa{font-size:1.75rem!important;letter-spacing:-.04em!important}
+#tu-v6-home-hero .ring-sub{font-size:.55rem!important}
+#tu-v6-home-hero>.gpa-ring-section:before{font-size:.59rem!important;line-height:1!important}
+#tu-v6-home-hero .tu-v6-privacy-btn{font-size:.59rem!important;padding:5px 8px!important;min-height:27px!important}
+
+/* Real avatar cropper. */
+#tu-v7-avatar-crop{position:fixed;inset:0;z-index:220000;background:rgba(0,0,0,.82);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px;direction:rtl}
+#tu-v7-avatar-crop.on{display:flex}
+.tu-v7-crop-card{width:min(430px,100%);max-height:94vh;overflow:auto;border:1px solid var(--bor2);border-radius:23px;background:linear-gradient(155deg,#151c27,#070b10 66%);box-shadow:0 32px 95px rgba(0,0,0,.72);padding:21px;color:var(--t)}
+.tu-v7-crop-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:15px}.tu-v7-crop-head h3{font-size:1.12rem;margin:0 0 4px}.tu-v7-crop-head p{font-size:.72rem;color:var(--t2);line-height:1.65;margin:0}.tu-v7-crop-x{width:34px;height:34px;border-radius:50%;border:1px solid var(--bor2);background:var(--s3);color:var(--t);font-size:1rem;cursor:pointer;flex:0 0 auto}
+.tu-v7-crop-stage{width:min(280px,78vw);aspect-ratio:1;margin:0 auto 15px;position:relative;border-radius:18px;overflow:hidden;background:#05070a;box-shadow:0 0 0 1px var(--bor2),0 18px 50px rgba(0,0,0,.42);touch-action:none;user-select:none}
+#tu-v7-crop-canvas{width:100%;height:100%;display:block;cursor:grab;touch-action:none}#tu-v7-crop-canvas:active{cursor:grabbing}
+.tu-v7-crop-guide{position:absolute;inset:8%;border:2px solid rgba(255,255,255,.92);border-radius:50%;box-shadow:0 0 0 999px rgba(0,0,0,.44);pointer-events:none}.tu-v7-crop-guide:before,.tu-v7-crop-guide:after{content:"";position:absolute;background:rgba(255,255,255,.25);pointer-events:none}.tu-v7-crop-guide:before{width:1px;height:100%;left:50%;top:0}.tu-v7-crop-guide:after{height:1px;width:100%;top:50%;left:0}
+.tu-v7-crop-zoom{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;margin:4px 0 9px}.tu-v7-crop-zoom span{font-size:.7rem;color:var(--t2);font-weight:800}.tu-v7-crop-zoom input{width:100%;accent-color:var(--a1)}.tu-v7-crop-hint{font-size:.68rem;color:var(--t3);text-align:center;line-height:1.65;margin-bottom:14px}.tu-v7-crop-actions{display:flex;gap:8px}.tu-v7-crop-actions button{flex:1;border-radius:12px;padding:11px 12px;font-family:inherit;font-weight:900;cursor:pointer}.tu-v7-crop-save{border:0;background:var(--grad);color:#fff}.tu-v7-crop-cancel{border:1px solid var(--bor2);background:var(--s3);color:var(--t2)}
+
+/* Stronger subscriber value and comparison. */
+#tu-value-comparison{display:none!important}
+#tu-v7-power-compare{margin:0 0 18px;border:1px solid rgba(91,157,253,.25);border-radius:20px;padding:20px;background:linear-gradient(145deg,rgba(91,157,253,.10),rgba(7,10,15,.98));position:relative;overflow:hidden}
+.tu-v7-power-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}.tu-v7-power-head h3{font-size:1.08rem;margin:0 0 5px;color:var(--t)}.tu-v7-power-head p{font-size:.72rem;color:var(--t2);line-height:1.7;margin:0}.tu-v7-power-badge{font-size:.62rem;font-weight:900;color:var(--a2);border:1px solid rgba(91,157,253,.32);background:rgba(91,157,253,.1);border-radius:999px;padding:6px 9px;white-space:nowrap}
+.tu-v7-compare-table{display:grid;gap:7px}.tu-v7-compare-row{display:grid;grid-template-columns:minmax(150px,1.25fr) minmax(95px,.72fr) minmax(120px,.9fr);align-items:center;gap:8px;border:1px solid var(--bor);background:rgba(255,255,255,.022);border-radius:12px;padding:10px 12px}.tu-v7-compare-row.head{background:rgba(91,157,253,.09);border-color:rgba(91,157,253,.22);font-weight:900}.tu-v7-compare-row>span{font-size:.69rem;color:var(--t2);line-height:1.5}.tu-v7-compare-row>span:first-child{color:var(--t);font-weight:850}.tu-v7-compare-row .yes{color:var(--g);font-weight:900}.tu-v7-compare-row .basic{color:var(--t3)}
+#tu-v6-sub-story .tu-v6-benefit-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}#tu-v6-sub-story .tu-v6-benefit{min-height:116px!important;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.015))!important}
+
+/* Correct, eager account form and verification presentation. */
+#au-email-grp{transition:none}.cf-turnstile{width:100%!important;min-height:68px!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;overflow:visible!important;margin:9px 0 5px!important}.cf-turnstile iframe{max-width:100%!important}.tu-v7-captcha-status{min-height:26px;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--t3);font-size:.67rem;margin-top:4px}.tu-v7-captcha-status:before{content:"";width:11px;height:11px;border:2px solid var(--bor3);border-top-color:var(--a1);border-radius:50%;animation:spin .8s linear infinite}.tu-v7-captcha-status.ok{color:var(--g)}.tu-v7-captcha-status.ok:before{content:"✓";width:auto;height:auto;border:0;animation:none;font-weight:900}.tu-v7-captcha-status.err{color:var(--y)}.tu-v7-captcha-status.err:before{display:none}
+
+@media(max-width:700px){
+ #tu-v6-home-hero{grid-template-columns:minmax(0,1fr) 108px!important;gap:9px!important;margin-bottom:10px!important}
+ #tu-v6-home-hero>.profile-header-card{grid-column:1!important;height:142px!important;min-height:142px!important;padding:12px!important;gap:10px!important;border-radius:16px!important;flex-direction:row!important;text-align:right!important}
+ #tu-v6-home-hero>.gpa-ring-section{grid-column:2!important;height:142px!important;min-height:142px!important;padding:8px 3px!important;gap:3px!important;border-radius:16px!important}
+ #tu-v6-home-hero .profile-avatar{width:62px!important;height:62px!important;min-width:62px!important;max-width:62px!important;font-size:1.35rem!important;border-width:2px!important}
+ #tu-v6-home-hero .profile-avatar .pa-cam{width:21px!important;height:21px!important;font-size:.54rem!important}
+ #tu-v6-home-hero .profile-name{font-size:1.04rem!important;margin:1px 0 6px!important;letter-spacing:-.035em!important;max-width:100%!important}
+ #tu-v6-home-hero .tu-v6-profile-kicker{display:none!important}
+ #tu-v6-home-hero .profile-meta{font-size:.57rem!important;gap:5px!important;line-height:1.4!important}
+ #tu-v6-home-hero .ring-wrap{width:77px!important;height:77px!important;min-width:77px!important}
+ #tu-v6-home-hero .ring-gpa{font-size:1.12rem!important}
+ #tu-v6-home-hero .ring-sub{font-size:.43rem!important}
+ #tu-v6-home-hero>.gpa-ring-section:before{font-size:.49rem!important;white-space:nowrap!important}
+ #tu-v6-home-hero .tu-v6-privacy-btn{width:31px!important;height:26px!important;min-height:26px!important;padding:0!important;font-size:0!important;border-radius:9px!important}
+ #tu-v6-home-hero .tu-v6-privacy-btn:after{content:"👁";font-size:12px!important}
+ #tu-v6-home-value{padding:14px!important;border-radius:16px!important}
+ .tu-v7-power-head{display:block}.tu-v7-power-badge{display:inline-flex;margin-top:8px}.tu-v7-compare-row{grid-template-columns:minmax(112px,1.2fr) 68px minmax(88px,.9fr);padding:9px 8px;gap:5px}.tu-v7-compare-row>span{font-size:.58rem}.tu-v7-compare-row>span:first-child{font-size:.61rem}
+ #tu-v6-sub-story .tu-v6-benefit-grid{grid-template-columns:1fr 1fr!important}.tu-v6-sub-head{display:block!important}.tu-v6-sub-badge{display:inline-flex;margin-top:8px}
+}
+@media(max-width:370px){#tu-v6-home-hero{grid-template-columns:minmax(0,1fr) 98px!important}#tu-v6-home-hero .profile-avatar{width:56px!important;height:56px!important;min-width:56px!important}#tu-v6-home-hero .profile-name{font-size:.92rem!important}#tu-v6-home-hero .ring-wrap{width:70px!important;height:70px!important;min-width:70px!important}.tu-v7-compare-row{grid-template-columns:minmax(100px,1.15fr) 62px minmax(78px,.85fr)}}
+</style>
+<script id="tu-v7-compact-auth-js">
+(function(){
+'use strict';
+function qs(x,r){return (r||document).querySelector(x)}
+function esc7(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+/* ---------- interactive avatar crop ---------- */
+var crop={img:null,size:280,zoom:1,dx:0,dy:0,drag:false,px:0,py:0};
+function cropModal(){
+ var m=document.getElementById('tu-v7-avatar-crop');if(m)return m;
+ m=document.createElement('div');m.id='tu-v7-avatar-crop';m.innerHTML='<div class="tu-v7-crop-card" role="dialog" aria-modal="true" aria-labelledby="tu-v7-crop-title"><div class="tu-v7-crop-head"><div><h3 id="tu-v7-crop-title">حدّد الجزء الظاهر من الصورة</h3><p>كبّر الصورة واسحبها لين يضبط الأفاتار مثل ما تبيه.</p></div><button class="tu-v7-crop-x" type="button" onclick="tuV7CropClose()">×</button></div><div class="tu-v7-crop-stage"><canvas id="tu-v7-crop-canvas" width="280" height="280"></canvas><div class="tu-v7-crop-guide"></div></div><label class="tu-v7-crop-zoom"><span>تصغير</span><input id="tu-v7-crop-range" type="range" min="1" max="3" value="1" step="0.01" oninput="tuV7CropZoom(this.value)"><span>تكبير</span></label><div class="tu-v7-crop-hint">اسحب الصورة بأصبعك لتحديد الوجه أو الجزء المطلوب داخل الدائرة.</div><div class="tu-v7-crop-actions"><button class="tu-v7-crop-save" type="button" onclick="tuV7CropSave()">استخدام الصورة</button><button class="tu-v7-crop-cancel" type="button" onclick="tuV7CropClose()">إلغاء</button></div></div>';
+ document.body.appendChild(m);m.addEventListener('click',function(e){if(e.target===m)window.tuV7CropClose()});
+ var cv=qs('#tu-v7-crop-canvas',m);
+ cv.addEventListener('pointerdown',function(e){crop.drag=true;crop.px=e.clientX;crop.py=e.clientY;try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+ cv.addEventListener('pointermove',function(e){if(!crop.drag)return;var r=cv.getBoundingClientRect(),k=crop.size/r.width;crop.dx+=(e.clientX-crop.px)*k;crop.dy+=(e.clientY-crop.py)*k;crop.px=e.clientX;crop.py=e.clientY;drawCrop()});
+ function up(){crop.drag=false}cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+ return m;
+}
+function cropMetrics(){var im=crop.img;if(!im)return null;var base=Math.max(crop.size/im.naturalWidth,crop.size/im.naturalHeight),sc=base*crop.zoom,w=im.naturalWidth*sc,h=im.naturalHeight*sc,mx=Math.max(0,(w-crop.size)/2),my=Math.max(0,(h-crop.size)/2);crop.dx=Math.max(-mx,Math.min(mx,crop.dx));crop.dy=Math.max(-my,Math.min(my,crop.dy));return {w:w,h:h,x:(crop.size-w)/2+crop.dx,y:(crop.size-h)/2+crop.dy}}
+function drawCrop(){var cv=qs('#tu-v7-crop-canvas'),im=crop.img;if(!cv||!im)return;var z=cropMetrics(),cx=cv.getContext('2d');cx.clearRect(0,0,crop.size,crop.size);cx.fillStyle='#06090d';cx.fillRect(0,0,crop.size,crop.size);cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.drawImage(im,z.x,z.y,z.w,z.h)}
+window.tuV7CropZoom=function(v){crop.zoom=Math.max(1,Math.min(3,parseFloat(v)||1));drawCrop()};
+window.tuV7CropClose=function(){var m=qs('#tu-v7-avatar-crop');if(m)m.classList.remove('on');crop.img=null};
+window.tuV7CropSave=function(){if(!crop.img)return;var z=cropMetrics(),out=document.createElement('canvas'),S=384,k=S/crop.size;out.width=S;out.height=S;var cx=out.getContext('2d');cx.fillStyle='#0b1017';cx.fillRect(0,0,S,S);cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.drawImage(crop.img,z.x*k,z.y*k,z.w*k,z.h*k);var data=out.toDataURL('image/jpeg',.9);try{student.avatar=data;saveSt();updateAvatarUI();window.tuV7CropClose();if(typeof toast==='function')toast('تم قص الصورة وحفظها ✅')}catch(e){console.error(e)}};
+window.onAvatarPick=function(e){var f=e&&e.target&&e.target.files&&e.target.files[0];if(!f)return;if(String(f.type||'').indexOf('image')!==0){if(typeof toast==='function')toast('اختر صورة من الألبوم');return}var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){crop.img=im;crop.zoom=1;crop.dx=0;crop.dy=0;var m=cropModal(),r=qs('#tu-v7-crop-range',m);if(r)r.value='1';m.classList.add('on');drawCrop()};im.onerror=function(){if(typeof toast==='function')toast('تعذّر قراءة الصورة')};im.src=rd.result};rd.readAsDataURL(f);try{e.target.value=''}catch(_){}};
+
+/* ---------- registration autofill and eager Turnstile ---------- */
+function setAttr(el,k,v){if(el)el.setAttribute(k,v)}
+function fixAuth(mode){
+ var email=document.getElementById('au-email'),user=document.getElementById('au-user'),pass=document.getElementById('au-pass'),eg=email&&email.closest('.field-group'),ug=document.getElementById('au-user-grp');
+ if(eg&&!eg.id)eg.id='au-email-grp';
+ if(user){setAttr(user,'name','profile_handle');setAttr(user,'autocomplete','off');setAttr(user,'autocapitalize','none');setAttr(user,'autocorrect','off');setAttr(user,'spellcheck','false');setAttr(user,'data-form-type','other');setAttr(user,'data-lpignore','true');setAttr(user,'data-1p-ignore','');}
+ if(mode==='signup'){
+  if(email){email.type='email';setAttr(email,'name','email');setAttr(email,'autocomplete','email');setAttr(email,'inputmode','email');setAttr(email,'autocapitalize','none');setAttr(email,'autocorrect','off');setAttr(email,'spellcheck','false')}
+  if(eg&&ug&&eg.nextElementSibling!==ug)ug.parentNode.insertBefore(eg,ug);
+  if(pass){setAttr(pass,'name','new_password');setAttr(pass,'autocomplete','new-password')}
+ }else{
+  if(email){email.type='text';setAttr(email,'name','login_identifier');setAttr(email,'autocomplete','username');setAttr(email,'inputmode','email');setAttr(email,'autocapitalize','none');setAttr(email,'autocorrect','off');setAttr(email,'spellcheck','false')}
+  if(pass){setAttr(pass,'name','password');setAttr(pass,'autocomplete','current-password')}
+ }
+ window.tuV7EnsureTurnstile();
+}
+var twWidget=null,twTries=0;
+function captchaStatus(text,kind){var el=document.getElementById('tu-v7-captcha-status'),tw=qs('.cf-turnstile');if(!tw)return;if(!el){el=document.createElement('div');el.id='tu-v7-captcha-status';el.className='tu-v7-captcha-status';tw.insertAdjacentElement('afterend',el)}el.textContent=text||'';el.className='tu-v7-captcha-status'+(kind?' '+kind:'')}
+window.tuV7EnsureTurnstile=function(){
+ var el=qs('.cf-turnstile');if(!el)return false;['appearance','execution','size','refresh-expired'].forEach(function(k){var vals={'appearance':'always','execution':'render','size':'flexible','refresh-expired':'auto'};setAttr(el,'data-'+k,vals[k])});
+ if(el.querySelector('iframe')||el.querySelector('[name="cf-turnstile-response"]')){captchaStatus('التحقق الأمني جاهز','ok');return true}
+ captchaStatus('جارٍ تجهيز التحقق الأمني...','');
+ if(!window.turnstile||typeof window.turnstile.render!=='function')return false;
+ if(el.dataset.tuV7Rendering==='1')return false;el.dataset.tuV7Rendering='1';
+ try{twWidget=window.turnstile.render(el,{sitekey:el.getAttribute('data-sitekey'),theme:'dark',size:'flexible',appearance:'always',execution:'render',callback:function(){captchaStatus('تم التحقق الأمني','ok')},'expired-callback':function(){captchaStatus('انتهى التحقق — يتجدد الآن','err')},'error-callback':function(){captchaStatus('تعذر التحقق، تحقق من الاتصال','err')}});el.dataset.tuV7Widget=String(twWidget);return true}catch(e){el.dataset.tuV7Rendering='';return !!el.querySelector('iframe')}
+};
+function eagerTurnstile(){var link=document.querySelector('link[data-tu-v7-cf]');if(!link){link=document.createElement('link');link.rel='preconnect';link.href='https://challenges.cloudflare.com';link.crossOrigin='anonymous';link.dataset.tuV7Cf='1';document.head.appendChild(link)}window.tuV7EnsureTurnstile();var timer=setInterval(function(){twTries++;if(window.tuV7EnsureTurnstile()||twTries>40)clearInterval(timer)},250)}
+var oldAuthTab=window.authTab;if(typeof oldAuthTab==='function'){window.authTab=function(m){oldAuthTab(m);fixAuth(m);setTimeout(window.tuV7EnsureTurnstile,0);setTimeout(window.tuV7EnsureTurnstile,350);return true}}
+
+/* ---------- stronger, truthful subscription value ---------- */
+var benefits=[
+ ['✨','واجهة احترافية كاملة','لوحة عمل متكاملة للمشترك بدون أقفال أو قيود على أدوات الخطة.'],
+ ['✏️','تعديل الخطة بحرية','غيّر المواد والساعات ورتّب خطتك بالطريقة المناسبة لك.'],
+ ['☀️','فصول صيفية مرنة','أضف فصلًا صيفيًا في مكانه الصحيح وعدّل محتواه وقت ما تحتاج.'],
+ ['🎓','تخصصك الخاص','أنشئ تخصصًا كاملًا من الصفر بعدد المستويات الذي تختاره.'],
+ ['🧭','خريطة أكاديمية متقدمة','شاهد طريقك الدراسي والتقدم والمتبقي بصورة أوضح.'],
+ ['⚠️','أدوات الحرمان والغياب','احسب حدود الغياب وتابع المواد قبل الوصول للخطر.'],
+ ['🗓️','تخطيط وجدولة ذكية','استخدم مولد الجداول والمخطط المتقدم لتنظيم الدراسة.'],
+ ['🔁','مقارنة وتبديل الخطط','قارن التخصصات وبدّل الشعب واتخذ قرارك بوضوح.'],
+ ['📸','تصدير احترافي','احفظ خطتك وملخصاتك كصور مرتبة وجاهزة للمشاركة.']
+];
+var rows=[
+ ['الواجهة','أساسيات فقط','واجهة احترافية كاملة'],['تعديل المواد والساعات','غير متاح','متاح بلا قيود'],['الفصل الصيفي','غير متاح','إضافة وتعديل كامل'],['إنشاء تخصص خاص','غير متاح','تخصص كامل من الصفر'],['خريطة الخطة والتحليلات','مقفلة','كل الأدوات مفتوحة'],['الغياب والحرمان','مقفل','حساب ومتابعة متقدمة'],['المقارنة وتبديل الشعب','محدود','وصول كامل'],['التصدير','أساسي','صور احترافية جاهزة'],['مدرسون خصوصيون','متاح','متاح دائمًا']
+];
+function subscriptionPower(){
+ var p=document.getElementById('p-subscription');if(!p)return;var story=document.getElementById('tu-v6-sub-story');
+ if(story&&(story.querySelectorAll('.tu-v6-benefit').length!==9||story.dataset.tuV7!=='1'||story.innerText.indexOf('واجهة احترافية')<0)){var h=qs('.tu-v6-sub-head h2',story),d=qs('.tu-v6-sub-head p',story),b=qs('.tu-v6-sub-badge',story),g=qs('.tu-v6-benefit-grid',story);if(h)h.textContent='حوّل حسابك إلى مساحة أكاديمية احترافية';if(d)d.textContent='الاشتراك ليس مجرد فتح زر؛ يعطيك تحكمًا كاملًا في الخطة وتخطيطًا أعمق وواجهة عمل بدون القيود.';if(b)b.textContent='قيمة حقيقية للمشترك';if(g)g.innerHTML=benefits.map(function(x){return '<div class="tu-v6-benefit"><i>'+x[0]+'</i><b>'+esc7(x[1])+'</b><span>'+esc7(x[2])+'</span></div>'}).join('');story.dataset.tuV7='1'}
+ var c=document.getElementById('tu-v7-power-compare');if(!c){c=document.createElement('section');c.id='tu-v7-power-compare';c.innerHTML='<div class="tu-v7-power-head"><div><h3>الفرق الحقيقي بين المجاني والاشتراك</h3><p>المجاني للحساب السريع، والمشترك لإدارة رحلتك الأكاديمية كاملة باحتراف.</p></div><span class="tu-v7-power-badge">مزايا أقوى وواضحة</span></div><div class="tu-v7-compare-table"><div class="tu-v7-compare-row head"><span>الميزة</span><span>المجاني</span><span>المشترك</span></div>'+rows.map(function(r){return '<div class="tu-v7-compare-row"><span>'+esc7(r[0])+'</span><span class="basic">'+esc7(r[1])+'</span><span class="yes">✓ '+esc7(r[2])+'</span></div>'}).join('')+'</div>';if(story)story.insertAdjacentElement('afterend',c);else p.insertBefore(c,p.firstChild)}
+}
+function compactPolish(){var a=document.getElementById('home-avatar');if(a){a.title='اضغط لتحديد وقص الصورة';a.setAttribute('aria-label','تغيير وقص الصورة الشخصية')}subscriptionPower()}
+function boot(){fixAuth((typeof authMode!=='undefined'&&authMode)||'login');eagerTurnstile();compactPolish();setInterval(compactPolish,1100)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+window.tuV7ApplyAll=function(){compactPolish();window.tuV7EnsureTurnstile()};
 })();
 </script>
 </body></html>
