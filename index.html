@@ -13601,4 +13601,82 @@ body.tu-v14-custom-free #p-plan.tu-v6-plan-free .plan-editbar{display:flex!impor
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(apply,100)},{once:true});else setTimeout(apply,100);setInterval(apply,650);window.tuV14ApplyPlanChoice=apply;
 })();
 </script>
+
+<style id="tu-v16-schedule-paste-fix-css">
+/* Schedule paste display fix: preserve readable cards at every viewport. */
+#p-schedule,#p-schedule>.card,#schedule-grid-wrap,#schedule-grid-wrap .sch-big{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+#schedule-grid-wrap{overflow:visible!important;container-type:inline-size}
+#p-schedule .sch-day-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;align-items:start!important;width:100%;min-width:0}
+#p-schedule .sch-day-card{width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+#p-schedule .sch-day-body{min-width:0!important}
+#p-schedule .sch-event-card{width:100%!important;min-width:0!important;grid-template-columns:86px minmax(0,1fr)!important;box-sizing:border-box!important}
+#p-schedule .sch-event-card>*{min-width:0!important;box-sizing:border-box!important}
+#p-schedule .sch-event-info{min-width:0!important;padding:11px 10px!important}
+#p-schedule .sch-event-name,#p-schedule .sch-event-place{word-break:normal!important;overflow-wrap:break-word!important;white-space:normal!important;max-width:100%!important}
+#p-schedule .sch-event-name{font-size:.82rem!important;line-height:1.55!important}
+#p-schedule .sch-event-place{font-size:.65rem!important;line-height:1.5!important}
+#p-schedule .sch-event-time{min-width:0!important;white-space:nowrap!important;padding:11px 7px!important}
+@media(max-width:1100px){#p-schedule .sch-day-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:760px){
+ #p-schedule .sch-overview{grid-template-columns:1fr!important}
+ #p-schedule .sch-day-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ #p-schedule .sch-event-card{grid-template-columns:90px minmax(0,1fr)!important}
+ #p-schedule .sch-event-name{font-size:.88rem!important;line-height:1.55!important}
+ #p-schedule .sch-event-place{font-size:.7rem!important}
+}
+/* iPhone/iPad desktop-request mode can report a 980px viewport; use the real device class too. */
+html.tu-v16-phone #p-schedule .sch-overview{grid-template-columns:1fr!important}
+html.tu-v16-phone #p-schedule .sch-day-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+html.tu-v16-phone #p-schedule .sch-day-card{width:100%!important;min-width:0!important}
+html.tu-v16-phone #p-schedule .sch-event-card{grid-template-columns:92px minmax(0,1fr)!important}
+html.tu-v16-phone #p-schedule .sch-event-name{font-size:.9rem!important;line-height:1.55!important;word-break:normal!important;overflow-wrap:break-word!important}
+html.tu-v16-phone #p-schedule .sch-event-place{font-size:.71rem!important;word-break:normal!important;overflow-wrap:break-word!important}
+html.tu-v16-phone #p-schedule .sch-actions{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}
+html.tu-v16-phone #p-schedule .sch-actions>button{width:100%!important;min-width:0!important;min-height:46px!important}
+</style>
+<script id="tu-v16-schedule-paste-fix-js">
+(function(){
+ 'use strict';
+ function isPhoneLike(){
+   try{
+     var sw=Math.min(Number(screen&&screen.width)||9999,Number(screen&&screen.height)||9999);
+     var ua=/iphone|ipod|ipad|android|mobile/i.test(navigator.userAgent||'');
+     var touch=(Number(navigator.maxTouchPoints)||0)>1||matchMedia('(pointer:coarse)').matches;
+     return (ua||touch)&&sw<=900;
+   }catch(e){return false}
+ }
+ function fix(){
+   var phone=isPhoneLike(),root=document.documentElement;
+   root.classList.toggle('tu-v16-phone',phone);
+   var g=document.querySelector('#p-schedule .sch-day-grid');
+   if(!g)return;
+   if(phone){
+     g.style.setProperty('grid-template-columns','minmax(0,1fr)','important');
+     g.querySelectorAll('.sch-day-card').forEach(function(c){c.style.setProperty('width','100%','important');c.style.setProperty('min-width','0','important')});
+   }else{
+     g.style.removeProperty('grid-template-columns');
+     g.querySelectorAll('.sch-day-card').forEach(function(c){c.style.removeProperty('width');c.style.removeProperty('min-width')});
+   }
+   g.setAttribute('data-tu-v16-responsive','ready');
+ }
+ function hook(){
+   if(typeof window.renderSchedule==='function'&&!window.__tuV16ScheduleWrapped){
+     window.__tuV16ScheduleWrapped=true;
+     var base=window.renderSchedule;
+     window.renderSchedule=function(){var r=base.apply(this,arguments);requestAnimationFrame(fix);setTimeout(fix,80);return r};
+   }
+   var w=document.getElementById('schedule-grid-wrap');
+   if(w&&!w.__tuV16Observed){
+     w.__tuV16Observed=true;
+     new MutationObserver(function(){requestAnimationFrame(fix)}).observe(w,{childList:true,subtree:true});
+     if(window.ResizeObserver)new ResizeObserver(fix).observe(w);
+   }
+   fix();
+ }
+ window.tuV16FixScheduleLayout=fix;
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hook,{once:true});else hook();
+ addEventListener('resize',fix,{passive:true});addEventListener('orientationchange',function(){setTimeout(fix,120)},{passive:true});
+ setTimeout(hook,120);setTimeout(fix,700);
+})();
+</script>
 </body></html>
