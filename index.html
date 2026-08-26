@@ -1964,6 +1964,20 @@ html[data-theme="light"] .tu-bank-btn{background:#f3f6fb!important;color:#1f5bb0
 .tu-tg-promo-card p{margin:0 auto 17px;max-width:340px;color:#a8b4c7;font-size:12px;line-height:1.9}
 .tu-tg-promo-link{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;border-radius:13px;background:linear-gradient(135deg,#229ed9,#168ac2);color:#fff;text-decoration:none;font-size:12px;font-weight:950;box-shadow:0 10px 24px rgba(34,158,217,.18)}
 .tu-tg-promo-close{width:100%;margin-top:9px;min-height:42px;border:1px solid #26354b;border-radius:12px;background:#0e1520;color:#aeb9ca;font-family:inherit;font-size:11px;font-weight:900;cursor:pointer}
+#tu-offer-promo{position:fixed;inset:0;z-index:500001;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,5,10,.78);backdrop-filter:blur(13px);direction:rtl}
+#tu-offer-promo.on{display:flex}
+.tu-offer-card{width:min(470px,100%);border:1px solid rgba(54,116,255,.34);border-radius:26px;background:linear-gradient(155deg,#101a2c,#070b12 75%);box-shadow:0 35px 100px rgba(0,0,0,.72);padding:25px;text-align:center;color:#f5f8ff;position:relative;overflow:hidden}
+.tu-offer-card:before{content:"";position:absolute;inset:-60% -20%;background:radial-gradient(circle,rgba(43,107,255,.18),transparent 55%);pointer-events:none}
+.tu-offer-badge{position:relative;display:inline-flex;padding:7px 12px;border-radius:999px;background:rgba(255,183,0,.12);border:1px solid rgba(255,183,0,.28);color:#ffd66b;font-size:11px;font-weight:950}
+.tu-offer-card h2{position:relative;margin:14px 0 7px;font-size:24px;font-weight:950}
+.tu-offer-card .tu-offer-price{position:relative;font-size:40px;font-weight:1000;line-height:1.1;margin:8px 0}.tu-offer-price small{font-size:13px;color:#aeb9ca;font-weight:800}
+.tu-offer-card .tu-offer-month{position:relative;color:#82a9ff;font-size:13px;font-weight:900;margin-bottom:13px}
+.tu-offer-card p{position:relative;margin:0 auto 15px;max-width:390px;color:#aab5c6;font-size:12px;line-height:1.9}
+.tu-offer-benefits{position:relative;display:grid;gap:7px;text-align:right;margin:0 0 15px}.tu-offer-benefits div{padding:9px 11px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);font-size:11px;color:#d8e0ec}.tu-offer-benefits b{color:#fff}
+.tu-pay-title{position:relative;margin:10px 0 8px;color:#8e9bb0;font-size:10px;font-weight:900}.tu-payments{position:relative;display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:15px}.tu-payment{padding:7px 11px;border-radius:10px;background:#0b111b;border:1px solid #243247;color:#dbe5f5;font-size:10px;font-weight:900}
+.tu-offer-buy{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-height:50px;border-radius:14px;background:linear-gradient(135deg,#2d6df6,#1c55d7);color:#fff;text-decoration:none;font-size:13px;font-weight:1000;box-shadow:0 12px 28px rgba(45,109,246,.28);cursor:pointer;border:0;font-family:inherit}.tu-offer-buy:hover{filter:brightness(1.06)}
+.tu-offer-later{position:relative;width:100%;margin-top:8px;min-height:40px;border:1px solid #26354b;border-radius:12px;background:#0c121c;color:#aeb9ca;font-family:inherit;font-size:10px;font-weight:900;cursor:pointer}
+.tu-offer-note{position:relative;margin-top:10px;color:#7f8da2;font-size:9px}
 </style>
 </head>
 <body style="background: rgb(5, 6, 8) !important;">
@@ -6733,28 +6747,57 @@ async function authOAuth(p){
   }catch(e){ if(typeof authMsg==='function') authMsg('خطأ: '+((e&&e.message)||e)); if(typeof authBusy==='function') authBusy(false); }
 }
 function authGuest(){ CURRENT_USER=null; routeLocal(); }
-async function authLogout(){ var _uid=CURRENT_USER&&CURRENT_USER.id; try{ await cloudPush(); }catch(e){} try{ if(_uid)sessionStorage.removeItem('tu_tg_welcome_'+_uid); }catch(e){} try{ if(sbClient) await sbClient.auth.signOut(); }catch(e){} clearLocalUserData(); CURRENT_USER=null; location.reload(); }
+async function authLogout(){ var _uid=CURRENT_USER&&CURRENT_USER.id; try{ await cloudPush(); }catch(e){} try{ if(_uid){sessionStorage.removeItem('tu_tg_welcome_'+_uid);sessionStorage.removeItem('tu_offer_30_'+_uid);} }catch(e){} try{ if(sbClient) await sbClient.auth.signOut(); }catch(e){} clearLocalUserData(); CURRENT_USER=null; location.reload(); }
 function showTelegramLoginPromo(){
   try{
     if(!CURRENT_USER||!CURRENT_USER.id)return;
     var key='tu_tg_welcome_'+CURRENT_USER.id;
     if(sessionStorage.getItem(key))return;
     sessionStorage.setItem(key,'1');
-    var old=document.getElementById('tu-login-telegram-promo');
-    if(old)old.remove();
-    var ov=document.createElement('div');
-    ov.id='tu-login-telegram-promo';
+    var old=document.getElementById('tu-login-telegram-promo'); if(old)old.remove();
+    var ov=document.createElement('div'); ov.id='tu-login-telegram-promo';
     ov.innerHTML='<div class="tu-tg-promo-card" role="dialog" aria-modal="true" aria-label="قناة المنصة">'+
       '<div class="tu-tg-promo-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.5 3.3 18.3 20c-.24 1.18-.86 1.47-1.75.92l-4.82-3.55-2.33 2.24c-.26.26-.48.48-.98.48l.35-4.9 8.92-8.06c.39-.35-.09-.55-.61-.2L6.06 13.7 1.33 12.22c-1.03-.32-1.05-1.03.22-1.5L20.04 3.3c.87-.32 1.63.2 1.46 0Z"/></svg></div>'+
       '<div class="tu-tg-ok">✓ تم تسجيل الدخول بنجاح</div>'+
       '<h3>تابع قناة المنصة على تيليجرام</h3>'+
       '<p>في قناة المنصة ننشر أهم التحديثات، التنبيهات الجديدة، وخصومات الاشتراك والعروض أولًا بأول.</p>'+
       '<a class="tu-tg-promo-link" href="https://t.me/taibahiacademic" target="_blank" rel="noopener noreferrer">انضم إلى قناة المنصة</a>'+
-      '<button type="button" class="tu-tg-promo-close" onclick="document.getElementById(\'tu-login-telegram-promo\').classList.remove(\'on\')">متابعة إلى المنصة</button>'+
+      '<button type="button" class="tu-tg-promo-close" onclick="document.getElementById(\'tu-login-telegram-promo\').classList.remove(\'on\');setTimeout(showLimitedOfferPromo,450)">متابعة إلى المنصة</button>'+
       '</div>';
-    ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('on')});
-    document.body.appendChild(ov);
-    setTimeout(function(){ov.classList.add('on')},650);
+    ov.addEventListener('click',function(e){if(e.target===ov){ov.classList.remove('on');setTimeout(showLimitedOfferPromo,450)}});
+    document.body.appendChild(ov); setTimeout(function(){ov.classList.add('on')},650);
+  }catch(e){}
+}
+function showLimitedOfferPromo(){
+  try{
+    if(!CURRENT_USER||!CURRENT_USER.id)return;
+    var key='tu_offer_30_'+CURRENT_USER.id; if(sessionStorage.getItem(key))return;
+    sessionStorage.setItem(key,'1');
+    var old=document.getElementById('tu-offer-promo'); if(old)old.remove();
+    var ov=document.createElement('div'); ov.id='tu-offer-promo';
+    ov.innerHTML='<div class="tu-offer-card" role="dialog" aria-modal="true" aria-label="عرض الاشتراك السنوي">'+
+      '<div class="tu-offer-badge">🔥 عرض لفترة محدودة جدًا</div>'+
+      '<h2>اشتراك السنة بـ 30 ريال فقط</h2>'+
+      '<div class="tu-offer-price">30 <small>ريال / سنة</small></div>'+
+      '<div class="tu-offer-month">يعني عليك الشهر بـ 2.5 ريال فقط</div>'+
+      '<p>إذا كنت ناوي تكمل مع المنصة، هذا أفضل وقت للاشتراك. السعر مخفّض لفترة محدودة جدًا، وبعد انتهاء العرض قد يعود السعر المعتاد.</p>'+
+      '<div class="tu-offer-benefits"><div>✓ <b>سنة كاملة</b> من الاشتراك بسعر العرض</div><div>✓ وصول سريع بعد إتمام الدفع وتفعيل الاشتراك</div><div>✓ <b>لا تفوّت العرض</b> — الكمية/المدة محدودة</div></div>'+
+      '<div class="tu-pay-title">طرق الدفع المتاحة في صفحة الدفع</div>'+
+      '<div class="tu-payments"><span class="tu-payment">مدى</span><span class="tu-payment">Apple Pay</span><span class="tu-payment">البطاقات البنكية</span><span class="tu-payment">تمارا</span></div>'+
+      '<button type="button" class="tu-offer-buy" onclick="goToSubscriptionPurchase()">أبي العرض بـ 30 ريال</button>'+
+      '<button type="button" class="tu-offer-later" onclick="document.getElementById(\'tu-offer-promo\').classList.remove(\'on\')">متابعة بدون الاشتراك الآن</button>'+
+      '<div class="tu-offer-note">يظهر العرض مرة واحدة لكل تسجيل دخول.</div>'+
+      '</div>';
+    document.body.appendChild(ov); setTimeout(function(){ov.classList.add('on')},200);
+  }catch(e){}
+}
+function goToSubscriptionPurchase(){
+  try{
+    var els=[].slice.call(document.querySelectorAll('button,a,[role="button"]'));
+    var hit=els.find(function(el){var t=(el.innerText||el.textContent||'').trim();return el.offsetParent!==null&&/(اشترك|الاشتراك|شراء|الدفع|خطط الاشتراك)/.test(t)});
+    if(hit){document.getElementById('tu-offer-promo').classList.remove('on');hit.click();return}
+    var target=document.querySelector('#pricing,#plans,#subscription'); if(target){document.getElementById('tu-offer-promo').classList.remove('on');target.scrollIntoView({behavior:'smooth',block:'center'});return}
+    window.location.hash='subscription';
   }catch(e){}
 }
 async function afterLogin(){
@@ -13581,7 +13624,6 @@ setInterval(function(){watch();apply()},650);window.tuV8ApplySubscriberHome=appl
 
 <script id="tu-v14-plan-choice-js">
 (function(){
-  /* اختيار التخصص أصبح مفتوحًا للجميع — لا توجد شاشة اختيار مدفوع/مجاني. */
   window.tuV14CustomFree=function(){return false};
   window.tuV14ReadyPaid=function(){return false};
   window.tuV14ApplyPlanChoice=function(){};
