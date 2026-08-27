@@ -6784,7 +6784,7 @@ function showLimitedOfferPromo(){
       '<div class="tu-offer-benefits"><div>✓ <b>سنة كاملة</b> من الاشتراك بسعر العرض</div><div>✓ وصول سريع بعد إتمام الدفع وتفعيل الاشتراك</div><div>✓ <b>لا تفوّت العرض</b> — الكمية/المدة محدودة</div></div>'+
       '<div class="tu-pay-title">طرق الدفع المتاحة في صفحة الدفع</div>'+
       '<div class="tu-payments"><span class="tu-payment">مدى</span><span class="tu-payment">Apple Pay</span><span class="tu-payment">البطاقات البنكية</span><span class="tu-payment">تمارا</span></div>'+
-      '<button type="button" class="tu-offer-buy" onclick="goToSubscriptionPurchase()">أبي العرض بـ 30 ريال</button>'+
+      '<a class="tu-offer-buy" href="https://salla.sa/silvrcol/اشتراك-طيبه-اكاديمي-سنه/p1931426482" target="_blank" rel="noopener noreferrer">أبي العرض بـ 30 ريال</a>'+
       '<button type="button" class="tu-offer-later" onclick="document.getElementById(\'tu-offer-promo\').classList.remove(\'on\')">متابعة بدون الاشتراك الآن</button>'+
       '<div class="tu-offer-note">يظهر العرض مرة واحدة لكل تسجيل دخول.</div>'+
       '</div>';
@@ -6792,13 +6792,7 @@ function showLimitedOfferPromo(){
   }catch(e){}
 }
 function goToSubscriptionPurchase(){
-  try{
-    var els=[].slice.call(document.querySelectorAll('button,a,[role="button"]'));
-    var hit=els.find(function(el){var t=(el.innerText||el.textContent||'').trim();return el.offsetParent!==null&&/(اشترك|الاشتراك|شراء|الدفع|خطط الاشتراك)/.test(t)});
-    if(hit){document.getElementById('tu-offer-promo').classList.remove('on');hit.click();return}
-    var target=document.querySelector('#pricing,#plans,#subscription'); if(target){document.getElementById('tu-offer-promo').classList.remove('on');target.scrollIntoView({behavior:'smooth',block:'center'});return}
-    window.location.hash='subscription';
-  }catch(e){}
+  window.open('https://salla.sa/silvrcol/اشتراك-طيبه-اكاديمي-سنه/p1931426482','_blank','noopener');
 }
 async function afterLogin(){
   try{ await cloudPull(); }catch(e){}
