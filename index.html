@@ -6825,12 +6825,12 @@ async function cloudPull(){
       var cloudTs=(blob&&blob['tu_pro_ts'])?(parseInt(blob['tu_pro_ts'],10)||0):0;
       var localTs=parseInt(localStorage.getItem('tu_pro_ts')||'0',10);
       if(hasCloud && (!sameUser || cloudTs>localTs)){
+        /* real cloud data exists to restore from: safe to replace local with it */
         clearLocalUserData();
         Object.keys(blob).forEach(function(k){ if(k.indexOf('tu_pro_')===0 && blob[k]!=null) _origSet(k, blob[k]); });
         _origSet('tu_pro_ts', String(cloudTs||Date.now()));
-      } else if(!hasCloud && !sameUser){
-        clearLocalUserData();
       } else {
+        /* no cloud data (or nothing newer) to restore from: never delete what's on the device — keep it and push it up instead */
         pushAfter=true;
       }
     }
