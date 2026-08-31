@@ -1,34 +1,56 @@
-/* TU Academic service worker — offline app shell */
-var CACHE='tu-academic-v1';
-var CORE=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png'];
-self.addEventListener('install',function(e){
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(CORE).catch(function(){}); }));
+/* TU Academic service worker — build 2026.08.31.1527 */
+const CACHE_NAME = 'tu-academic-2026.08.31.1527';
+
+self.addEventListener('install', () => self.skipWaiting());
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
-self.addEventListener('activate',function(e){
-  e.waitUntil(caches.keys().then(function(ks){
-    return Promise.all(ks.map(function(k){ if(k!==CACHE){ return caches.delete(k); } }));
-  }).then(function(){ return self.clients.claim(); }));
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
-self.addEventListener('fetch',function(e){
-  var req=e.request;
-  if(req.method!=='GET'){ return; }
-  var url;
-  try{ url=new URL(req.url); }catch(_){ return; }
-  if(url.origin!==self.location.origin){ return; }
-  if(req.mode==='navigate'){
-    e.respondWith(fetch(req).then(function(r){
-      try{ var cp=r.clone(); caches.open(CACHE).then(function(c){ c.put('./index.html',cp); }); }catch(_){}
-      return r;
-    }).catch(function(){
-      return caches.match('./index.html').then(function(r){ return r||caches.match('./'); });
-    }));
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Never cache APIs or dynamic backend traffic.
+  if (/\/(rest|auth|functions|storage)\/v\d+\//.test(url.pathname)) return;
+
+  // HTML/navigation is always network-first so GitHub Pages updates appear.
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request, { cache: 'no-store' });
+        if (fresh && fresh.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, fresh.clone());
+        }
+        return fresh;
+      } catch (error) {
+        return (await caches.match(request)) || Response.error();
+      }
+    })());
     return;
   }
-  e.respondWith(caches.match(req).then(function(c){
-    return c || fetch(req).then(function(r){
-      try{ if(r&&r.status===200){ var cp=r.clone(); caches.open(CACHE).then(function(ch){ ch.put(req,cp); }); } }catch(_){}
-      return r;
-    }).catch(function(){ return c; });
-  }));
+
+  // Same-origin static files: refresh in the background.
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    const network = fetch(request).then(async response => {
+      if (response && response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    }).catch(() => null);
+    return cached || (await network) || Response.error();
+  })());
 });
