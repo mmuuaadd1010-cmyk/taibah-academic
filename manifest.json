@@ -1,18 +1,12 @@
 {
-  "name": "طيبة أكاديمي — منصة طلاب جامعة طيبة",
-  "short_name": "طيبة أكاديمي",
-  "description": "منصة طلاب جامعة طيبة: تتبع المعدل، مولّد الجداول الذكي، الخطط الدراسية، ومجتمع الزملاء.",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#05060d",
-  "theme_color": "#05060d",
+  "name": "TU Academic — طيبة أكاديمي",
+  "short_name": "TU Academic",
+  "description": "منصة أكاديمية شاملة لطلاب الجامعات",
   "lang": "ar",
   "dir": "rtl",
-  "categories": ["education", "productivity"],
-  "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ]
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050608",
+  "theme_color": "#050608"
 }
