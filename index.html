@@ -2825,8 +2825,24 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     <!-- SCHEDULE -->
     <div class="tab-pane" id="p-schedule">
       <div class="card">
-        <div class="card-h">📅 جدولي الأسبوعي <span class="sub">عرض أسبوعي كامل بدون سحب — اضغط أي مادة لتعديلها</span></div>
+        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <span>📅 جدولي الأسبوعي <span class="sub">اضغط أي مادة لتعديلها</span></span>
+          <div class="sch-view-toggle" id="sch-view-toggle" style="display:flex;background:var(--s2);border:1px solid var(--bor);border-radius:10px;padding:3px;gap:2px">
+            <button type="button" onclick="setSchViewMode('cards')" id="sch-view-btn-cards" style="border:none;background:transparent;padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:800;color:var(--t2);cursor:pointer;font-family:inherit">🗂️ بطاقات</button>
+            <button type="button" onclick="setSchViewMode('grid')" id="sch-view-btn-grid" style="border:none;background:transparent;padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:800;color:var(--t2);cursor:pointer;font-family:inherit">📊 جدول</button>
+          </div>
+        </div>
         <div id="my-sch-banner"></div>
+        <div class="plnr-hero" id="sch-now-card" style="margin-bottom:14px;display:none">
+          <div class="plnr-next-lbl">⏳ جدولي الآن</div>
+          <div class="plnr-next-tt" id="sch-now-tt">جاري التحميل...</div>
+          <div class="plnr-next-cd" id="sch-now-cd">
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-d">–</div><div class="plnr-cd-l">يوم</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-h">–</div><div class="plnr-cd-l">ساعة</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-m">–</div><div class="plnr-cd-l">دقيقة</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-s">–</div><div class="plnr-cd-l">ثانية</div></div>
+          </div>
+        </div>
         <div class="sch-view" id="schedule-grid-wrap"><div class="empty" style="padding:34px 14px"><span class="ei">📅</span>لا توجد مواد بعد — اضغط «➕ إضافة مادة» بالأسفل لإضافة محاضراتك</div></div>
         <div class="sch-actions no-print"><button class="btn-add-goal" style="flex:1" onclick="openSchAdd()">إضافة مادة</button><button class="btn-add-goal" style="flex:1" onclick="tuaiPasteSchedule()">📋 لصق الجدول</button><button class="btn-ghost" style="flex:1" onclick="exportSchPDF()">طباعة / PDF</button><button class="btn-ghost" style="flex:1" onclick="exportSchImage()">حفظ كصورة</button></div>
       </div>
@@ -2834,6 +2850,16 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
 
     <!-- PLANNER -->
     <style id="plnr-css">
+.sch-cards-wrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.sch-card-day{flex:0 0 auto;width:150px;scroll-snap-align:start}
+.sch-card-day-h{position:sticky;top:0;background:var(--s2);border:1px solid var(--bor);border-radius:10px;padding:8px 6px;text-align:center;font-weight:900;font-size:.82rem;color:var(--t);margin-bottom:8px}
+.sch-card-day-h .cnt{display:block;font-size:.66rem;font-weight:700;color:var(--t2);margin-top:2px}
+.sch-ev-card{border-radius:12px;padding:10px 11px;margin-bottom:8px;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:transform .12s ease}
+.sch-ev-card:active{transform:scale(.97)}
+.sch-ev-card .en{font-weight:900;font-size:.84rem;line-height:1.35;margin-bottom:6px}
+.sch-ev-card .et{font-size:.74rem;font-weight:700;opacity:.95}
+.sch-ev-card .ep{font-size:.71rem;font-weight:600;opacity:.85;margin-top:3px}
+.sch-card-empty{border:1px dashed var(--bor2);border-radius:10px;padding:16px 6px;text-align:center;font-size:.72rem;color:var(--t2)}
 .plnr-hero{background:linear-gradient(135deg,rgba(91,157,253,.15),rgba(57,208,255,.06));border:1px solid var(--bor);border-radius:18px;padding:16px 16px 14px;margin-bottom:14px;position:relative;overflow:hidden}
 .plnr-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(160px 100px at 92% -20%,rgba(57,208,255,.20),transparent);pointer-events:none}
 .plnr-hero-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;flex-wrap:wrap}
@@ -4423,12 +4449,108 @@ function schCalMarkup(pm){
   });
   h+='</div>';return h;
 }
+var schViewMode=(function(){try{return localStorage.getItem('tu_sch_view')||'cards';}catch(e){return 'cards';}})();
+function setSchViewMode(mode){
+  schViewMode=(mode==='grid')?'grid':'cards';
+  try{localStorage.setItem('tu_sch_view',schViewMode);}catch(e){}
+  renderSchedule();
+}
+function schUpdateViewToggleUI(){
+  var bc=document.getElementById('sch-view-btn-cards'),bg=document.getElementById('sch-view-btn-grid');
+  if(!bc||!bg)return;
+  var on='background:var(--grad);color:#fff;',off='background:transparent;color:var(--t2);';
+  bc.style.cssText=bc.style.cssText.replace(/background:[^;]+;|color:[^;]+;/g,'')+(schViewMode==='cards'?on:off);
+  bg.style.cssText=bg.style.cssText.replace(/background:[^;]+;|color:[^;]+;/g,'')+(schViewMode==='grid'?on:off);
+}
+function schCardsMarkup(){
+  var items=(scheduleData.items||[]);var days=[[],[],[],[],[]];
+  items.forEach(function(e){if(e.day>=0&&e.day<5)days[e.day].push(e);});
+  var todayIdx=new Date().getDay();
+  var h='<div class="sch-cards-wrap">';
+  DAYS.forEach(function(dn,di){
+    var evs=days[di].slice().sort(function(a,b){return (t2m(a.start)||0)-(t2m(b.start)||0);});
+    h+='<div class="sch-card-day">';
+    h+='<div class="sch-card-day-h"'+(di===todayIdx?' style="border-color:var(--a1);color:var(--a1)"':'')+'>'+dn+(evs.length?'<span class="cnt">'+evs.length+' محاضرة</span>':'')+'</div>';
+    if(!evs.length){h+='<div class="sch-card-empty">لا محاضرات</div>';}
+    else{evs.forEach(function(e){
+      h+='<div class="sch-ev-card" style="background:'+(e.color||'#5b9dfd')+'" onclick="openSchEdit(\''+e.id+'\')">'+
+         '<div class="en">'+esc(e.name)+'</div>'+
+         '<div class="et">'+m2t(t2m(e.start))+' – '+m2t(t2m(e.end))+'</div>'+
+         (e.place?'<div class="ep">📍 '+esc(e.place)+'</div>':'')+
+         '</div>';
+    });}
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
 function renderSchedule(){
   migrateSch();
   var banner=document.getElementById('my-sch-banner');
   if(banner){banner.innerHTML=scheduleData.__generated?'<div class="reco-box" style="margin-bottom:12px"><div class="reco-text">\uD83D\uDCDA \u0647\u0630\u0627 \u062c\u062f\u0648\u0644 \u0645\u0639\u062a\u0645\u062f \u0645\u0646 \u0627\u0644\u0645\u0648\u0644\u0651\u062f. \u064a\u0645\u0643\u0646\u0643 \u0627\u0644\u062a\u0639\u062f\u064a\u0644 \u0628\u0627\u0644\u0636\u063a\u0637 \u0639\u0644\u0649 \u0623\u064a \u0645\u0627\u062f\u0629 \u0623\u0648 \u0625\u0636\u0627\u0641\u0629 \u0645\u0627\u062f\u0629 \u062c\u062f\u064a\u062f\u0629.</div></div>':'';}
   var wrap=document.getElementById('schedule-grid-wrap');
-  if(wrap)wrap.innerHTML=(scheduleData.items&&scheduleData.items.length)?schCalMarkup(false):'<div class="empty" style="padding:34px 14px"><span class="ei">\uD83D\uDCC5</span>\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0648\u0627\u062f \u0628\u0639\u062f \u2014 \u0627\u0636\u063a\u0637 \u00ab\u2795 \u0625\u0636\u0627\u0641\u0629 \u0645\u0627\u062f\u0629\u00bb \u0628\u0627\u0644\u0623\u0633\u0641\u0644 \u0644\u0625\u0636\u0627\u0641\u0629 \u0645\u062d\u0627\u0636\u0631\u0627\u062a\u0643</div>';
+  if(wrap){
+    if(!(scheduleData.items&&scheduleData.items.length)){
+      wrap.innerHTML='<div class="empty" style="padding:34px 14px"><span class="ei">\uD83D\uDCC5</span>\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0648\u0627\u062f \u0628\u0639\u062f \u2014 \u0627\u0636\u063a\u0637 \u00ab\u2795 \u0625\u0636\u0627\u0641\u0629 \u0645\u0627\u062f\u0629\u00bb \u0628\u0627\u0644\u0623\u0633\u0641\u0644 \u0644\u0625\u0636\u0627\u0641\u0629 \u0645\u062d\u0627\u0636\u0631\u0627\u062a\u0643</div>';
+    }else{
+      wrap.innerHTML=(schViewMode==='grid')?schCalMarkup(false):schCardsMarkup();
+    }
+  }
+  schUpdateViewToggleUI();
+  schNowUpdate();
+  if(!schNowTimerStarted){schNowTimerStarted=true;setInterval(schNowUpdate,1000);}
+}
+/* ===== جدولي الآن: أقرب/حالية محاضرة ===== */
+var schNowTimerStarted=false;
+function schNowUpdate(){
+  var card=document.getElementById('sch-now-card');
+  var ttEl=document.getElementById('sch-now-tt');
+  var cdWrap=document.getElementById('sch-now-cd');
+  if(!card||!ttEl)return;
+  var items=(scheduleData.items||[]).filter(function(e){return e.day>=0&&e.day<5&&e.start&&e.end;});
+  if(!items.length){card.style.display='none';return;}
+  card.style.display='';
+  var now=new Date();
+  var todayIdx=now.getDay();
+  var nowMin=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;
+  var current=null,next=null,target=null,html='';
+  if(todayIdx>=0&&todayIdx<5){
+    var todays=items.filter(function(e){return e.day===todayIdx;}).sort(function(a,b){return (t2m(a.start)||0)-(t2m(b.start)||0);});
+    for(var i=0;i<todays.length;i++){var s=t2m(todays[i].start),en=t2m(todays[i].end);if(s!=null&&en!=null&&nowMin>=s&&nowMin<en){current=todays[i];break;}}
+    if(!current){for(var j=0;j<todays.length;j++){if((t2m(todays[j].start)||0)>nowMin){next=todays[j];break;}}}
+  }
+  var todayBase=new Date(now.getFullYear(),now.getMonth(),now.getDate(),0,0,0,0);
+  if(current){
+    target=new Date(todayBase.getTime()+(t2m(current.end)||0)*60000);
+    html='<b>🟢 عندك محاضرة الآن: '+esc(current.name)+'</b>'+(current.place?' — '+esc(current.place):'')+'<br><span style="font-size:.78rem;color:var(--t2)">تنتهي الساعة '+m2t(t2m(current.end))+' — تبقّى:</span>';
+  }else if(next){
+    target=new Date(todayBase.getTime()+(t2m(next.start)||0)*60000);
+    html='<b>⏳ محاضرتك القادمة: '+esc(next.name)+'</b>'+(next.place?' — '+esc(next.place):'')+'<br><span style="font-size:.78rem;color:var(--t2)">الساعة '+m2t(t2m(next.start))+' — تبدأ خلال:</span>';
+  }else{
+    var found=null,offset=0;
+    for(var off=1;off<=7;off++){
+      var d=(todayIdx+off)%7;
+      if(d<0||d>4)continue;
+      var dayItems=items.filter(function(e){return e.day===d;}).sort(function(a,b){return (t2m(a.start)||0)-(t2m(b.start)||0);});
+      if(dayItems.length){found=dayItems[0];offset=off;break;}
+    }
+    if(found){
+      target=new Date(todayBase.getTime()+offset*86400000+(t2m(found.start)||0)*60000);
+      var isWeekend=(todayIdx===5||todayIdx===6);
+      html=(isWeekend?'<b>🎉 إجازة نهاية الأسبوع</b><br>':'<b>📅 لا محاضرات متبقية اليوم</b><br>')+'<span style="font-size:.78rem;color:var(--t2)">القادمة: '+esc(found.name)+' يوم '+DAYS[found.day]+' الساعة '+m2t(t2m(found.start))+(found.place?' — '+esc(found.place):'')+'</span>';
+    }else{
+      html='<b>📅 جدولي</b><br><span style="font-size:.78rem;color:var(--t2)">لا توجد محاضرات مجدولة</span>';
+    }
+  }
+  ttEl.innerHTML=html;
+  if(!target){if(cdWrap)cdWrap.style.display='none';return;}
+  if(cdWrap)cdWrap.style.display='';
+  var diff=target-now;if(diff<0)diff=0;
+  var d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000),s=Math.floor(diff%60000/1000);
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  set('sch-now-cd-d',d);set('sch-now-cd-h',h);set('sch-now-cd-m',m);set('sch-now-cd-s',s);
+  var dUnit=document.getElementById('sch-now-cd-d');
+  if(dUnit&&dUnit.parentElement)dUnit.parentElement.style.display=d>0?'':'none';
 }
 function schBodyClick(ev,di){var body=ev.currentTarget;var rect=body.getBoundingClientRect();var y=ev.clientY-rect.top;var slot=Math.max(0,Math.min(11,Math.floor(y/SCH_PXH)));var st=SCH_VS+slot*60;openSchAdd(di,m2hhmm(st),m2hhmm(st+60));}
 function selDefaultColor(){var opts=document.querySelectorAll('#color-row .color-opt');opts.forEach(function(c){c.classList.remove('sel');});if(opts[0])opts[0].classList.add('sel');}
@@ -6825,12 +6947,12 @@ async function cloudPull(){
       var cloudTs=(blob&&blob['tu_pro_ts'])?(parseInt(blob['tu_pro_ts'],10)||0):0;
       var localTs=parseInt(localStorage.getItem('tu_pro_ts')||'0',10);
       if(hasCloud && (!sameUser || cloudTs>localTs)){
+        /* real cloud data exists to restore from: safe to replace local with it */
         clearLocalUserData();
         Object.keys(blob).forEach(function(k){ if(k.indexOf('tu_pro_')===0 && blob[k]!=null) _origSet(k, blob[k]); });
         _origSet('tu_pro_ts', String(cloudTs||Date.now()));
-      } else if(!hasCloud && !sameUser){
-        clearLocalUserData();
       } else {
+        /* no cloud data (or nothing newer) to restore from: never delete what's on the device — keep it and push it up instead */
         pushAfter=true;
       }
     }
@@ -6841,14 +6963,27 @@ async function cloudPull(){
   if(pushAfter){ try{ cloudPush(); }catch(e){} }
 }
 var _pushTimer=null;
-function scheduleCloudPush(){ if(_pushTimer)clearTimeout(_pushTimer); _pushTimer=setTimeout(function(){ cloudPush(); },1200); }
+var _pushPending=false;
+function scheduleCloudPush(){ _pushPending=true; if(_pushTimer)clearTimeout(_pushTimer); _pushTimer=setTimeout(function(){ cloudPush(); },400); }
 async function cloudPush(){
-  if(!CURRENT_USER||!sbClient)return;
+  if(_pushTimer){ clearTimeout(_pushTimer); _pushTimer=null; }
+  if(!CURRENT_USER||!sbClient){ _pushPending=false; return; }
   var blob={};
   ['tu_pro_st','tu_pro_plan','tu_pro_plans','tu_pro_goals','tu_pro_sch','tu_pro_gen','tu_pro_pomo'].forEach(function(k){ var v=localStorage.getItem(k); if(v!=null) blob[k]=v; });
   try{ blob['tu_pro_ts']=localStorage.getItem('tu_pro_ts')||String(Date.now()); }catch(e){}
-  try{ await sbClient.from('user_data').upsert({ user_id:CURRENT_USER.id, data:blob, updated_at:new Date().toISOString() }, { onConflict:'user_id' }); }catch(e){}
+  try{ await sbClient.from('user_data').upsert({ user_id:CURRENT_USER.id, data:blob, updated_at:new Date().toISOString() }, { onConflict:'user_id' }); _pushPending=false; }catch(e){}
 }
+/* Reliability fix: flush any pending save immediately when the tab is about to
+   navigate away or be hidden/closed, so switching accounts (e.g. via admin
+   "login as user") or closing the tab can never race ahead of an unsaved
+   change. Without this, a save queued by scheduleCloudPush's debounce could
+   still be pending when the page navigates, leaving the cloud copy stale. */
+function flushCloudPushIfPending(){ if(_pushPending){ try{ cloudPush(); }catch(e){} } }
+try{
+  window.addEventListener('visibilitychange', function(){ if(document.visibilityState==='hidden') flushCloudPushIfPending(); });
+  window.addEventListener('pagehide', flushCloudPushIfPending);
+  window.addEventListener('beforeunload', flushCloudPushIfPending);
+}catch(e){}
 function authBootEntry(){
   goAuthScreen('loading');
   if(typeof supabase==='undefined' || !supabase || !supabase.createClient){
@@ -7971,7 +8106,7 @@ async function adminToggleRole(uid,current){
 }
 window.adminImpersonate=async function(){
   var inp=document.getElementById('adm-imp-email'); var msg=document.getElementById('adm-imp-msg');
-  var email=((inp&&inp.value)||'').trim();
+  var email=((inp&&inp.value)||'').trim().toLowerCase();
   if(!email){ if(msg){msg.textContent='⚠️ اكتب الايميل أولاً';msg.style.color='var(--r)';} return; }
   if(!confirm('بيسجّل خروجك من حسابك الحالي وبيفتح لك حساب:\n'+email+'\n\nمتأكد؟'))return;
   if(msg){msg.textContent='⏳ جارٍ التحضير...';msg.style.color='var(--t2)';}
@@ -7991,6 +8126,7 @@ window.adminImpersonate=async function(){
       return;
     }
     if(msg){msg.textContent='✅ جارٍ الدخول...';msg.style.color='var(--g)';}
+    try{ if(typeof flushCloudPushIfPending==='function') flushCloudPushIfPending(); }catch(e){}
     location.href=data.action_link;
   }catch(e){ if(msg){msg.textContent='❌ تعذّر الاتصال بالسيرفر';msg.style.color='var(--r)';} }
 };
@@ -12691,7 +12827,7 @@ function professionalizeTabIcons(){
 }
 function buildProfessionalMobileNav(){
   var n=$('tu-bottom-nav');if(!n){n=document.createElement('nav');n.id='tu-bottom-nav';document.body.appendChild(n)}
-  n.innerHTML='';var entries=[['home','الرئيسية'],['plan','الخطة'],['schedule','جدولي الآن'],['subscription','اشتراكي'],['tutors','مدرسون خصوصيون'],['menu','المزيد']];
+  n.innerHTML='';var entries=[['home','الرئيسية'],['plan','الخطة'],['subscription','اشتراكي'],['tutors','مدرسون خصوصيون'],['menu','المزيد']];
   entries.forEach(function(x){var b=document.createElement('button');b.type='button';b.className='pro-mobile-item'+(x[0]==='home'?' on':'');b.dataset.tab=x[0];b.innerHTML='<span>'+proSvg(x[0])+'</span><small>'+x[1]+'</small>';b.onclick=function(){if(x[0]==='menu'){try{tuOpenDrawer()}catch(e){}return}if(x[0]==='assistant'){try{if(typeof tuaiToggle==='function')tuaiToggle(true);else if($('tuai-fab'))$('tuai-fab').click()}catch(e){}return}var t=findTabButton(x[0]);window.goTab(x[0],t);if(x[0]==='swaps')swapLoad();if(x[0]==='tutors'&&typeof loadTutors==='function')loadTutors()};n.appendChild(b)})
 }
 function professionalizeFloatingTools(){var fab=$('tuai-fab');if(fab){fab.innerHTML=proSvg('assistant');fab.setAttribute('aria-label','فتح المساعد الأكاديمي');fab.title='المساعد الأكاديمي'}var support=$('site-support');if(support)support.setAttribute('aria-label','دعم المطور')}
@@ -12826,7 +12962,7 @@ function chosen(){return Array.from(document.querySelectorAll('#tutor-picker inp
 .tu-payment-box .tu-v2-payments{padding:12px;margin:4px 0 16px;text-align:right}.tu-payment-box .tu-v2-payments-head{margin-bottom:10px}.tu-payment-box .tu-v2-payment-grid{grid-template-columns:1fr 1fr}.tu-payment-box .tu-v2-method{min-height:80px;padding:10px}.tu-payment-box .tu-v2-payment-grid .tu-v2-method-meta small{display:none}
 
 /* ---- mobile navigation label fix ---- */
-@media(max-width:1024px){#tu-bottom-nav{min-height:70px!important;padding-inline:3px!important;display:grid!important;grid-template-columns:repeat(6,1fr)!important;align-items:stretch!important}.pro-mobile-item{min-width:0!important;width:100%!important;padding:7px 2px 5px!important;gap:3px!important;overflow:visible!important}.pro-mobile-item>span{flex:0 0 auto}.pro-mobile-item small{display:block!important;width:100%!important;max-width:100%!important;min-height:2.3em!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:normal!important;line-height:1.12!important;font-size:.58rem!important;text-align:center!important}#tu-bottom-nav .pro-mobile-item[data-tab="tutors"] small{font-size:.55rem!important;letter-spacing:-.3px!important;white-space:nowrap!important;min-width:0!important}}
+@media(max-width:1024px){#tu-bottom-nav{min-height:70px!important;padding-inline:3px!important;display:grid!important;grid-template-columns:1fr 1fr 1fr 1.25fr 1fr!important;align-items:stretch!important}.pro-mobile-item{min-width:0!important;width:100%!important;padding:7px 2px 5px!important;gap:3px!important;overflow:visible!important}.pro-mobile-item>span{flex:0 0 auto}.pro-mobile-item small{display:block!important;width:100%!important;max-width:100%!important;min-height:2.3em!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:normal!important;line-height:1.12!important;font-size:.58rem!important;text-align:center!important}#tu-bottom-nav .pro-mobile-item[data-tab="tutors"] small{font-size:.55rem!important;letter-spacing:-.3px!important;white-space:nowrap!important;min-width:0!important}}
 @media(max-width:760px){.tutor-page-head{align-items:stretch!important}.tutor-filter,.tutor-filter select{width:100%!important}.tutor-grid{grid-template-columns:1fr!important}.tu-v2-payment-grid{grid-template-columns:1fr 1fr}.tu-v2-payments-head{align-items:flex-start}.tu-v2-security{display:none}.tutor-subject,.tutor-notes{min-height:0}}
 @media(max-width:380px){.pro-mobile-item small{font-size:.54rem!important}.tu-v2-payment-grid{grid-template-columns:1fr}.tu-payment-box .tu-v2-payment-grid{grid-template-columns:1fr 1fr}}
 html[data-theme="light"] .tutor-card{background:#fff!important;border-color:#dce2ee!important;box-shadow:0 14px 35px rgba(24,40,72,.08)!important}html[data-theme="light"] .tutor-page-head{background:linear-gradient(145deg,#fff,#f5f7fb)!important;border-color:#dce2ee!important}html[data-theme="light"] .tutor-subject{color:#172033!important}html[data-theme="light"] .tu-v2-payments{background:linear-gradient(145deg,#fff,#f6f8fc)!important}html[data-theme="light"] .tu-v2-method{background:#fff;border-color:#dce2ee;color:#172033}html[data-theme="light"] .tu-v2-method.apple{background:#050505;color:#fff}
@@ -13033,13 +13169,13 @@ var q=false;new MutationObserver(function(){if(q)return;q=true;setTimeout(functi
 'use strict';
 var SALLA='https://salla.sa/silvrcol';
 window.TU_TUTORS_PUBLIC_UNTIL=new Date('2026-08-26T23:55:33+03:00').getTime();
-var LOCKED=['roadmap','abs','gen','planner','chart','target','swaps','compare'];
+var LOCKED=['roadmap','abs','gen','planner','chart','swaps','compare'];
 var NAMES={roadmap:'خريطة الخطة الأكاديمية',abs:'حاسبة الغياب والحرمان',gen:'مولّد الجداول الذكي',schedule:'الجدول الدراسي',planner:'تقويم الجامعة',chart:'الإحصاءات الذكية',target:'المعدل المستهدف',goals:'الأهداف الأكاديمية',pomo:'مؤقت التركيز',countdown:'عدّاد التخرج',swaps:'تبديل الشعب',compare:'مقارنة التخصصات',peers:'مجتمع الزملاء',fans:'نجوم المنصة',tutors:'المدرسون الخصوصيون'};
 var state={origGoTab:null,origRenderPlan:null,origCalc:null,origGenGate:null,lastSignature:''};
 function uni(){try{if(typeof currentUniversity==='function')return currentUniversity()}catch(e){}try{if(typeof student!=='undefined'&&student)return student.university}catch(e){}try{return (JSON.parse(localStorage.getItem('tu_pro_st')||'{}')||{}).university||null}catch(e){return null}}
 function admin(){try{return typeof IS_ADMIN!=='undefined'&&!!IS_ADMIN}catch(e){return false}}
 function subscribed(){if(admin())return true;var v=null;try{v=typeof subLocal==='function'?subLocal():JSON.parse(localStorage.getItem('tu_subscription')||'null')}catch(e){}return !!(v&&v.expires_at&&new Date(v.expires_at).getTime()>Date.now())}
-function taibahFree(){return uni()==='taibah'&&!subscribed()}
+function taibahFree(){return false}
 function tutorsPublic(){return true}
 function locked(id){if(!taibahFree())return false;if(id==='tutors')return false;return LOCKED.indexOf(id)>-1}
 function remain(){var d=Math.max(0,Number(window.TU_TUTORS_PUBLIC_UNTIL||0)-Date.now()),days=Math.floor(d/86400000),hrs=Math.floor((d%86400000)/3600000),mins=Math.floor((d%3600000)/60000);return days>0?(days+' يوم و'+hrs+' ساعة'):(hrs>0?(hrs+' ساعة و'+mins+' دقيقة'):(mins+' دقيقة'))}
@@ -13161,7 +13297,7 @@ var SALLA='https://salla.sa/silvrcol';
 var PNU_FALLBACK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20260%20260%22%3E%3Crect%20width%3D%22260%22%20height%3D%22260%22%20rx%3D%2248%22%20fill%3D%22%23f7f8fb%22%2F%3E%3Ccircle%20cx%3D%22130%22%20cy%3D%22105%22%20r%3D%2268%22%20fill%3D%22none%22%20stroke%3D%22%238c96a3%22%20stroke-width%3D%228%22%2F%3E%3Cpath%20d%3D%22M82%20119c25-54%2061-69%2096-48-16%203-29%2013-39%2028-12%2019-28%2031-57%2020z%22%20fill%3D%22%2364c6bd%22%2F%3E%3Cpath%20d%3D%22M87%20124c31%2013%2058%203%2076-28%206%2030-8%2057-36%2070-17-7-30-21-40-42z%22%20fill%3D%22%2378a9d6%22%2F%3E%3Cpath%20d%3D%22M116%2062c7%2027%201%2048-18%2067-5-29%201-51%2018-67z%22%20fill%3D%22%23a4d8d1%22%2F%3E%3Ctext%20x%3D%22130%22%20y%3D%22212%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2224%22%20font-weight%3D%22700%22%20fill%3D%22%234b5563%22%3E%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D9%86%D9%88%D8%B1%D8%A9%3C%2Ftext%3E%3C%2Fsvg%3E';
 function university(){try{if(typeof currentUniversity==='function')return currentUniversity()}catch(e){}try{return (JSON.parse(localStorage.getItem('tu_pro_st')||'{}')||{}).university||null}catch(e){return null}}
 function activeSub(){var v=null;try{v=typeof subLocal==='function'?subLocal():JSON.parse(localStorage.getItem('tu_subscription')||'null')}catch(e){}return !!(v&&v.expires_at&&new Date(v.expires_at)>new Date())}
-function taibahFree(){return university()==='taibah'&&!activeSub()}
+function taibahFree(){return false}
 function tabButton(id){var a=document.querySelectorAll('.tab-item');for(var i=0;i<a.length;i++){if((a[i].getAttribute('onclick')||'').indexOf("goTab('"+id+"'")>-1)return a[i]}return null}
 window.tuProductGo=function(id){var b=tabButton(id);if(b)b.click()};
 function ensureHomeLayout(){var p=document.getElementById('p-home');if(!p)return;var cd=document.getElementById('home-cd'),ring=p.querySelector('.gpa-ring-section'),stats=p.querySelector('.stats-grid');if(cd&&ring){var focus=document.getElementById('tu-home-focus-grid');if(!focus){focus=document.createElement('section');focus.id='tu-home-focus-grid';p.insertBefore(focus,stats||null)}if(cd.parentNode!==focus)focus.appendChild(cd);if(ring.parentNode!==focus)focus.appendChild(ring)}var cards=[].slice.call(p.querySelectorAll(':scope > .card'));if(cards.length){var details=document.getElementById('tu-home-detail-grid');if(!details){details=document.createElement('section');details.id='tu-home-detail-grid';p.appendChild(details)}cards.forEach(function(c){details.appendChild(c)})}var rt=p.querySelector('.reco-title');if(rt)rt.textContent='ملخص الأداء';var rr=document.getElementById('home-reco');if(rr)rr.textContent=(rr.textContent||'').replace(/الذكية/g,'المفيدة').replace(/الذكي/g,'الأكاديمي')}
@@ -13219,7 +13355,7 @@ window.tuApplyProductOptimization=apply;setInterval(apply,900);
 'use strict';
 var CUSTOM_KEY='tu_custom_specs_v6', AVATAR_KEY='tu_avatar_size_v6', PRIVACY_KEY='tu_gpa_hidden_v6';
 function uni(){try{return typeof currentUniversity==='function'?currentUniversity():(student&&student.university)||'taibah'}catch(e){return 'taibah'}}
-function premium(){try{if(window.tuV14CustomFree&&window.tuV14CustomFree())return true;if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN)return true;if(window.tuAccessState&&tuAccessState().subscribed)return true;return uni()==='pnu'}catch(e){return false}}
+function premium(){return true}
 window.tuV6IsPremium=premium;
 function safeName(){try{return String((student&&student.name)||'الطالب').trim()||'الطالب'}catch(e){return 'الطالب'}}
 function tabButton(id){var a=document.querySelectorAll('.tab-item');for(var i=0;i<a.length;i++){if((a[i].getAttribute('onclick')||'').indexOf("goTab('"+id+"'")>-1)return a[i]}return null}
