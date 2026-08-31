@@ -2,7 +2,9 @@ name: Fix mobile schedule tab
 
 on:
   push:
+    branches: [main]
     paths:
+      - 'index.html'
       - '.github/workflows/fix-schedule-mobile-nav.yml'
   workflow_dispatch:
 
@@ -14,23 +16,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Add جدولي الآن to mobile navigation
+      - name: Ensure جدولي الآن exists in mobile navigation
         shell: python
         run: |
           from pathlib import Path
+          import re
+
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
 
-          old = "entries=[['home','الرئيسية'],['plan','الخطة'],['subscription','اشتراكي'],['tutors','مدرسون خصوصيون'],['menu','المزيد']]"
-          new = "entries=[['home','الرئيسية'],['plan','الخطة'],['schedule','جدولي الآن'],['subscription','اشتراكي'],['tutors','مدرسون خصوصيون'],['menu','المزيد']]"
-          if old in s:
-              s = s.replace(old, new, 1)
+          # Add the schedule tab to the mobile navigation wherever the
+          # navigation entries array is defined. Do not duplicate it.
+          m = re.search(r"entries\s*=\s*\[(.*?)\]", s, re.S)
+          if m and "'schedule'" not in m.group(1):
+              inner = m.group(1)
+              needle = "['plan','الخطة'],"
+              if needle in inner:
+                  inner = inner.replace(needle, needle + "['schedule','جدولي الآن'],", 1)
+                  s = s[:m.start(1)] + inner + s[m.end(1):]
 
-          old_css = 'grid-template-columns:1fr 1fr 1fr 1.25fr 1fr!important'
-          new_css = 'grid-template-columns:repeat(6,1fr)!important'
-          if old_css in s:
-              s = s.replace(old_css, new_css, 1)
+          # Keep six bottom-nav items on one row when the old five-column
+          # rule is present.
+          s = s.replace(
+              'grid-template-columns:1fr 1fr 1fr 1.25fr 1fr!important',
+              'grid-template-columns:repeat(6,1fr)!important',
+              1
+          )
 
           p.write_text(s, encoding='utf-8')
 
@@ -39,5 +53,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Fix جدولي الآن mobile tab'
+          git diff --cached --quiet || git commit -m 'apply requested promotion flow'
           git push
