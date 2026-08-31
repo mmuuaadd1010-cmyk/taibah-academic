@@ -2727,14 +2727,32 @@ function tgGateOk(){try{sessionStorage.setItem('tu_tg_gate','1');}catch(e){}var 
     </div>
 
     <!-- SCHEDULE -->
+        <!-- SCHEDULE -->
     <div class="tab-pane" id="p-schedule">
       <div class="card">
-        <div class="card-h">📅 جدولي الأسبوعي <span class="sub">عرض أسبوعي كامل بدون سحب — اضغط أي مادة لتعديلها</span></div>
+        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <span>📅 جدولي الأسبوعي <span class="sub">اضغط أي مادة لتعديلها</span></span>
+          <div class="sch-view-toggle" id="sch-view-toggle" style="display:flex;background:var(--s2);border:1px solid var(--bor);border-radius:10px;padding:3px;gap:2px">
+            <button type="button" onclick="setSchViewMode('cards')" id="sch-view-btn-cards" style="border:none;background:transparent;padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:800;color:var(--t2);cursor:pointer;font-family:inherit">🗂️ بطاقات</button>
+            <button type="button" onclick="setSchViewMode('grid')" id="sch-view-btn-grid" style="border:none;background:transparent;padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:800;color:var(--t2);cursor:pointer;font-family:inherit">📊 جدول</button>
+          </div>
+        </div>
         <div id="my-sch-banner"></div>
+        <div class="plnr-hero" id="sch-now-card" style="margin-bottom:14px;display:none">
+          <div class="plnr-next-lbl">⏳ جدولي الآن</div>
+          <div class="plnr-next-tt" id="sch-now-tt">جاري التحميل...</div>
+          <div class="plnr-next-cd" id="sch-now-cd">
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-d">–</div><div class="plnr-cd-l">يوم</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-h">–</div><div class="plnr-cd-l">ساعة</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-m">–</div><div class="plnr-cd-l">دقيقة</div></div>
+            <div class="plnr-cd-u"><div class="plnr-cd-v" id="sch-now-cd-s">–</div><div class="plnr-cd-l">ثانية</div></div>
+          </div>
+        </div>
         <div class="sch-view" id="schedule-grid-wrap"><div class="empty" style="padding:34px 14px"><span class="ei">📅</span>لا توجد مواد بعد — اضغط «➕ إضافة مادة» بالأسفل لإضافة محاضراتك</div></div>
-        <div class="sch-actions no-print"><button class="btn-add-goal" style="flex:1" onclick="openSchAdd()">إضافة مادة</button><button class="btn-ghost" style="flex:1" onclick="exportSchPDF()">طباعة / PDF</button><button class="btn-ghost" style="flex:1" onclick="exportSchImage()">حفظ كصورة</button></div>
+        <div class="sch-actions no-print"><button class="btn-add-goal" style="flex:1" onclick="openSchAdd()">إضافة مادة</button><button class="btn-add-goal" style="flex:1" onclick="tuaiPasteSchedule()">📋 لصق الجدول</button><button class="btn-ghost" style="flex:1" onclick="exportSchPDF()">طباعة / PDF</button><button class="btn-ghost" style="flex:1" onclick="exportSchImage()">حفظ كصورة</button></div>
       </div>
     </div>
+
 
     <!-- PLANNER -->
     <style id="plnr-css">
