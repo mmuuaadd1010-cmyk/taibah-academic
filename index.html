@@ -5330,7 +5330,22 @@ async function scfgEdAiUpdate(){
 }
 
 function closePlanImg(e){ if(e&&e.target&&e.target.id!=='plan-img-modal')return; var m=document.getElementById('plan-img-modal');if(m)m.classList.remove('on'); var mu=document.getElementById('pim-multi');if(mu){mu.innerHTML='';mu.style.display='none';} var im=document.getElementById('pim-img');if(im)im.style.display=''; var sdl=document.getElementById('pim-dl');if(sdl)sdl.style.display=''; if(sdl)sdl.setAttribute('download','TU-Academic-Plan.png'); var _hd=document.querySelector('#plan-img-modal .pim-head span');if(_hd)_hd.textContent='📷 صورة الخطة'; }
-function savePlan(){if(planData&&planData.specId){planStore[planData.specId]=planData;try{localStorage.setItem('tu_pro_plans',JSON.stringify(planStore));}catch(e){}}localStorage.setItem('tu_pro_plan',JSON.stringify(planData));}
+function savePlan(){
+  try{
+    /* إصلاح حفظ الخطة والدرجات: مصدر العرض هو currentPlan وليس planData فقط */
+    if(typeof currentPlan!=='undefined' && currentPlan){
+      planData=currentPlan;
+      if(currentPlan.specId){ planData.specId=currentPlan.specId; }
+    }
+    if(planData&&planData.specId){
+      planStore[planData.specId]=planData;
+      localStorage.setItem('tu_pro_plans',JSON.stringify(planStore));
+    }
+    localStorage.setItem('tu_pro_plan',JSON.stringify(planData));
+    localStorage.setItem('tu_pro_ts',String(Date.now()));
+    if(typeof scheduleCloudPush==='function') scheduleCloudPush();
+  }catch(e){ console.warn('savePlan',e); }
+}
 function pickAvatar(){var i=document.getElementById('avatar-file');if(i){i.value='';i.click();}}
 function removeAvatar(){student.avatar=null;saveSt();updateAvatarUI();toast('تمت إزالة الصورة');}
 function updateAvatarUI(){
@@ -6908,8 +6923,16 @@ async function promptNewPassword(){
 (function(){var tries=0;function retryAdmin(){tries++;try{if(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&typeof sbClient!=='undefined'&&sbClient&&typeof checkAdminStatus==='function')checkAdminStatus();}catch(e){}if(tries<5)setTimeout(retryAdmin,1200);}if(window.addEventListener)window.addEventListener('load',function(){setTimeout(retryAdmin,500);});setTimeout(retryAdmin,1800);})();
 async function authBoot(){
   try{
+    /* تأكيد استمرار الجلسة بعد إغلاق التطبيق */
+    try{
+      if(sbClient && sbClient.auth && sbClient.auth.setSession){}
+    }catch(_){}
     var s=await withTimeout(sbClient.auth.getSession(), 8000);
-    if(s && s.data && s.data.session && s.data.session.user){ CURRENT_USER=s.data.session.user; await afterLogin(); return; }
+    if(s && s.data && s.data.session && s.data.session.user){
+      CURRENT_USER=s.data.session.user;
+      await afterLogin();
+      return;
+    }
   }catch(e){}
   goAuthScreen('forms');
 }
