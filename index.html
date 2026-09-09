@@ -3841,10 +3841,10 @@ function reconcilePlan(spec, oldPlan){
   try{ if(oldPlan&&oldPlan.levels){ oldPlan.levels.forEach(function(lv){ if(!lv||!lv.summer)return; var ex=null; for(var i=0;i<fresh.levels.length;i++){ if(fresh.levels[i].level===lv.level){ex=fresh.levels[i];break;} } if(ex){ ex.summer=true; ex.name=lv.name; ex.order=lv.order; } else { fresh.levels.push(JSON.parse(JSON.stringify(lv))); } }); fresh.levels.forEach(function(l){ if(l.order==null)l.order=l.level; }); fresh.levels.sort(function(a,b){ return (a.order||0)-(b.order||0); }); } }catch(e){}
   return fresh;
 }
-function reconcileActivePlan(){try{if(typeof student==='undefined'||!student||!student.spec)return;if(typeof currentPlan==='undefined'||!currentPlan||currentPlan.specId!==student.spec)return;var sp=findSpec(student.spec);if(!sp)return;planData=reconcilePlan(sp,planStore[student.spec]);currentSpec=sp;savePlan();currentPlan=planData;try{if(typeof renderPlan==='function')renderPlan();}catch(e){}try{if(typeof renderHome==='function')renderHome();}catch(e){}}catch(e){}}
+function reconcileActivePlan(){try{if(typeof student==='undefined'||!student||!student.spec)return;if(typeof currentPlan==='undefined'||!currentPlan||currentPlan.specId!==student.spec)return;var sp=findSpec(student.spec);if(!sp)return;planData=reconcilePlan(sp,planStore[student.spec]);currentSpec=sp;currentPlan=planData;savePlan();try{if(typeof renderPlan==='function')renderPlan();}catch(e){}try{if(typeof renderHome==='function')renderHome();}catch(e){}}catch(e){}}
 
-function selectSpec(id){const spec=findSpec(id);if(!spec)return;student.spec=id;saveSt();window.SPEC_COLLEGE=null;currentSpec=spec;planData=reconcilePlan(spec,planStore[id]);savePlan();currentPlan=planData;try{if(typeof syncProfile==='function')syncProfile();}catch(e){}showScreen('s-app');initApp();}
-function loadApp(){currentSpec=findSpec(student.spec);if(!currentSpec){showScreen('s-spec');renderSpecs();return;}planData=reconcilePlan(currentSpec,planStore[student.spec]);savePlan();currentPlan=planData;showScreen('s-app');initApp();}
+function selectSpec(id){const spec=findSpec(id);if(!spec)return;student.spec=id;saveSt();window.SPEC_COLLEGE=null;currentSpec=spec;planData=reconcilePlan(spec,planStore[id]);currentPlan=planData;savePlan();try{if(typeof syncProfile==='function')syncProfile();}catch(e){}showScreen('s-app');initApp();}
+function loadApp(){currentSpec=findSpec(student.spec);if(!currentSpec){showScreen('s-spec');renderSpecs();return;}planData=reconcilePlan(currentSpec,planStore[student.spec]);currentPlan=planData;savePlan();showScreen('s-app');initApp();}
 function initApp(){applyUniversityUI();document.getElementById('nav-spec-pill').innerText=(UNIVERSITY_META[student.university].short+' · '+currentSpec.name)+' \u2039';if(student.name)document.getElementById('set-name').value=student.name;buildGradeScale();renderHome();renderPlan();renderGoals();renderSchedule();renderAchievements();renderGenCourses();buildOffdayPicker();tuLogVisit();try{tuRestoreView();}catch(e){}}
 function backToMajors(){
   try{
@@ -3922,7 +3922,7 @@ function tuBuildDrawer(){
 }
 function tuOpenDrawer(){ tuBuildDrawer(); var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.add('open'); if(o)o.classList.add('open'); }
 function tuCloseDrawer(){ var d=document.getElementById('tu-drawer'),o=document.getElementById('tu-drawer-ov'); if(d)d.classList.remove('open'); if(o)o.classList.remove('open'); }
-function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}var _app=document.getElementById('s-app');if(_app)_app.dataset.currentTab=id;document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}if(id==='planner'){plnrRender();}if(id==='subscription'){subInit();}if(id==='gen'){genGateCheck();}}
+function goTab(id,btn){try{localStorage.setItem('tu_view_tab',id);if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);}catch(e){}var _app=document.getElementById('s-app');if(_app)_app.dataset.currentTab=id;document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');if(btn)btn.classList.add('on');document.querySelector('.tab-body').scrollIntoView({block:'start'});if(id==='plan')renderPlan();if(id==='chart')renderCharts();if(id==='home')renderHome();if(id==='countdown')updateCountdown();if(id==='compare')buildCompare();if(id==='pomo')pomoInit();if(id==='roadmap')renderRoadmap();if(id==='abs'){try{absRender();}catch(e){}}if(id==='peers'){onPeersTab();var _pb=document.getElementById('peers-badge');if(_pb){_pb.textContent='';_pb.style.display='none';}}if(id==='admin'){onAdminTab();var _ab=document.getElementById('adm-badge');if(_ab){_ab.textContent='';_ab.style.display='none';}}if(id==='planner'){plnrRender();}if(id==='subscription'){subInit();}if(id==='gen'){genGateCheck();}}
 function tuSubActive(v){
   try{
     if(typeof IS_ADMIN!=='undefined'&&IS_ADMIN) return true;
@@ -3931,106 +3931,55 @@ function tuSubActive(v){
   }catch(e){ return false; }
 }
 
-async function genVerifySubscription(){
-  var gate=document.getElementById('gen-paywall');
-  var body=document.getElementById('gen-body-wrap');
-  var btn=document.getElementById('gen-sub-check-btn');
-  var msg=document.getElementById('gen-sub-check-msg');
-
-  try{
-    if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحقق...';}
-    if(msg)msg.textContent='';
-
-    var uid='';
-    try{uid=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.id)||'';}catch(e){}
-    if(!uid){
-      if(msg)msg.textContent='⚠️ لم يتم التعرف على جلسة الدخول. حدّث الصفحة بعد تسجيل الدخول.';
-      return false;
-    }
-    if(!sbClient)throw new Error('الاتصال بالخادم غير جاهز');
-
-    // أولًا: الاشتراك الطبيعي في user_subscriptions.
-    var q=await sbClient.from('user_subscriptions')
-      .select('plan_type,starts_at,expires_at,code')
-      .eq('user_id',uid)
-      .order('expires_at',{ascending:false})
-      .limit(1)
-      .maybeSingle();
-
-    if(q.error)throw q.error;
-
-    if(q.data && tuSubActive(q.data)){
-      try{subSaveLocal(q.data);subRender(q.data);}catch(e){}
-      gate.style.display='none'; body.style.display='';
-      if(msg)msg.textContent='✅ اشتراكك فعال وتم فتح مولّد الجداول.';
-      return true;
-    }
-
-    // استرجاع آمن للاشتراكات القديمة:
-    // بعض الأكواد القديمة قد تكون redeemed_by مرتبطة بالحساب
-    // لكن لم يُنشأ لها سجل في user_subscriptions.
-    var old=await sbClient.from('subscription_codes')
-      .select('code,plan_type,redeemed_at,disabled')
-      .eq('redeemed_by',uid)
-      .eq('disabled',false)
-      .order('redeemed_at',{ascending:false})
-      .limit(1)
-      .maybeSingle();
-
-    if(old.error)throw old.error;
-
-    if(old.data && old.data.redeemed_at){
-      var start=new Date(old.data.redeemed_at);
-      var end=new Date(start);
-      end.setMonth(end.getMonth()+(old.data.plan_type==='year'?12:5));
-
-      var recovered={
-        user_id:uid,
-        code:old.data.code,
-        plan_type:old.data.plan_type,
-        starts_at:start.toISOString(),
-        expires_at:end.toISOString()
-      };
-
-      if(tuSubActive(recovered)){
-        // إعادة بناء السجل المفقود حتى لا تتكرر المشكلة.
-        try{
-          var fix=await sbClient.from('user_subscriptions').upsert(recovered,{onConflict:'user_id'});
-          if(fix.error)console.warn('subscription recovery upsert:',fix.error);
-        }catch(e){}
-        try{subSaveLocal(recovered);subRender(recovered);}catch(e){}
-        gate.style.display='none'; body.style.display='';
-        if(msg)msg.textContent='✅ تم استرجاع اشتراكك السابق وفتح مولّد الجداول.';
-        return true;
-      }
-    }
-
-    gate.style.display='block'; body.style.display='none';
-    if(msg)msg.textContent='❌ لا يوجد اشتراك فعال لهذا الحساب.';
-    return false;
-
-  }catch(e){
-    console.error('genVerifySubscription:',e);
-    if(msg)msg.textContent='⚠️ تعذر التحقق من الاشتراك: '+(e.message||'خطأ غير معروف');
-    return false;
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent='🔄 تحقق من الاشتراك';}
-  }
+var genSubscriptionPending=null;
+function genSetAccess(active){
+  var gate=document.getElementById('gen-paywall'),body=document.getElementById('gen-body-wrap');
+  if(gate)gate.style.display=active?'none':'block';
+  if(body)body.style.display=active?'':'none';
 }
-
-async function genGateCheck(){
-  var gate=document.getElementById('gen-paywall'), body=document.getElementById('gen-body-wrap');
-  if(!gate||!body)return;
-  try{if(typeof subInit==='function')await subInit();}catch(e){}
-  // تحقق أولي سريع من النسخة المحلية/المخزّنة.
-  var active=tuSubActive();
-  gate.style.display=active?'none':'block';
-  body.style.display=active?'':'none';
-  if(active)return;
-  // إن لم يظهر الاشتراك مفعّلاً محليًا، نفّذ نفس الفحص الكامل الذي يستخدمه
-  // زر "تحقق من الاشتراك" (بما في ذلك استرجاع الأكواد القديمة من
-  // subscription_codes) حتى يُفتح القسم تلقائيًا لأي مشترك فعلي.
-  try{ await genVerifySubscription(); }catch(e){}
+async function genVerifySubscription(){
+  var uid=subUserId();
+  if(!uid||!sbClient){genSetAccess(false);return false;}
+  if(genSubscriptionPending&&genSubscriptionPending.uid===uid)return genSubscriptionPending.promise;
+  var task=(async function(){
+    var btn=document.getElementById('gen-sub-check-btn'),msg=document.getElementById('gen-sub-check-msg');
+    if(btn){btn.disabled=true;btn.textContent='جاري التحقق...';}
+    if(msg)msg.textContent='';
+    try{
+      var q=await withTimeout(sbClient.from('user_subscriptions').select('user_id,plan_type,starts_at,expires_at,code').eq('user_id',uid).order('expires_at',{ascending:false}).limit(1).maybeSingle(),15000);
+      if(q.error)throw q.error;
+      var record=q.data;
+      if(!record){
+        var old=await withTimeout(sbClient.from('subscription_codes').select('code,plan_type,redeemed_at,disabled,duration_months').eq('redeemed_by',uid).eq('disabled',false).order('redeemed_at',{ascending:false}),15000);
+        if(old.error)throw old.error;
+        (old.data||[]).forEach(function(row){
+          if(!row.redeemed_at)return;
+          var start=new Date(row.redeemed_at),end=new Date(start);
+          if(row.plan_type==='lifetime')end=new Date('2999-12-31T00:00:00Z');
+          else end.setMonth(end.getMonth()+(row.duration_months!=null?row.duration_months:(row.plan_type==='year'?12:5)));
+          if(!isFinite(end.getTime()))return;
+          if(!record||end>new Date(record.expires_at))record={user_id:uid,code:row.code,plan_type:row.plan_type,starts_at:start.toISOString(),expires_at:end.toISOString()};
+        });
+      }
+      // Do not apply a response belonging to an account that has signed out.
+      if(subUserId()!==uid)return false;
+      subSaveLocal(record);subRender(record);
+      var active=tuSubActive(record);genSetAccess(active);
+      if(msg)msg.textContent=active?'اشتراكك فعّال، تم فتح مولّد الجداول.':'لا يوجد اشتراك فعّال لهذا الحساب.';
+      return active;
+    }catch(e){
+      if(subUserId()!==uid)return false;
+      var cached=tuSubActive();genSetAccess(cached);
+      if(msg)msg.textContent='تعذّر الاتصال للتحقق من الاشتراك. أعد المحاولة.';
+      return cached;
+    }finally{if(btn){btn.disabled=false;btn.textContent='تحقق من الاشتراك';}}
+  })();
+  genSubscriptionPending={uid:uid,promise:task};
+  try{return await task;}finally{if(genSubscriptionPending&&genSubscriptionPending.promise===task)genSubscriptionPending=null;}
+}
+function genGateCheck(){
+  genSetAccess(tuSubActive());
+  return genVerifySubscription();
 }
 function genGoSub(){
   var items=document.querySelectorAll('.tab-item');
@@ -4104,6 +4053,13 @@ function planPromptSummer(){ if(!currentPlan){try{toast('اختر تخصصك أ�
 function planDelSummer(lv){ if(!currentPlan)return; if(!confirm('حذف هذا الترم الصيفي وكل مواده؟'))return; currentPlan.levels=currentPlan.levels.filter(function(l){ return l.level!==lv; }); savePlan(); renderPlan(); try{renderHome();}catch(e){} try{renderRoadmap();}catch(e){} }
 function planRenameSummer(lv){ if(!currentPlan)return; var l=currentPlan.levels.find(function(x){return x.level===lv;}); if(!l)return; var nm=prompt('اسم الترم الصيفي:', l.name||'ترم صيفي'); if(nm===null)return; l.name=(nm.trim()||'ترم صيفي'); savePlan(); renderPlan(); try{renderRoadmap();}catch(e){} }
 function renderPlan(){
+  if(!currentPlan||!Array.isArray(currentPlan.levels)){
+    var saved=student&&student.spec&&planStore[student.spec];
+    var spec=student&&student.spec&&findSpec(student.spec);
+    if(spec){currentSpec=spec;currentPlan=planData=reconcilePlan(spec,saved);}
+    else if(saved&&Array.isArray(saved.levels)){currentPlan=planData=saved;}
+    else{document.getElementById('plan-cnt').innerHTML='<div class="empty">اختر تخصصك لعرض الخطة الدراسية.</div>';return;}
+  }
   try{planPurgeDeleted();}catch(e){}
   try{planSortLevels();}catch(e){}
   const q=(document.getElementById('srch-box')?.value||'').toLowerCase();let h='';
@@ -4138,7 +4094,7 @@ function planToggleLevel(hdr){var blk=hdr.parentElement,body=hdr.nextElementSibl
     try{hdr.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}
   }else{try{localStorage.setItem('tu_view_level','');}catch(e){}}
 }
-function planApplyOpenState(){var want='';try{want=localStorage.getItem('tu_view_level')||'';}catch(e){}
+function planApplyOpenState(){if(TU_PLAN_EDIT){planExpandAll(true);return;}var want='';try{want=localStorage.getItem('tu_view_level')||'';}catch(e){}
   var blocks=document.querySelectorAll('#plan-cnt .lv-block');if(!blocks.length)return;
   var target=null;
   blocks.forEach(function(b){var bd=b.querySelector('.lv-body');if(bd)bd.style.display='none';b.classList.remove('open');
@@ -4217,7 +4173,7 @@ function planSyncEditUI(){
 function planToggleEdit(){
   if(TU_PLAN_EDIT){planSaveEdit();return;}
   try{TU_PLAN_SNAP=JSON.stringify(currentPlan);}catch(e){TU_PLAN_SNAP=null;}
-  TU_PLAN_EDIT=true;planSyncEditUI();
+  TU_PLAN_EDIT=true;filter='all';var search=document.getElementById('srch-box');if(search)search.value='';renderPlan();planSyncEditUI();
   try{planExpandAll(true);}catch(e){}
   toast('\u0648\u0636\u0639 \u0627\u0644\u062a\u0639\u062f\u064a\u0644 \u0645\u0641\u062a\u0648\u062d \u270f\ufe0f');
 }
@@ -6903,9 +6859,17 @@ function authBootEntry(){
     goAuthScreen('forms'); authMsg('جاري إعادة الاتصال بخدمة تسجيل الدخول...','');
     var sc=document.createElement('script');sc.src='https://unpkg.com/@supabase/supabase-js@2';sc.onload=function(){setTimeout(authBootEntry,50);};sc.onerror=function(){authMsg('تعذّر تحميل خدمة تسجيل الدخول. تحقق من الإنترنت ثم حدّث الصفحة.','err');};document.head.appendChild(sc);return;
   }
-  try{ sbClient=supabase.createClient(SB_URL, SB_KEY); }catch(e){ routeLocal(); return; }
+  try{ if(!sbClient) sbClient=supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); }catch(e){ routeLocal(); return; }
   try{ scfgLoad(); }catch(e){}
-  try{ sbClient.auth.onAuthStateChange(function(ev,sess){ if(ev==='PASSWORD_RECOVERY'){ promptNewPassword(); } }); }catch(e){}
+  try{ sbClient.auth.onAuthStateChange(function(ev,sess){
+    // Defer async work until Supabase releases its auth lock.
+    if(ev==='PASSWORD_RECOVERY'){setTimeout(promptNewPassword,0);return;}
+    if(ev==='SIGNED_OUT'){CURRENT_USER=null;subSaveLocal(null);goAuthScreen('forms');return;}
+    if(sess&&sess.user&&ev==='TOKEN_REFRESHED') CURRENT_USER=sess.user;
+    if(sess&&sess.user&&(ev==='SIGNED_IN'||ev==='INITIAL_SESSION')&&!CURRENT_USER){
+      setTimeout(function(){if(!CURRENT_USER)authBoot();},0);
+    }
+  }); }catch(e){}
   authBoot();
 }
 async function promptNewPassword(){
@@ -6921,21 +6885,36 @@ async function promptNewPassword(){
 }
 /* Developer panel reliability: retry the authoritative admin check after auth/profile data settles. */
 (function(){var tries=0;function retryAdmin(){tries++;try{if(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&typeof sbClient!=='undefined'&&sbClient&&typeof checkAdminStatus==='function')checkAdminStatus();}catch(e){}if(tries<5)setTimeout(retryAdmin,1200);}if(window.addEventListener)window.addEventListener('load',function(){setTimeout(retryAdmin,500);});setTimeout(retryAdmin,1800);})();
-async function authBoot(){
-  try{
-    /* تأكيد استمرار الجلسة بعد إغلاق التطبيق */
+var authBootPending=null;
+function authBoot(){
+  if(authBootPending)return authBootPending;
+  goAuthScreen('loading');
+  authBootPending=(async function(){
     try{
-      if(sbClient && sbClient.auth && sbClient.auth.setSession){}
-    }catch(_){}
-    var s=await withTimeout(sbClient.auth.getSession(), 8000);
-    if(s && s.data && s.data.session && s.data.session.user){
-      CURRENT_USER=s.data.session.user;
-      await afterLogin();
-      return;
+      // An expired access token is refreshed by getSession. A slow refresh
+      // must not be mistaken for a signed-out user.
+      var s=await sbClient.auth.getSession();
+      if(s&&s.error)throw s.error;
+      var session=s&&s.data&&s.data.session;
+      if(!session||!session.user){goAuthScreen('forms');return;}
+      CURRENT_USER=session.user;
+      try{await afterLogin();}catch(e){
+        console.error('Account restore:',e);
+        authMsg('تعذّر تحميل بياناتك. أعد المحاولة عند عودة الاتصال.','err');
+      }
+    }catch(e){
+      goAuthScreen('forms');
+      authMsg('تعذّر استعادة الجلسة مؤقتًا. تحقق من الاتصال ثم اضغط إعادة المحاولة.','err');
+      var host=document.getElementById('auth-forms');
+      if(host&&!document.getElementById('auth-session-retry')){
+        var retry=document.createElement('button');retry.id='auth-session-retry';retry.type='button';
+        retry.textContent='إعادة المحاولة';retry.onclick=authBoot;host.appendChild(retry);
+      }
     }
-  }catch(e){}
-  goAuthScreen('forms');
+  })().finally(function(){authBootPending=null;});
+  return authBootPending;
 }
+window.addEventListener('online',function(){if(sbClient&&!CURRENT_USER)authBoot();});
 window.onload=function(){
   try{ syncThemeBtn(); }catch(e){}
   authBootEntry();
@@ -7073,6 +7052,7 @@ async function saveProfile(){
   var _uEl=document.getElementById('pf-username'); if(_uEl&&!_uEl.readOnly)p.username=(_uEl.value||'').trim().replace(/^@/,'');
   p.bio=(document.getElementById('pf-bio').value||'').trim();
   p.level=parseInt(document.getElementById('pf-level').value,10)||null;
+  if(p.level){localStorage.setItem('tu_view_level',String(p.level));filter='all';var search=document.getElementById('srch-box');if(search)search.value='';renderPlan();}
   p.visible=document.getElementById('pf-visible').checked;
   p.help=document.getElementById('pf-help').checked;
   saveProfileLocal(p);
@@ -9162,12 +9142,12 @@ function plnrExportImage(){
 <script id="tu-subscription-export-fix-v11">
 (function(){'use strict';
 function subUserId(){try{return CURRENT_USER&&CURRENT_USER.id||'';}catch(e){return '';}}
-function subLocal(){try{return JSON.parse(localStorage.getItem('tu_subscription')||'null');}catch(e){return null;}}
-function subSaveLocal(v){try{localStorage.setItem('tu_subscription',JSON.stringify(v));}catch(e){}}
+function subLocal(){try{var v=JSON.parse(localStorage.getItem('tu_subscription')||'null'),uid=subUserId();return uid&&v&&v.user_id===uid?v:null;}catch(e){return null;}}
+function subSaveLocal(v){try{var uid=subUserId();if(v&&uid)v=Object.assign({},v,{user_id:uid});localStorage.setItem('tu_subscription',JSON.stringify(v));}catch(e){}}
 function subMsg(t,ok){var e=document.getElementById('sub-msg');if(!e)return;e.textContent=t;e.className='sub-msg '+(ok?'ok':'err');}
 function subFmt(d){try{return new Intl.DateTimeFormat('ar-SA',{dateStyle:'long'}).format(new Date(d));}catch(e){return d;}}
 function subRender(v){var chip=document.getElementById('sub-status-chip'),body=document.getElementById('sub-active-body');if(!chip||!body)return;var active=v&&v.expires_at&&new Date(v.expires_at)>new Date();chip.textContent=active?'مفعّل':'غير مفعّل';chip.classList.toggle('active',!!active);if(active){var label=v.plan_type==='year'?'12 شهرًا':'ترم كامل (5 أشهر)';body.innerHTML='<b style="color:var(--g)">✅ اشتراكك فعّال</b><div style="margin-top:8px">الباقة: <b>'+label+'</b><br>ينتهي في: <b>'+subFmt(v.expires_at)+'</b></div>';}else body.innerHTML='<b>لا يوجد اشتراك فعّال.</b><br>أدخل كودًا صالحًا لتفعيل باقتك.';}
-window.subInit=async function(){var ad=document.getElementById('sub-admin-card');try{if(ad)ad.hidden=!(typeof IS_ADMIN!=='undefined'&&IS_ADMIN);}catch(e){}var v=subLocal();subRender(v);var uid=subUserId();if(!uid||!sbClient)return;try{var q=await sbClient.from('user_subscriptions').select('plan_type,starts_at,expires_at,code').eq('user_id',uid).order('expires_at',{ascending:false}).limit(1).maybeSingle();if(q.data){subSaveLocal(q.data);subRender(q.data);}}catch(e){}
+window.subInit=async function(){var ad=document.getElementById('sub-admin-card');try{if(ad)ad.hidden=!(typeof IS_ADMIN!=='undefined'&&IS_ADMIN);}catch(e){}var v=subLocal();subRender(v);var uid=subUserId();if(!uid||!sbClient)return;try{var q=await sbClient.from('user_subscriptions').select('plan_type,starts_at,expires_at,code').eq('user_id',uid).order('expires_at',{ascending:false}).limit(1).maybeSingle();if(!q.error&&subUserId()===uid){subSaveLocal(q.data||null);subRender(q.data||null);}}catch(e){}
 };
 window.subRedeem=async function(){var inp=document.getElementById('sub-code-input'),btn=document.getElementById('sub-redeem-btn');var code=(inp&&inp.value||'').trim().toUpperCase();if(!/^TU-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code))return subMsg('تأكد من كتابة الكود كاملًا بالصيغة الصحيحة.',false);var uid=subUserId();if(!uid)return subMsg('سجّل الدخول أولًا لتفعيل الاشتراك.',false);if(!sbClient)return subMsg('تعذّر الاتصال بخدمة التفعيل.',false);btn.disabled=true;btn.textContent='جاري التفعيل...';try{var q=await sbClient.from('subscription_codes').select('*').eq('code',code).maybeSingle();if(q.error)throw q.error;var row=q.data;if(!row)return subMsg('الكود غير موجود.',false);if(row.redeemed_by)return subMsg('هذا الكود مستخدم مسبقًا.',false);if(row.disabled)return subMsg('هذا الكود موقوف.',false);var dm=(row.duration_months!=null?row.duration_months:(row.plan_type==='lifetime'?null:(row.plan_type==='year'?12:5))),start=new Date(),end;if(dm==null){end=new Date('2999-12-31T00:00:00Z');}else{end=new Date(start);end.setMonth(end.getMonth()+dm);}var up=await sbClient.from('subscription_codes').update({redeemed_by:uid,redeemed_at:start.toISOString()}).eq('id',row.id).is('redeemed_by',null).select();if(up.error||!up.data||!up.data.length)throw new Error('الكود استُخدم قبل لحظات');var rec={user_id:uid,code:code,plan_type:row.plan_type,starts_at:start.toISOString(),expires_at:end.toISOString()};var sv=await sbClient.from('user_subscriptions').upsert(rec,{onConflict:'user_id'});if(sv.error)throw sv.error;subSaveLocal(rec);subRender(rec);subMsg('تم تفعيل اشتراكك بنجاح 🎉',true);inp.value='';}catch(e){subMsg('تعذّر التفعيل: '+(e.message||'تحقق من الكود والمحاولة لاحقًا'),false);}finally{btn.disabled=false;btn.textContent='تفعيل';}};
 function subCode(){var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',parts=[];for(var p=0;p<3;p++){var x='';for(var i=0;i<4;i++)x+=chars[Math.floor(Math.random()*chars.length)];parts.push(x);}return 'TU-'+parts.join('-');}

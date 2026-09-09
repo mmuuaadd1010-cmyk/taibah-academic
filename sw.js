@@ -1,5 +1,5 @@
-/* TU Academic service worker — build 2026.09.01.university-plans */
-const CACHE_NAME = 'tu-academic-2026.09.01.university-plans';
+/* TU Academic service worker — build 2026.09.09.session-subscription-plan */
+const CACHE_NAME = 'tu-academic-2026.09.09.session-subscription-plan';
 
 self.addEventListener('install', () => self.skipWaiting());
 
