@@ -3,8 +3,11 @@ const html=fs.readFileSync('index.html','utf8');
 function section(a,b){return html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));}
 const elements=new Map(),store=new Map();
 function element(id){if(!elements.has(id))elements.set(id,{style:{},classList:{toggle(){},add(){},remove(){}},appendChild(){}});return elements.get(id);}
-const c={console,Date,Promise,JSON,Object,Array,isFinite,setTimeout,clearTimeout,CURRENT_USER:{id:'account-a'},IS_ADMIN:false,document:{getElementById:element,createElement:()=>({}),querySelectorAll:()=>[]},window:{addEventListener(){}},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},withTimeout:p=>p,subRender(){}};vm.createContext(c);
-vm.runInContext(section('function subUserId(){','function subMsg('),c);
+const c={console,Date,Promise,JSON,Object,Array,isFinite,setTimeout,clearTimeout,CURRENT_USER:{id:'account-a'},IS_ADMIN:false,document:{getElementById:element,createElement:()=>({}),querySelectorAll:()=>[]},window:{addEventListener(){}},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},withTimeout:p=>p,subRender(){}};c.window=c;c.addEventListener=()=>{};vm.createContext(c);
+const subscriptionScript=html.match(/<script id="tu-subscription-export-fix-v11">([\s\S]*?)<\/script>/)[1];
+vm.runInContext(subscriptionScript,c);
+for(const name of ['subUserId','subLocal','subSaveLocal','subRender'])assert.equal(typeof c[name],'function',name+' must be exported from the real subscription closure');
+c.subRender=()=>{};
 vm.runInContext(section('function tuSubActive(v){','function genGoSub(){'),c);
 function client(record,old=[]){return {from(table){let q={select(){return q},eq(){return q},order(){return q},limit(){return q},maybeSingle(){return Promise.resolve({data:record})},then(a,b){return Promise.resolve({data:old}).then(a,b)}};return q}}}
 (async()=>{
