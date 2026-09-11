@@ -1,7 +1,7 @@
 /* Daily analytics. All day boundaries and account IDs are assigned by the server. */
 (function(){
 'use strict';
-var report=null,loading=null,inflight=false,lastKey='',memoryVisitor=null,memorySession=null;
+var report=null,loading=null,inflight=false,lastKey='',memoryVisitor=null,memorySession=null,adminViewKey='';
 function read(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
 function write(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function uuid(){return crypto.randomUUID()}
@@ -28,7 +28,7 @@ function number(n){return Number(n||0).toLocaleString('ar-SA')}
 function escapeText(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function dashboard(){
  var host=document.getElementById('tu-visits-total-card');if(!host)return;
- if(!document.getElementById('tu-analytics-daily'))host.insertAdjacentHTML('afterend','<section id="tu-analytics-daily" style="margin:12px 0;padding:14px;background:var(--s2);border:1px solid var(--bor);border-radius:14px"><h3>الزوار يوم بيوم — آخر ٣٠ يوم</h3><p style="font-size:.78rem;color:var(--t2);line-height:1.8">بتوقيت السعودية. الحساب يُحسب مرة في اليوم عبر أجهزته. الزائر بدون حساب يُميّز حسب المتصفح؛ تسجيل دخوله في نفس اليوم يدمج الزيارة مع حسابه. الزيارة جلسة تنتهي بعد ٣٠ دقيقة دون نشاط. البيانات القديمة لم تكن تسجل هويات، لذلك لا يمكن تصحيحها بأثر رجعي.</p><div id="tu-analytics-status" role="status"></div><div style="overflow:auto"><table style="width:100%;text-align:right;border-collapse:collapse"><thead><tr><th>اليوم</th><th>الزوار المميزون*</th><th>حسابات</th><th>بدون حساب</th><th>جلسات زيارة</th></tr></thead><tbody id="tu-analytics-rows"></tbody></table></div><small>* مجموع الحسابات والمتصفحات غير المرتبطة بحساب؛ ليس قياسًا مؤكدًا لعدد الأشخاص.</small></section>');
+ if(!document.getElementById('tu-analytics-daily'))host.insertAdjacentHTML('afterend','<section id="tu-analytics-daily" style="margin:12px 0;padding:14px;background:var(--s2);border:1px solid var(--bor);border-radius:14px"><h3>الزوار يوم بيوم — آخر ٣٠ يوم</h3><p style="font-size:.78rem;color:var(--t2);line-height:1.8">بتوقيت السعودية. الحساب يُحسب مرة في اليوم عبر أجهزته. الزائر بدون حساب يُميّز حسب المتصفح؛ تسجيل دخوله في نفس اليوم يدمج الزيارة مع حسابه. الزيارة جلسة تنتهي بعد ٣٠ دقيقة دون نشاط. البيانات القديمة لم تكن تسجل هويات، لذلك لا يمكن تصحيحها بأثر رجعي.</p><button type="button" onclick="tuLoadVisits()" style="padding:8px 14px;background:var(--s3);color:var(--t);border:1px solid var(--bor);border-radius:8px">تحديث الإحصائيات</button><div id="tu-analytics-status" role="status" style="padding:8px 0"></div><div style="overflow:auto"><table style="width:100%;text-align:right;border-collapse:collapse"><thead><tr><th>اليوم</th><th>الزوار المميزون*</th><th>حسابات</th><th>بدون حساب</th><th>جلسات زيارة</th></tr></thead><tbody id="tu-analytics-rows"></tbody></table></div><small>* مجموع الحسابات والمتصفحات غير المرتبطة بحساب؛ ليس قياسًا مؤكدًا لعدد الأشخاص.</small></section>');
 }
 function render(){
  if(!report)return;dashboard();var today=report.days[0]||{};
@@ -42,9 +42,11 @@ function render(){
 }
 window.tuLoadVisits=function(){
  if(loading)return loading;
- if(typeof sbClient==='undefined'||!sbClient||typeof IS_ADMIN==='undefined'||!IS_ADMIN)return Promise.resolve();
- dashboard();text('tu-analytics-status','جارٍ تحميل الإحصائيات...');
- loading=(async function(){try{var r=await sbClient.rpc('tu_visit_report');if(r.error)throw r.error;report=r.data;render();}catch(e){text('tu-analytics-status','تعذّر تحميل الإحصائيات. اضغط تحديث للمحاولة مجددًا.');['tu-vis-today','tu-vis-uniq','tu-logins-today','tu-vis-total','tu-vis-total-uniq'].forEach(function(id){text(id,'—')})}finally{loading=null}})();return loading;
+ dashboard();
+ if(typeof sbClient==='undefined'||!sbClient){text('tu-analytics-status','خدمة الاتصال لم تجهز بعد. اضغط تحديث بعد لحظات.');return Promise.resolve();}
+ if(typeof CURRENT_USER==='undefined'||!CURRENT_USER){text('tu-analytics-status','سجّل الدخول بحساب المشرف لعرض الإحصائيات. فتح لوحة المطوّر محليًا لا يمنح صلاحية قراءة الحسابات.');['tu-vis-today','tu-vis-uniq','tu-logins-today','tu-vis-total','tu-vis-total-uniq'].forEach(function(id){text(id,'—')});return Promise.resolve();}
+ text('tu-analytics-status','جارٍ تحميل الإحصائيات...');
+ loading=(async function(){try{var controller=new AbortController(),timer=setTimeout(function(){controller.abort()},12000);var r;try{r=await sbClient.rpc('tu_visit_report').abortSignal(controller.signal)}finally{clearTimeout(timer)}if(r.error)throw r.error;if(!r.data||!Array.isArray(r.data.days))throw new Error('Invalid report');report=r.data;render();}catch(e){text('tu-analytics-status',(e.code==='42501'||e.code==='PGRST301')?'الحساب الحالي لا يملك صلاحية قراءة الإحصائيات. سجّل الدخول بحساب المشرف.':'تعذّر الاتصال بالإحصائيات. اضغط تحديث للمحاولة مجددًا.');['tu-vis-today','tu-vis-uniq','tu-logins-today','tu-vis-total','tu-vis-total-uniq'].forEach(function(id){text(id,'—')})}finally{loading=null}})();return loading;
 };
 window.tuLoadTotalVisits=window.tuLoadLogins=window.tuLoadLoginsList=window.admLoadAttendance=window.tuLoadVisits;
 window.admRenderAttendance=function(){
@@ -57,7 +59,13 @@ window.admRenderAttendance=function(){
  var hourly=typeof TU_ATT_MODE==='undefined'||TU_ATT_MODE==='hour',data=hourly?hours:daily.slice(0,7).reverse();
  TU_ATT_CHART=new Chart(cv,{type:'bar',data:{labels:data.map(function(d){return hourly?String(d.hour).padStart(2,'0'):d.day}),datasets:[{label:hourly?'أول دخول للحساب اليوم':'حسابات نشطة',data:data.map(function(d){return Number(d.accounts)}),backgroundColor:'#5b9dfd',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
 };
-function boot(){track(false);setInterval(function(){track(false)},15000);setInterval(function(){track(true);if(document.visibilityState!=='hidden'&&document.getElementById('p-admin')?.classList.contains('on'))window.tuLoadVisits()},60000)}
+function syncAdminView(){
+ var pane=document.getElementById('p-admin'),visible=!!(pane&&pane.classList.contains('on'));
+ var uid=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.id)||'';
+ var key=visible?'admin|'+uid:'';
+ if(key&&key!==adminViewKey){adminViewKey=key;window.tuLoadVisits()}else if(!key)adminViewKey='';
+}
+function boot(){syncAdminView();setInterval(syncAdminView,1500);track(false);setInterval(function(){track(false)},15000);setInterval(function(){track(true);if(document.visibilityState!=='hidden'&&document.getElementById('p-admin')?.classList.contains('on'))window.tuLoadVisits()},60000)}
 window.addEventListener('online',function(){track(true)});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')track(true)});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

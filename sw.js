@@ -1,5 +1,5 @@
-/* TU Academic service worker — build 2026.09.10.daily-analytics */
-const CACHE_NAME = 'tu-academic-2026.09.10.daily-analytics';
+/* TU Academic service worker — build 2026.09.11.analytics-loading */
+const CACHE_NAME = 'tu-academic-2026.09.11.analytics-loading';
 
 self.addEventListener('install', () => self.skipWaiting());
 
@@ -25,7 +25,7 @@ self.addEventListener('fetch', event => {
   if (/\/(rest|auth|functions|storage)\/v\d+\//.test(url.pathname)) return;
 
   // HTML/navigation is always network-first so GitHub Pages updates appear.
-  if (request.mode === 'navigate' || request.destination === 'document') {
+  if (request.mode === 'navigate' || request.destination === 'document' || url.pathname.endsWith('/visitor-analytics.js')) {
     event.respondWith((async () => {
       try {
         const fresh = await fetch(request, { cache: 'no-store' });
