@@ -47,6 +47,7 @@ begin
  from days x
  )
  select jsonb_build_object('today',d,'timezone','Asia/Riyadh','since',(select min(first_seen) from analytics_private.sessions),
+ 'legacy',jsonb_build_object('since',(select min(day) from public.visit_stats),'total_visits',(select coalesce(sum(visits),0) from public.visit_stats),'days',(select coalesce(jsonb_agg(to_jsonb(t) order by t.day desc),'[]'::jsonb) from (select day,visits,uniques from public.visit_stats) t)),
  'days',(select jsonb_agg(to_jsonb(t) order by t.day desc) from daily t),
  'total_visits',(select count(*) from analytics_private.sessions),
  'total_accounts',(select count(distinct user_id) from analytics_private.accounts),

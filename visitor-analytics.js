@@ -24,18 +24,34 @@ async function track(force){
  try{var r=await sbClient.rpc('tu_track_visit',{p_visitor:ids.visitor,p_session:ids.session});if(r.error)throw r.error;lastKey=key;}catch(e){console.warn('Visitor tracking temporarily unavailable');}finally{inflight=false;}
 }
 function text(id,v){var e=document.getElementById(id);if(e)e.textContent=v}
-function number(n){return Number(n||0).toLocaleString('ar-SA')}
+function number(n){return Number(n||0).toLocaleString('en-US')}
 function escapeText(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function dashboard(){
  var host=document.getElementById('tu-visits-total-card');if(!host)return;
- if(!document.getElementById('tu-analytics-daily'))host.insertAdjacentHTML('afterend','<section id="tu-analytics-daily" style="margin:12px 0;padding:14px;background:var(--s2);border:1px solid var(--bor);border-radius:14px"><h3>الزوار يوم بيوم — آخر ٣٠ يوم</h3><p style="font-size:.78rem;color:var(--t2);line-height:1.8">بتوقيت السعودية. الحساب يُحسب مرة في اليوم عبر أجهزته. الزائر بدون حساب يُميّز حسب المتصفح؛ تسجيل دخوله في نفس اليوم يدمج الزيارة مع حسابه. الزيارة جلسة تنتهي بعد ٣٠ دقيقة دون نشاط. البيانات القديمة لم تكن تسجل هويات، لذلك لا يمكن تصحيحها بأثر رجعي.</p><button type="button" onclick="tuLoadVisits()" style="padding:8px 14px;background:var(--s3);color:var(--t);border:1px solid var(--bor);border-radius:8px">تحديث الإحصائيات</button><div id="tu-analytics-status" role="status" style="padding:8px 0"></div><div style="overflow:auto"><table style="width:100%;text-align:right;border-collapse:collapse"><thead><tr><th>اليوم</th><th>الزوار المميزون*</th><th>حسابات</th><th>بدون حساب</th><th>جلسات زيارة</th></tr></thead><tbody id="tu-analytics-rows"></tbody></table></div><small>* مجموع الحسابات والمتصفحات غير المرتبطة بحساب؛ ليس قياسًا مؤكدًا لعدد الأشخاص.</small></section>');
+ if(!document.getElementById('tu-analytics-daily'))host.insertAdjacentHTML('afterend','<section id="tu-analytics-daily" style="margin:12px 0;padding:14px;background:var(--s2);border:1px solid var(--bor);border-radius:14px"><h3>الزوار يوم بيوم — آخر ٣٠ يوم</h3><p style="font-size:.78rem;color:var(--t2);line-height:1.8">بتوقيت السعودية. الحساب يُحسب مرة في اليوم عبر أجهزته. الزائر بدون حساب يُميّز حسب المتصفح؛ تسجيل دخوله في نفس اليوم يدمج الزيارة مع حسابه. الزيارة جلسة تنتهي بعد ٣٠ دقيقة دون نشاط. السجل السابق معروض في قسم مستقل أعلاه؛ تعداد الحسابات يبدأ من التتبع الجديد.</p><button type="button" onclick="tuLoadVisits()" style="padding:8px 14px;background:var(--s3);color:var(--t);border:1px solid var(--bor);border-radius:8px">تحديث الإحصائيات</button><div id="tu-analytics-status" role="status" style="padding:8px 0"></div><div style="overflow:auto"><table style="width:100%;text-align:right;border-collapse:collapse"><thead><tr><th>اليوم</th><th>الزوار المميزون*</th><th>حسابات</th><th>بدون حساب</th><th>جلسات زيارة</th></tr></thead><tbody id="tu-analytics-rows"></tbody></table></div><small>* مجموع الحسابات والمتصفحات غير المرتبطة بحساب؛ ليس قياسًا مؤكدًا لعدد الأشخاص.</small></section>');
 }
+function renderHistory(){
+ var legacy=report.legacy||{},days=legacy.days||[],anchor=document.getElementById('tu-analytics-daily');
+ if(!anchor)return;
+ var panel=document.getElementById('tu-analytics-history');
+ if(!panel){anchor.insertAdjacentHTML('beforebegin','<section id="tu-analytics-history" style="margin:12px 0;padding:14px;background:var(--s2);border:1px solid var(--bor);border-radius:14px"><h3>الإحصائيات السابقة — العداد القديم</h3><p id="tu-history-summary" style="font-weight:700"></p><p style="font-size:.78rem;color:var(--t2);line-height:1.7">هذه سجلات الزيارات السابقة كما حُفظت بتواريخ العداد القديم. الزيارات تشمل تحديث الصفحة، والزوار المختلفون تقدير حسب المتصفح لكل يوم. لا تتوفر أعداد الحسابات السابقة، ولا تُجمع هذه الأرقام مع جلسات التتبع الجديد.</p><label>عرض شهر: <select id="tu-history-month" onchange="tuRenderHistoryRows()" style="padding:7px;background:var(--s3);color:var(--t);border:1px solid var(--bor);border-radius:8px"></select></label><div style="overflow:auto;max-height:480px;margin-top:10px"><table style="width:100%;text-align:right;border-collapse:collapse"><thead><tr><th>اليوم</th><th>الزيارات المسجلة</th><th>زوار مختلفون — تقديري</th></tr></thead><tbody id="tu-history-rows"></tbody></table></div></section>');}
+ text('tu-history-summary',days.length?number(days.length)+' يومًا محفوظًا — من '+legacy.since+' — إجمالي الزيارات: '+number(legacy.total_visits):'لا توجد سجلات سابقة.');
+ var picker=document.getElementById('tu-history-month'),selected=picker.value;
+ var months=Array.from(new Set(days.map(function(d){return d.day.slice(0,7)})));
+ picker.innerHTML='<option value="">كل السجل السابق</option>'+months.map(function(m){return '<option value="'+escapeText(m)+'">'+escapeText(m)+'</option>'}).join('');if(months.indexOf(selected)!==-1)picker.value=selected;
+ window.tuRenderHistoryRows();
+}
+window.tuRenderHistoryRows=function(){
+ var box=document.getElementById('tu-history-rows');if(!box||!report)return;
+ var month=(document.getElementById('tu-history-month')||{}).value||'';
+ box.innerHTML=((report.legacy||{}).days||[]).filter(function(d){return !month||d.day.slice(0,7)===month}).map(function(d){return '<tr>'+[d.day,number(d.visits),number(d.uniques)].map(function(v){return '<td style="padding:10px;border-top:1px solid var(--bor)">'+escapeText(v)+'</td>'}).join('')+'</tr>'}).join('');
+};
 function render(){
- if(!report)return;dashboard();var today=report.days[0]||{};
+ if(!report)return;dashboard();renderHistory();var today=report.days[0]||{};
  text('tu-vis-today',number(today.visits));text('tu-vis-uniq',number(Number(today.accounts)+Number(today.anonymous)));text('tu-logins-today',number(today.accounts));
  text('tu-vis-total',number(report.total_visits));text('tu-vis-total-uniq',number(Number(report.total_accounts)+Number(report.total_anonymous)));text('tu-vis-since',report.since?new Intl.DateTimeFormat('ar-SA',{timeZone:'Asia/Riyadh',dateStyle:'medium'}).format(new Date(report.since)):'يبدأ من أول زيارة');
  text('tu-analytics-status','آخر تحديث: '+new Intl.DateTimeFormat('ar-SA',{timeZone:'Asia/Riyadh',timeStyle:'short'}).format(new Date()));
- var rows=document.getElementById('tu-analytics-rows');if(rows)rows.innerHTML=report.days.map(function(d){return '<tr>'+[d.day,number(Number(d.accounts)+Number(d.anonymous)),number(d.accounts),number(d.anonymous),number(d.visits)].map(function(v){return '<td style="padding:9px;border-top:1px solid var(--bor)">'+escapeText(v)+'</td>'}).join('')+'</tr>'}).join('');
+ var rows=document.getElementById('tu-analytics-rows');if(rows)rows.innerHTML=report.days.filter(function(d){return !report.since||d.day>=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Riyadh'}).format(new Date(report.since))}).map(function(d){return '<tr>'+[d.day,number(Number(d.accounts)+Number(d.anonymous)),number(d.accounts),number(d.anonymous),number(d.visits)].map(function(v){return '<td style="padding:9px;border-top:1px solid var(--bor)">'+escapeText(v)+'</td>'}).join('')+'</tr>'}).join('');
  var people=report.people||[],box=document.getElementById('tu-logins-list');text('tu-logins-meta','حسابات نشطة اليوم: '+number(today.accounts)+(Number(today.accounts)>200?' — أحدث ٢٠٠ حساب':''));
  if(box)box.innerHTML=people.map(function(p){return '<div style="padding:9px;border-bottom:1px solid var(--bor)">'+escapeText(p.name||p.username||'طالب')+' <small>'+escapeText(new Intl.DateTimeFormat('ar-SA',{timeZone:'Asia/Riyadh',timeStyle:'short'}).format(new Date(p.last_seen)))+'</small></div>'}).join('')||'لا توجد حسابات نشطة مسجلة اليوم.';
  window.admRenderAttendance();
