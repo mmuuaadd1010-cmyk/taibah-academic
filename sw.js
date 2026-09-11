@@ -1,5 +1,5 @@
-/* TU Academic service worker — build 2026.09.10.subscription-scope-tablet */
-const CACHE_NAME = 'tu-academic-2026.09.10.subscription-scope-tablet';
+/* TU Academic service worker — build 2026.09.10.daily-analytics */
+const CACHE_NAME = 'tu-academic-2026.09.10.daily-analytics';
 
 self.addEventListener('install', () => self.skipWaiting());
 
