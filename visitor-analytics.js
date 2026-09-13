@@ -85,3 +85,93 @@ function boot(){syncAdminView();setInterval(syncAdminView,1500);track(false);set
 window.addEventListener('online',function(){track(true)});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')track(true)});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
+
+/* Account switching recovery — keeps developer "login by email" on the target account. */
+(function(){
+'use strict';
+var readyUid='';
+function universityForSpec(specId){
+ if(!specId)return null;
+ var groups=[['taibah',typeof TAIBAH_SPECS!=='undefined'?TAIBAH_SPECS:[]],['imam',typeof IMAM_SPECS!=='undefined'?IMAM_SPECS:[]],['pnu',typeof PNU_SPECS!=='undefined'?PNU_SPECS:[]]];
+ for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i][1].length;j++)if((groups[i][1][j].entries||[]).some(function(s){return s.id===specId}))return groups[i][0];
+ return null;
+}
+function restoreState(){
+ student=JSON.parse(localStorage.getItem('tu_pro_st'))||{name:'',spec:null,university:null};
+ planStore=JSON.parse(localStorage.getItem('tu_pro_plans')||'null')||{};
+ planData=JSON.parse(localStorage.getItem('tu_pro_plan'))||null;
+ if(planData&&Array.isArray(planData.levels)){
+  var sid=planData.specId||student.spec;
+  if(sid&&!planStore[sid]){planData.specId=sid;planStore[sid]=planData;}
+  if(!student.spec&&sid)student.spec=sid;
+ }
+ if(!student.university&&student.spec)student.university=universityForSpec(student.spec);
+ goalsData=JSON.parse(localStorage.getItem('tu_pro_goals'))||[];
+ scheduleData=JSON.parse(localStorage.getItem('tu_pro_sch'))||{};
+ genData=JSON.parse(localStorage.getItem('tu_pro_gen'))||{courses:[],opts:{},offday:null};
+ pomoStats=JSON.parse(localStorage.getItem('tu_pro_pomo'))||{date:'',count:0,mins:0,total:0};
+ currentPlan=null;currentSpec=null;
+}
+reloadStateFromLS=restoreState;
+cloudPull=async function(){
+ if(!CURRENT_USER||!sbClient)throw new Error('no_session');
+ var uid=CURRENT_USER.id;readyUid='';PULLING=true;
+ if(_pushTimer){clearTimeout(_pushTimer);_pushTimer=null;}
+ try{
+  var sameUser=localStorage.getItem('tu_pro_uid')===uid;
+  var res=await withTimeout(sbClient.from('user_data').select('data,updated_at').eq('user_id',uid).maybeSingle(),12000);
+  if(res.error)throw res.error;
+  if(!CURRENT_USER||CURRENT_USER.id!==uid)throw new Error('account_changed');
+  var blob=res.data&&res.data.data;
+  var hasCloud=blob&&Object.keys(blob).some(function(k){return USER_DATA_KEYS.indexOf(k)>=0&&blob[k]!=null;});
+  var cloudTs=Number(blob&&blob.tu_pro_ts)||0,localTs=Number(localStorage.getItem('tu_pro_ts'))||0;
+  if(hasCloud&&(!sameUser||cloudTs>localTs)){
+   clearLocalUserData();
+   USER_DATA_KEYS.forEach(function(k){if(blob[k]!=null)_origSet(k,typeof blob[k]==='string'?blob[k]:JSON.stringify(blob[k]));});
+   _origSet('tu_pro_ts',String(cloudTs||Date.now()));
+  }else if(!sameUser){
+   // Never carry the developer's local grades into an empty target account.
+   clearLocalUserData();
+  }
+  var pr=await withTimeout(sbClient.from('profiles').select('username,name,avatar,bio,spec,level,available_to_help,visible').eq('user_id',uid).maybeSingle(),12000);
+  if(pr.error)throw pr.error;
+  if(!CURRENT_USER||CURRENT_USER.id!==uid)throw new Error('account_changed');
+  var st=JSON.parse(localStorage.getItem('tu_pro_st')||'null')||{},profile=pr.data;
+  if(profile){
+   if(!st.name)st.name=profile.name||'';
+   if(!st.spec)st.spec=profile.spec||null;
+   if(!st.avatar&&profile.avatar)st.avatar=profile.avatar;
+   if(!localStorage.getItem('tu_pro_profile'))_origSet('tu_pro_profile',JSON.stringify({username:profile.username||'',bio:profile.bio||'',level:profile.level,help:profile.available_to_help,visible:profile.visible}));
+  }
+  _origSet('tu_pro_st',JSON.stringify(st));_origSet('tu_pro_uid',uid);
+  restoreState();_origSet('tu_pro_st',JSON.stringify(student));
+  readyUid=uid;_pushPending=false;
+ }finally{PULLING=false;}
+};
+scheduleCloudPush=function(){
+ if(PULLING||!CURRENT_USER||readyUid!==CURRENT_USER.id)return;
+ _pushPending=true;if(_pushTimer)clearTimeout(_pushTimer);
+ _pushTimer=setTimeout(function(){cloudPush().catch(function(){toast('تعذّر حفظ التغييرات سحابيًا. تحقق من الاتصال وأعد المحاولة.');});},400);
+};
+cloudPush=async function(){
+ if(_pushTimer){clearTimeout(_pushTimer);_pushTimer=null;}
+ if(!CURRENT_USER||!sbClient)return;
+ var uid=CURRENT_USER.id;
+ if(PULLING||readyUid!==uid||localStorage.getItem('tu_pro_uid')!==uid)return;
+ var blob={};USER_DATA_KEYS.forEach(function(k){var v=localStorage.getItem(k);if(v!=null)blob[k]=v;});
+ blob.tu_pro_ts=localStorage.getItem('tu_pro_ts')||String(Date.now());
+ var res=await sbClient.from('user_data').upsert({user_id:uid,data:blob,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+ if(res.error){_pushPending=true;throw res.error;}
+ if(CURRENT_USER&&CURRENT_USER.id===uid&&localStorage.getItem('tu_pro_ts')===blob.tu_pro_ts)_pushPending=false;
+};
+flushCloudPushIfPending=function(){if(_pushPending)cloudPush().catch(function(){});};
+afterLogin=async function(){
+ await cloudPull();
+ try{if(!student.name){var md=CURRENT_USER&&CURRENT_USER.user_metadata,nm=md&&(md.full_name||md.name);if(nm){student.name=nm;saveSt();}}}catch(e){}
+ injectAccountUI();
+ try{syncProfile();}catch(e){}
+ try{subscribeInbox();}catch(e){}
+ try{checkAdminStatus();}catch(e){}
+ routeLocal();
+};
+})();
