@@ -1,4 +1,30 @@
 /* Daily analytics. All day boundaries and account IDs are assigned by the server. */
+/* National Day 96 campaign: visual promotion only; checkout remains on Salla. */
+(function(){
+ 'use strict';
+ var offerUrl='https://salla.sa/silvrcol/%D8%A7%D8%B4%D8%AA%D8%B1%D8%A7%D9%83-%D9%85%D8%AF%D9%89-%D8%A7%D9%84%D8%AD%D9%8A%D8%A7%D9%87-%D9%84%D9%83-%D8%B3%D9%86%D8%AA%D9%8A%D9%86-%D9%84%D8%AE%D9%88%D9%8A%D9%83/p1390590194';
+ function bootNationalOffer(){
+  if(document.getElementById('tu-national96'))return;
+  var style=document.createElement('style');
+  style.textContent='#tu-national96{box-sizing:border-box;width:min(440px,calc(100vw - 28px));max-height:calc(100dvh - 36px);overflow:auto;padding:0;border:1px solid #80cda066;border-radius:28px;background:#082c24;color:#fff;box-shadow:0 28px 100px #0009;font-family:inherit;text-align:center}#tu-national96::backdrop{background:#020b09c9;backdrop-filter:blur(7px)}#tu-national96 *{box-sizing:border-box}#tu-national96 .nd-body{padding:38px 26px 24px;position:relative;isolation:isolate;background:radial-gradient(ellipse at 50% 0,#1c795766,transparent 64%)}#tu-national96 .nd-close{position:absolute;top:12px;left:12px;background:#ffffff12;border:1px solid #ffffff30;color:#fff;width:36px;height:36px;border-radius:50%;font:24px sans-serif;cursor:pointer}#tu-national96 .nd-kicker{display:inline-block;color:#c9f8d9;font-size:12px;font-weight:700;letter-spacing:.4px;border:1px solid #91d3ab55;border-radius:99px;padding:8px 15px;margin:10px 0 18px}#tu-national96 .nd-96{font-size:64px;font-weight:900;line-height:1;color:#c7e9b5;letter-spacing:-4px;margin-bottom:12px}#tu-national96 h2{font-size:30px;line-height:1.4;margin:0 0 10px;color:#fff;font-weight:900}#tu-national96 .nd-sub{font-size:14px;color:#c0d9d0;line-height:1.8;margin:0 0 22px}#tu-national96 .nd-bundle{display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;gap:6px;margin-bottom:20px}#tu-national96 .nd-benefit{border:1px solid #b8e6ca33;background:#ffffff08;border-radius:18px;padding:17px 8px}#tu-national96 .nd-benefit small{display:block;color:#bdd8cd;font-size:12px;margin-bottom:7px}#tu-national96 .nd-benefit strong{font-size:22px;display:block;color:#fff}#tu-national96 .nd-plus{font-size:25px;color:#bce5a8}#tu-national96 .nd-limited{color:#e4edbc;font-size:12px;margin:0 0 12px}#tu-national96 .nd-cta{display:block;padding:16px 12px;border-radius:14px;background:#cee9b1;color:#10382b;font-size:17px;font-weight:900;text-decoration:none;box-shadow:0 6px 24px #b9e8a21a}#tu-national96 .nd-cta:hover{background:#e1f3cc}#tu-national96 .nd-note{font-size:11px;color:#a7c6b8;margin:12px 0 0;line-height:1.8}#tu-national96 .nd-later{display:block;margin:13px auto 0;padding:8px 14px;border:0;background:transparent;color:#c0d9d0;font:inherit;font-size:13px;cursor:pointer}#tu-national96 :focus-visible,#tu-national96-open:focus-visible{outline:3px solid #fff;outline-offset:3px}#tu-national96-open{position:fixed;inset-inline-end:14px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:900;background:#164c38;color:#e7f6ce;border:1px solid #b7db9666;padding:11px 17px;border-radius:99px;box-shadow:0 5px 20px #0004;font:inherit;font-weight:800;font-size:12px;cursor:pointer}#tu-national96-open[hidden]{display:none}@media(max-width:360px){#tu-national96 .nd-body{padding:32px 18px 20px}#tu-national96 h2{font-size:25px}}';
+  document.head.appendChild(style);
+  var modal=document.createElement('dialog');modal.id='tu-national96';modal.dir='rtl';modal.setAttribute('aria-labelledby','tu-nd-title');modal.setAttribute('aria-describedby','tu-nd-desc');
+  modal.innerHTML='<div class="nd-body"><button class="nd-close" type="button" aria-label="إغلاق العرض">×</button><div class="nd-kicker">بمناسبة اليوم الوطني السعودي</div><div class="nd-96" aria-label="96">96</div><h2 id="tu-nd-title">لك مدى الحياة.<br>ولخويك سنتين.</h2><p class="nd-sub" id="tu-nd-desc">احتفلوا سوا… واستفيدوا سوا.<br>عرض يجمع اشتراكك واشتراك خويك.</p><div class="nd-bundle"><div class="nd-benefit"><small>اشتراكك أنت</small><strong>مدى الحياة</strong></div><span class="nd-plus" aria-hidden="true">+</span><div class="nd-benefit"><small>اشتراك خويك</small><strong>سنتين</strong></div></div><p class="nd-limited">عرض اليوم الوطني 96 · لفترة محدودة</p><a class="nd-cta" target="_blank" rel="noopener noreferrer">خذ العرض لك ولخويك ←</a><p class="nd-note">اطّلع على السعر وتفاصيل العرض في متجرنا على سلة.</p><button class="nd-later" type="button">أكمل للموقع</button></div>';
+  modal.querySelector('.nd-cta').href=offerUrl;
+  var reopen=document.createElement('button');reopen.id='tu-national96-open';reopen.type='button';reopen.textContent='عرض اليوم الوطني 96';reopen.setAttribute('aria-haspopup','dialog');
+  document.body.appendChild(modal);document.body.appendChild(reopen);
+  function seen(){try{sessionStorage.setItem('tu_national96_seen','1')}catch(e){}}
+  function open(){if(modal.open)return;modal.showModal();reopen.hidden=true;seen();}
+  function close(){modal.close();}
+  modal.querySelector('.nd-close').onclick=close;modal.querySelector('.nd-later').onclick=close;
+  modal.addEventListener('close',function(){reopen.hidden=false;seen();});
+  modal.addEventListener('click',function(e){if(e.target===modal){var r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});
+  reopen.onclick=open;
+  var shown=false;try{shown=sessionStorage.getItem('tu_national96_seen')==='1'}catch(e){}
+  if(!shown)setTimeout(open,900);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootNationalOffer,{once:true});else bootNationalOffer();
+})();
 (function(){
 'use strict';
 var report=null,loading=null,inflight=false,lastKey='',memoryVisitor=null,memorySession=null,adminViewKey='';
