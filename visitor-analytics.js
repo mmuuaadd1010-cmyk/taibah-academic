@@ -13,20 +13,39 @@
   var price=document.createElement('div');price.style.cssText='margin:0 0 18px;color:#fff';
   price.innerHTML='<div style="font-size:12px;color:#c0d9d0;margin-bottom:5px">الاشتراكان معًا</div><div><strong style="font-size:44px;font-weight:900;line-height:1.2">96</strong> <span style="font-size:20px;font-weight:800;color:#cee9b1">ريال فقط</span></div>';
   modal.querySelector('.nd-limited').before(price);
+  var features=document.createElement('p');features.className='nd-features';
+  features.style.cssText='font-size:12px;line-height:1.9;color:#c0d9d0;margin:0 0 16px';
+  features.textContent='مولّد جداول ذكي · اختيار أيام الأوف · تجنّب تعارض المحاضرات';
+  price.before(features);
   modal.querySelector('.nd-cta').textContent='خذ العرض بـ 96 ريال ←';
   modal.querySelector('.nd-note').textContent='مدى الحياة لك + سنتين لخويك · تفاصيل العرض والشراء عبر سلة';
   modal.querySelector('.nd-cta').href=offerUrl;
   var reopen=document.createElement('button');reopen.id='tu-national96-open';reopen.type='button';reopen.textContent='عرض اليوم الوطني 96';reopen.setAttribute('aria-haspopup','dialog');
+  reopen.hidden=true;
   document.body.appendChild(modal);document.body.appendChild(reopen);
-  function seen(){try{sessionStorage.setItem('tu_national96_seen','1')}catch(e){}}
-  function open(){if(modal.open)return;modal.showModal();reopen.hidden=true;seen();}
+  var shownUsers=new Set(),activeUid='',timer=null;
+  function eligibleUid(){
+   var app=document.getElementById('s-app');
+   return typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.id&&app&&app.classList.contains('active')?CURRENT_USER.id:'';
+  }
+  function seen(){if(!activeUid)return;shownUsers.add(activeUid);try{sessionStorage.setItem('tu_national96_seen_'+activeUid,'1')}catch(e){}}
+  function open(){if(!eligibleUid()||eligibleUid()!==activeUid||modal.open)return;modal.showModal();reopen.hidden=true;seen();}
   function close(){modal.close();}
   modal.querySelector('.nd-close').onclick=close;modal.querySelector('.nd-later').onclick=close;
-  modal.addEventListener('close',function(){reopen.hidden=false;seen();});
+  modal.addEventListener('close',function(){reopen.hidden=!eligibleUid();});
   modal.addEventListener('click',function(e){if(e.target===modal){var r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});
   reopen.onclick=open;
-  var shown=false;try{shown=sessionStorage.getItem('tu_national96_seen')==='1'}catch(e){}
-  if(!shown)setTimeout(open,900);
+  function syncOfferAfterLogin(){
+   var uid=eligibleUid();
+   if(uid===activeUid)return;
+   if(timer){clearTimeout(timer);timer=null;}
+   if(modal.open)modal.close();
+   activeUid=uid;reopen.hidden=!uid;
+   if(!uid)return;
+   var shown=shownUsers.has(uid);try{shown=shown||sessionStorage.getItem('tu_national96_seen_'+uid)==='1'}catch(e){}
+   if(!shown)timer=setTimeout(open,900);
+  }
+  syncOfferAfterLogin();setInterval(syncOfferAfterLogin,500);
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootNationalOffer,{once:true});else bootNationalOffer();
 })();
