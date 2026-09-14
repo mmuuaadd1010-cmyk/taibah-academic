@@ -1,5 +1,5 @@
-/* TU Academic service worker — build 2026.09.11.analytics-history */
-const CACHE_NAME = 'tu-academic-2026.09.11.analytics-history';
+/* TU Academic service worker — build 2026.09.14.root-catalog */
+const CACHE_NAME = 'tu-academic-2026.09.14.root-catalog';
 
 self.addEventListener('install', () => self.skipWaiting());
 
