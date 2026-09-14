@@ -225,3 +225,14 @@ afterLogin=async function(){
  routeLocal();
 };
 })();
+
+/* Root full university catalogue loader — 2026-09-14 */
+(function(){
+  if(document.querySelector('script[data-root-academic-catalog]'))return;
+  var script=document.createElement('script');
+  script.src='./root-academic-catalog.js?v=20260914-1';
+  script.async=false;
+  script.dataset.rootAcademicCatalog='true';
+  script.onerror=function(){console.error('تعذر تحميل كتالوج الجامعات');};
+  document.head.appendChild(script);
+})();
