@@ -10,6 +10,11 @@
   document.head.appendChild(style);
   var modal=document.createElement('dialog');modal.id='tu-national96';modal.dir='rtl';modal.setAttribute('aria-labelledby','tu-nd-title');modal.setAttribute('aria-describedby','tu-nd-desc');
   modal.innerHTML='<div class="nd-body"><button class="nd-close" type="button" aria-label="إغلاق العرض">×</button><div class="nd-kicker">بمناسبة اليوم الوطني السعودي</div><div class="nd-96" aria-label="96">96</div><h2 id="tu-nd-title">لك مدى الحياة.<br>ولخويك سنتين.</h2><p class="nd-sub" id="tu-nd-desc">احتفلوا سوا… واستفيدوا سوا.<br>عرض يجمع اشتراكك واشتراك خويك.</p><div class="nd-bundle"><div class="nd-benefit"><small>اشتراكك أنت</small><strong>مدى الحياة</strong></div><span class="nd-plus" aria-hidden="true">+</span><div class="nd-benefit"><small>اشتراك خويك</small><strong>سنتين</strong></div></div><p class="nd-limited">عرض اليوم الوطني 96 · لفترة محدودة</p><a class="nd-cta" target="_blank" rel="noopener noreferrer">خذ العرض لك ولخويك ←</a><p class="nd-note">اطّلع على السعر وتفاصيل العرض في متجرنا على سلة.</p><button class="nd-later" type="button">أكمل للموقع</button></div>';
+  var price=document.createElement('div');price.style.cssText='margin:0 0 18px;color:#fff';
+  price.innerHTML='<div style="font-size:12px;color:#c0d9d0;margin-bottom:5px">الاشتراكان معًا</div><div><strong style="font-size:44px;font-weight:900;line-height:1.2">96</strong> <span style="font-size:20px;font-weight:800;color:#cee9b1">ريال فقط</span></div>';
+  modal.querySelector('.nd-limited').before(price);
+  modal.querySelector('.nd-cta').textContent='خذ العرض بـ 96 ريال ←';
+  modal.querySelector('.nd-note').textContent='مدى الحياة لك + سنتين لخويك · تفاصيل العرض والشراء عبر سلة';
   modal.querySelector('.nd-cta').href=offerUrl;
   var reopen=document.createElement('button');reopen.id='tu-national96-open';reopen.type='button';reopen.textContent='عرض اليوم الوطني 96';reopen.setAttribute('aria-haspopup','dialog');
   document.body.appendChild(modal);document.body.appendChild(reopen);
